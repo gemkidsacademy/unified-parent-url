@@ -1,0 +1,362 @@
+.homework-booking-page {
+  min-height: 100vh;
+  width: 100%;
+
+  background: #f5f2ff;
+
+  color: #29234f;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 28px 20px 40px;
+}
+
+
+/* =========================================
+   ACADEMY LOGO
+   ========================================= */
+
+.homework-academy-logo {
+  width: 100%;
+  max-width: 260px;
+
+  display: flex;
+  justify-content: center;
+
+  margin-bottom: 18px;
+}
+
+.homework-academy-logo img {
+  display: block;
+
+  width: 220px;
+  max-width: 100%;
+  height: auto;
+
+  object-fit: contain;
+}
+
+
+/* =========================================
+   MAIN CARD
+   ========================================= */
+
+.homework-booking-card {
+  width: 100%;
+  max-width: 560px;
+
+  background: #ffffff;
+
+  border-radius: 24px;
+
+  padding: 28px 32px 32px;
+
+  box-sizing: border-box;
+
+  box-shadow: 0 8px 30px rgba(70, 35, 150, 0.10);
+}
+
+
+/* =========================================
+   BACK BUTTON
+   ========================================= */
+
+.homework-back-button {
+  border: none;
+
+  background: transparent;
+
+  padding: 0;
+
+  color: #5425aa;
+
+  font-family: inherit;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.homework-back-button:hover {
+  text-decoration: underline;
+}
+
+
+/* =========================================
+   TITLE
+   ========================================= */
+
+.homework-title-section {
+  margin-top: 24px;
+
+  text-align: center;
+}
+
+.homework-title-section h1 {
+  margin: 0;
+
+  font-size: 28px;
+  line-height: 1.25;
+
+  font-weight: 700;
+
+  color: #30206d;
+}
+
+.homework-title-section p {
+  margin: 8px 0 0;
+
+  font-size: 15px;
+
+  color: #625d73;
+}
+
+
+/* =========================================
+   SESSION INFORMATION
+   ========================================= */
+
+.homework-session-info {
+  margin-top: 28px;
+
+  padding: 20px;
+
+  background: #f8f6ff;
+
+  border: 1px solid #ebe6fa;
+
+  border-radius: 16px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+.homework-info-row {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.homework-info-label {
+  display: block;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.04em;
+
+  color: #77718a;
+}
+
+.homework-info-row strong {
+  display: block;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  color: #302b49;
+}
+
+.homework-info-row .student-name {
+  color: #5425aa;
+}
+
+
+/* =========================================
+   ATTENDANCE
+   ========================================= */
+
+.homework-attendance-section {
+  margin-top: 30px;
+
+  text-align: center;
+}
+
+.homework-attendance-section h2 {
+  margin: 0;
+
+  font-size: 20px;
+
+  line-height: 1.4;
+
+  font-weight: 700;
+
+  color: #30206d;
+}
+
+.attendance-subtitle {
+  margin: 8px 0 22px;
+
+  font-size: 14px;
+
+  color: #696379;
+}
+
+
+/* =========================================
+   BUTTONS
+   ========================================= */
+
+.homework-actions {
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.homework-attend-button,
+.homework-not-attend-button {
+  width: 100%;
+
+  min-height: 52px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  padding: 0 20px;
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.homework-attend-button {
+  background: #2864e8;
+}
+
+.homework-not-attend-button {
+  background: #147f78;
+}
+
+.homework-attend-button:hover,
+.homework-not-attend-button:hover {
+  transform: translateY(-1px);
+
+  box-shadow: 0 5px 14px rgba(30, 30, 60, 0.15);
+}
+
+.button-arrow {
+  font-size: 22px;
+
+  font-weight: 400;
+}
+
+
+/* =========================================
+   EXISTING RESPONSE
+   ========================================= */
+
+.homework-existing-response {
+  display: block;
+
+  margin: 18px auto 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: #4169d8;
+
+  font-family: inherit;
+
+  font-size: 13px;
+
+  cursor: pointer;
+}
+
+.homework-existing-response:hover {
+  text-decoration: underline;
+}
+
+
+/* =========================================
+   FOOTER MESSAGE
+   ========================================= */
+
+.homework-footer-message {
+  margin: 18px 0 0;
+
+  text-align: center;
+
+  font-size: 12px;
+
+  color: #77718a;
+}
+
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 600px) {
+
+  .homework-booking-page {
+    padding: 20px 14px 30px;
+  }
+
+  .homework-academy-logo {
+    margin-bottom: 14px;
+  }
+
+  .homework-academy-logo img {
+    width: 190px;
+  }
+
+  .homework-booking-card {
+    padding: 24px 20px 28px;
+
+    border-radius: 20px;
+  }
+
+  .homework-title-section {
+    margin-top: 20px;
+  }
+
+  .homework-title-section h1 {
+    font-size: 24px;
+  }
+
+  .homework-session-info {
+    padding: 17px;
+
+    gap: 16px;
+  }
+
+  .homework-attendance-section h2 {
+    font-size: 18px;
+  }
+
+  .homework-attend-button,
+  .homework-not-attend-button {
+    min-height: 50px;
+
+    font-size: 14px;
+  }
+}

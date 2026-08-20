@@ -1,17 +1,60 @@
 import { useState } from "react";
+import { API_BASE_URL } from "../config/api";
 import "./EmailLogin.css";
 
-function EmailLogin() {
+function EmailLogin({ onLoginSuccess }) {
   const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleContinue = (event) => {
+  const handleContinue = async (event) => {
     event.preventDefault();
 
-    if (!email.trim()) {
+    if (isLoading) {
       return;
     }
 
-    console.log("Registered email:", email);
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail) {
+      setError("Please enter your registered email.");
+      return;
+    }
+
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/parent/dashboard-access`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: trimmedEmail }),
+        },
+      );
+
+      if (response.status === 404) {
+        setError("We couldn't find an active student account for this email.");
+        return;
+      }
+
+      if (!response.ok) {
+        setError("Unable to connect to the server. Please try again.");
+        return;
+      }
+
+      const data = await response.json();
+      console.log("Parent dashboard access:", data);
+
+      onLoginSuccess(data);
+    } catch {
+      setError("Unable to connect to the server. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -103,11 +146,18 @@ function EmailLogin() {
 
           </div>
 
+          {error && (
+            <p className="email-error" role="alert">
+              {error}
+            </p>
+          )}
+
           <button
             type="submit"
             className="continue-button"
+            disabled={isLoading}
           >
-            <span>Continue</span>
+            <span>{isLoading ? "Checking..." : "Continue"}</span>
             <span className="arrow">→</span>
           </button>
 

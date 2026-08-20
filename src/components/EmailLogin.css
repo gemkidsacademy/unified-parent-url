@@ -40,8 +40,6 @@ body,
   height: auto;
 
   margin: 0;
-
-  object-fit: cover;
 }
 
 
@@ -205,6 +203,15 @@ body,
 
 .email-input-wrapper input::placeholder {
   color: #858292;
+}
+
+.email-error {
+  margin: 8px 0 0;
+
+  font-size: 14px;
+  line-height: 1.4;
+
+  color: #b42318;
 }
 
 

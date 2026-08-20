@@ -1,0 +1,603 @@
+.parent-dashboard {
+  min-height: 100vh;
+  width: 100%;
+
+  background: #ffffff;
+
+  color: #29234f;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================================
+   HEADER
+   ========================================= */
+
+.dashboard-header {
+  width: 100%;
+
+  background: linear-gradient(
+    110deg,
+    #402080 0%,
+    #4b2498 50%,
+    #382078 100%
+  );
+
+  color: #ffffff;
+}
+
+.dashboard-header-inner {
+  width: 100%;
+  max-width: 1200px;
+
+  min-height: 130px;
+
+  margin: 0 auto;
+
+  padding: 12px 28px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  box-sizing: border-box;
+}
+
+/* Brand */
+
+.academy-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  min-width: 260px;
+  min-height: 110px;
+
+  background: #f5f7fa;
+
+  border-radius: 12px;
+
+  padding: 8px 18px;
+
+  box-sizing: border-box;
+}
+
+.academy-logo {
+  display: block;
+
+  width: 190px;
+  height: auto;
+
+  object-fit: contain;
+}
+
+/* Account */
+
+.student-account {
+  display: flex;
+  align-items: center;
+
+  gap: 14px;
+}
+
+.account-info {
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.account-info strong {
+  font-size: 18px;
+}
+
+.account-info span {
+  font-size: 14px;
+  opacity: 0.95;
+}
+
+.account-chevron {
+  border: none;
+  background: transparent;
+
+  color: #ffffff;
+
+  font-size: 26px;
+
+  cursor: pointer;
+}
+
+.header-divider {
+  width: 1px;
+  height: 46px;
+
+  background: rgba(255, 255, 255, 0.35);
+
+  margin: 0 4px;
+}
+
+.logout-button {
+  border: none;
+  background: transparent;
+
+  color: #ffffff;
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  font-size: 15px;
+
+  cursor: pointer;
+}
+
+.logout-icon {
+  font-size: 24px;
+}
+
+
+/* =========================================
+   MAIN
+   ========================================= */
+
+.dashboard-main {
+  width: 100%;
+  max-width: 1200px;
+
+  margin: 0 auto;
+
+  padding: 34px 28px 28px;
+
+  box-sizing: border-box;
+
+  flex: 1;
+}
+
+/* Welcome */
+
+.dashboard-welcome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  margin-bottom: 30px;
+}
+
+.welcome-left {
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+}
+
+.welcome-wave {
+  font-size: 43px;
+}
+
+.dashboard-welcome h1 {
+  margin: 0;
+
+  font-size: 28px;
+  line-height: 1.2;
+
+  color: #30206d;
+}
+
+.dashboard-welcome p {
+  margin: 6px 0 0;
+
+  font-size: 17px;
+
+  color: #57526d;
+}
+
+.welcome-star {
+  font-size: 60px;
+
+  color: #f5bc20;
+
+  line-height: 1;
+}
+
+
+/* =========================================
+   TOOL GRID
+   ========================================= */
+
+.tool-grid {
+  display: grid;
+
+  grid-template-columns: repeat(2, 1fr);
+
+  gap: 22px;
+}
+
+.tool-card {
+  min-height: 330px;
+
+  border-radius: 18px;
+
+  border: 1px solid rgba(50, 40, 90, 0.08);
+
+  padding: 22px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  text-align: center;
+
+  box-shadow: 0 4px 12px rgba(30, 25, 70, 0.06);
+}
+
+.chatbot-card {
+  background: #fbf9ff;
+}
+
+.quiz-card {
+  background: #f5fcf7;
+}
+
+.exam-card {
+  background: #fff9f2;
+}
+
+.homework-card {
+  background: #f5f9ff;
+}
+
+
+/* Images / placeholders */
+
+.tool-image {
+  width: 145px;
+  height: 125px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 72px;
+
+  margin-bottom: 10px;
+}
+
+.chatbot-image {
+  background: #eee8ff;
+}
+
+.quiz-image {
+  background: #ddf5df;
+}
+
+.exam-image {
+  background: #ffecd8;
+}
+
+.homework-image {
+  background: #e0efff;
+}
+
+
+/* Card text */
+
+.tool-card h2 {
+  margin: 0 0 8px;
+
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.chatbot-card h2 {
+  color: #5a27ad;
+}
+
+.quiz-card h2 {
+  color: #218b4d;
+}
+
+.exam-card h2 {
+  color: #e87b16;
+}
+
+.homework-card h2 {
+  color: #1769c4;
+}
+
+.tool-card p {
+  margin: 0;
+
+  min-height: 68px;
+
+  font-size: 15px;
+  line-height: 1.5;
+
+  color: #48435c;
+}
+
+
+/* Buttons */
+
+.tool-button {
+  width: 185px;
+  height: 42px;
+
+  border: none;
+  border-radius: 22px;
+
+  margin-top: auto;
+
+  padding: 0 18px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.tool-button:hover {
+  transform: translateY(-1px);
+
+  box-shadow: 0 5px 12px rgba(30, 30, 60, 0.15);
+}
+
+.purple-button {
+  background: #5a20b7;
+}
+
+.green-button {
+  background: #16994b;
+}
+
+.orange-button {
+  background: #f28718;
+}
+
+.blue-button {
+  background: #176fd4;
+}
+
+
+/* =========================================
+   MESSAGE
+   ========================================= */
+
+.dashboard-message {
+  margin-top: 24px;
+
+  min-height: 76px;
+
+  border-radius: 14px;
+
+  background: #f7f2ff;
+
+  padding: 15px 22px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 16px;
+
+  box-sizing: border-box;
+}
+
+.message-icon {
+  font-size: 30px;
+}
+
+.dashboard-message strong {
+  display: block;
+
+  color: #30206d;
+
+  font-size: 15px;
+}
+
+.dashboard-message p {
+  margin: 4px 0 0;
+
+  color: #56506a;
+
+  font-size: 14px;
+}
+
+
+/* =========================================
+   FOOTER
+   ========================================= */
+
+.dashboard-footer {
+  width: 100%;
+
+  background: #3f207e;
+
+  color: #ffffff;
+}
+
+.footer-inner {
+  max-width: 1200px;
+
+  min-height: 58px;
+
+  margin: 0 auto;
+
+  padding: 0 28px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-left,
+.footer-privacy {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  font-size: 13px;
+}
+
+.footer-left a,
+.footer-privacy a {
+  color: #ffffff;
+
+  text-decoration: underline;
+}
+
+.footer-divider {
+  width: 1px;
+  height: 26px;
+
+  background: rgba(255, 255, 255, 0.35);
+
+  margin-left: auto;
+  margin-right: 22px;
+}
+
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 800px) {
+
+  .dashboard-header-inner {
+    padding: 12px 18px;
+  }
+
+  .academy-brand {
+    min-width: auto;
+    min-height: 90px;
+    padding: 6px 12px;
+  }
+
+  .academy-logo {
+    width: 150px;
+  }
+
+  .account-info strong {
+    font-size: 15px;
+  }
+
+  .account-info span {
+    font-size: 12px;
+  }
+
+  .logout-button {
+    font-size: 13px;
+  }
+
+  .dashboard-main {
+    padding: 25px 18px;
+  }
+
+  .tool-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-welcome h1 {
+    font-size: 24px;
+  }
+
+  .welcome-star {
+    font-size: 45px;
+  }
+}
+
+
+@media (max-width: 560px) {
+
+  .dashboard-header-inner {
+    min-height: 105px;
+
+    padding: 10px 14px;
+  }
+
+  .student-account {
+    gap: 7px;
+  }
+
+  .account-info {
+    max-width: 125px;
+  }
+
+  .account-info strong,
+  .account-info span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-divider {
+    height: 35px;
+  }
+
+  .logout-button {
+    font-size: 0;
+  }
+
+  .logout-icon {
+    font-size: 25px;
+  }
+
+  .dashboard-welcome {
+    align-items: flex-start;
+  }
+
+  .welcome-left {
+    gap: 10px;
+  }
+
+  .welcome-wave {
+    font-size: 34px;
+  }
+
+  .dashboard-welcome h1 {
+    font-size: 21px;
+  }
+
+  .dashboard-welcome p {
+    font-size: 14px;
+  }
+
+  .welcome-star {
+    font-size: 38px;
+  }
+
+  .tool-card {
+    min-height: 320px;
+  }
+
+  .footer-inner {
+    padding: 14px;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+  }
+
+  .footer-divider {
+    display: none;
+  }
+}
