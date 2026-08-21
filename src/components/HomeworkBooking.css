@@ -297,6 +297,366 @@
 
 
 /* =========================================
+   LOADING & ERROR STATES
+   ========================================= */
+
+.homework-loading,
+.homework-error {
+  text-align: center;
+
+  padding: 40px 20px;
+}
+
+.homework-loading p,
+.homework-error p {
+  margin: 0;
+
+  font-size: 16px;
+
+  color: #302b49;
+}
+
+.homework-error {
+  background: #fee;
+
+  border-radius: 12px;
+
+  border: 1px solid #fcc;
+}
+
+.homework-error p {
+  color: #c33;
+}
+
+
+/* =========================================
+   TIME SLOTS SECTION
+   ========================================= */
+
+.homework-time-slots-section {
+  margin-top: 30px;
+}
+
+.homework-time-slots-section h2 {
+  margin: 0 0 20px;
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  color: #30206d;
+
+  text-align: center;
+}
+
+.homework-time-slots-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 12px;
+
+  margin-bottom: 24px;
+}
+
+.homework-time-slot-button {
+  width: 100%;
+
+  min-height: 64px;
+
+  border: 2px solid #ebe6fa;
+
+  border-radius: 12px;
+
+  padding: 14px 16px;
+
+  background: #ffffff;
+
+  cursor: pointer;
+
+  font-family: inherit;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+
+  gap: 6px;
+
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.homework-time-slot-button:hover:not(.disabled) {
+  border-color: #5425aa;
+
+  box-shadow: 0 4px 12px rgba(84, 37, 170, 0.12);
+}
+
+.homework-time-slot-button.selected {
+  border-color: #2864e8;
+
+  background: #f0f5ff;
+
+  box-shadow: 0 4px 12px rgba(40, 100, 232, 0.15);
+}
+
+.homework-time-slot-button.disabled {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+
+  border-color: #ccc;
+
+  background: #f9f9f9;
+}
+
+.slot-time {
+  font-size: 15px;
+
+  font-weight: 700;
+
+  color: #302b49;
+}
+
+.slot-capacity {
+  font-size: 12px;
+
+  color: #77718a;
+}
+
+.homework-time-slot-button.disabled .slot-capacity {
+  color: #999;
+}
+
+
+/* =========================================
+   CONFIRM BOOKING
+   ========================================= */
+
+.homework-confirm-booking {
+  margin-top: 24px;
+}
+
+.homework-confirm-button {
+  width: 100%;
+
+  min-height: 52px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  padding: 0 20px;
+
+  background: #2864e8;
+
+  color: #ffffff;
+
+  font-family: inherit;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.homework-confirm-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+
+  box-shadow: 0 5px 14px rgba(30, 30, 60, 0.15);
+}
+
+.homework-confirm-button:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================
+   RESPONSE CONFIRMATION
+   ========================================= */
+
+.homework-response-confirmation {
+  margin-top: 30px;
+}
+
+.confirmation-header {
+  text-align: center;
+
+  margin-bottom: 24px;
+}
+
+.confirmation-header h2 {
+  margin: 0;
+
+  font-size: 24px;
+
+  font-weight: 700;
+
+  color: #30206d;
+}
+
+.confirmation-message {
+  background: #f8f6ff;
+
+  border: 1px solid #ebe6fa;
+
+  border-radius: 12px;
+
+  padding: 20px;
+
+  margin-bottom: 24px;
+
+  text-align: center;
+}
+
+.confirmation-message p {
+  margin: 0 0 12px;
+
+  font-size: 15px;
+
+  color: #302b49;
+
+  line-height: 1.6;
+}
+
+.confirmation-message p:last-child {
+  margin-bottom: 0;
+}
+
+.confirmation-message .thank-you {
+  font-size: 16px;
+
+  font-weight: 600;
+
+  color: #147f78;
+}
+
+.confirmation-message .submission-status {
+  font-size: 14px;
+
+  font-weight: 600;
+
+  color: #2864e8;
+}
+
+.confirmation-details {
+  background: #f8f6ff;
+
+  border: 1px solid #ebe6fa;
+
+  border-radius: 12px;
+
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 16px;
+
+  margin-bottom: 24px;
+}
+
+.confirmation-details .homework-info-row {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.confirmation-details .homework-info-label {
+  font-size: 12px;
+
+  font-weight: 600;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.04em;
+
+  color: #77718a;
+}
+
+.confirmation-details strong {
+  font-size: 15px;
+
+  font-weight: 600;
+
+  color: #302b49;
+}
+
+.confirmation-actions {
+  text-align: center;
+}
+
+.homework-back-link {
+  border: none;
+
+  background: transparent;
+
+  padding: 0;
+
+  color: #5425aa;
+
+  font-family: inherit;
+
+  font-size: 14px;
+
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.homework-back-link:hover {
+  text-decoration: underline;
+}
+
+.homework-no-slots {
+  text-align: center;
+
+  padding: 40px 20px;
+
+  background: #f8f6ff;
+
+  border-radius: 12px;
+
+  margin-top: 30px;
+}
+
+.homework-no-slots p {
+  margin: 0 0 20px;
+
+  font-size: 15px;
+
+  color: #302b49;
+}
+
+
+/* =========================================
+   BUTTON DISABLED STATE
+   ========================================= */
+
+.homework-attend-button:disabled,
+.homework-not-attend-button:disabled {
+  opacity: 0.6;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================
    FOOTER MESSAGE
    ========================================= */
 

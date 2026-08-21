@@ -1,15 +1,210 @@
+import { useEffect, useState } from "react";
 import "./HomeworkBooking.css";
+import { API_BASE_URL } from "../config/api";
 
 function HomeworkBooking({ parentData, onBack }) {
-  const student = parentData?.students?.[0];
+  // Main data state
+  const [bookingData, setBookingData] = useState(null);
+  const [loadingDashboard, setLoadingDashboard] = useState(true);
+  const [error, setError] = useState(null);
 
-  const studentName = student?.name || "Student";
+  // Flow state
+  const [flowState, setFlowState] = useState("initial"); // "initial", "attendance", "selecting_time_slot", "not_attending", "confirmation"
+  const [selectedSlotId, setSelectedSlotId] = useState(null);
+  const [timeSlots, setTimeSlots] = useState([]);
+  const [loadingTimeSlots, setLoadingTimeSlots] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  // Temporary values.
-  // These will later come from the backend.
-  const homeworkTitle = "Homework Support";
-  const weekNumber = 5;
-  const sessionDate = "Saturday, September 12, 2026";
+  // Fetch dashboard data on mount
+  useEffect(() => {
+    const fetchBookingData = async () => {
+      try {
+        setLoadingDashboard(true);
+        setError(null);
+
+        const response = await fetch(
+          `${API_BASE_URL}/homework-support/parent/dashboard`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              parent_email: parentData?.email,
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(
+            errorData?.detail || "Unable to load Homework Support information. Please try again."
+          );
+        }
+
+        const data = await response.json();
+        setBookingData(data);
+
+        // Check if parent has already responded
+        if (data.response === "ATTENDING") {
+          setFlowState("confirmation");
+        } else if (data.response === "NOT_ATTENDING") {
+          setFlowState("not_attending");
+        } else {
+          setFlowState("attendance");
+        }
+      } catch (err) {
+        console.error("Error fetching homework booking data:", err);
+        setError(
+          err.message || "Unable to load Homework Support information. Please try again."
+        );
+      } finally {
+        setLoadingDashboard(false);
+      }
+    };
+
+    if (parentData?.email) {
+      fetchBookingData();
+    }
+  }, [parentData?.email]);
+
+  // Handler for "No, will not attend"
+  const handleNotAttending = async () => {
+    try {
+      setSubmitting(true);
+      setError(null);
+
+      const response = await fetch(
+        `${API_BASE_URL}/homework-support/parent/response`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            parent_email: parentData?.email,
+            response: "NOT_ATTENDING",
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData?.detail || "Unable to submit response. Please try again."
+        );
+      }
+
+      setFlowState("not_attending");
+    } catch (err) {
+      console.error("Error submitting not attending response:", err);
+      setError(
+        err.message || "Unable to submit response. Please try again."
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Handler for "Yes, will attend" - fetch time slots
+  const handleWillAttend = async () => {
+    try {
+      setLoadingTimeSlots(true);
+      setError(null);
+
+      const response = await fetch(
+        `${API_BASE_URL}/homework-support/parent/time-slots`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            parent_email: parentData?.email,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData?.detail || "Unable to load available time slots. Please try again."
+        );
+      }
+
+      const data = await response.json();
+      setTimeSlots(data.time_slots || []);
+      setFlowState("selecting_time_slot");
+    } catch (err) {
+      console.error("Error fetching time slots:", err);
+      setError(
+        err.message || "Unable to load available time slots. Please try again."
+      );
+    } finally {
+      setLoadingTimeSlots(false);
+    }
+  };
+
+  // Handler for confirming booking with selected time slot
+  const handleConfirmBooking = async () => {
+    if (!selectedSlotId) {
+      setError("Please select a time slot.");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      setError(null);
+
+      const response = await fetch(
+        `${API_BASE_URL}/homework-support/parent/response`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            parent_email: parentData?.email,
+            response: "ATTENDING",
+            selected_time_slot_id: selectedSlotId,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData?.detail || "Unable to confirm booking. Please try again."
+        );
+      }
+
+      // Update bookingData with the new response
+      setBookingData((prev) => ({
+        ...prev,
+        response: "ATTENDING",
+        selected_time_slot_id: selectedSlotId,
+      }));
+
+      setFlowState("confirmation");
+    } catch (err) {
+      console.error("Error confirming booking:", err);
+      setError(
+        err.message || "Unable to confirm booking. Please try again."
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Get the selected time slot details for display
+  const getSelectedSlotDetails = () => {
+    return timeSlots.find((slot) => slot.id === selectedSlotId);
+  };
+
+  const studentName = bookingData?.student_name || "Student";
+  const homeworkTitle = bookingData?.title || "Homework Support";
+  const weekNumber = bookingData?.week_number || 5;
+  const sessionDate = bookingData?.session_date || "Saturday, September 12, 2026";
 
   return (
     <main className="homework-booking-page">
@@ -34,106 +229,276 @@ function HomeworkBooking({ parentData, onBack }) {
           ← Back to dashboard
         </button>
 
-        {/* Title */}
-        <div className="homework-title-section">
-          <h1>Homework Support</h1>
-
-          <p>
-            Confirm your child's attendance
-          </p>
-        </div>
-
-        {/* Session Information */}
-        <div className="homework-session-info">
-
-          <div className="homework-info-row">
-            <div>
-              <span className="homework-info-label">
-                Session
-              </span>
-
-              <strong>
-                {homeworkTitle} — Week {weekNumber}
-              </strong>
-            </div>
+        {/* Loading Dashboard State */}
+        {loadingDashboard && (
+          <div className="homework-loading">
+            <p>Loading Homework Support...</p>
           </div>
+        )}
 
-          <div className="homework-info-row">
-            <div>
-              <span className="homework-info-label">
-                Date
-              </span>
-
-              <strong>
-                {sessionDate}
-              </strong>
-            </div>
+        {/* Error State */}
+        {error && !loadingDashboard && (
+          <div className="homework-error">
+            <p>{error}</p>
           </div>
+        )}
 
-          <div className="homework-info-row">
-            <div>
-              <span className="homework-info-label">
-                Student
-              </span>
+        {/* Content - Only show when not loading and no error */}
+        {!loadingDashboard && !error && bookingData && (
+          <>
+            {/* ===== ATTENDANCE SCREEN ===== */}
+            {flowState === "attendance" && (
+              <>
+                <div className="homework-title-section">
+                  <h1>Homework Support</h1>
+                  <p>Confirm your child's attendance</p>
+                </div>
 
-              <strong className="student-name">
-                {studentName}
-              </strong>
-            </div>
-          </div>
+                <div className="homework-session-info">
+                  <div className="homework-info-row">
+                    <div>
+                      <span className="homework-info-label">Session</span>
+                      <strong>
+                        {homeworkTitle} — Week {weekNumber}
+                      </strong>
+                    </div>
+                  </div>
 
-        </div>
+                  <div className="homework-info-row">
+                    <div>
+                      <span className="homework-info-label">Date</span>
+                      <strong>{sessionDate}</strong>
+                    </div>
+                  </div>
 
-        {/* Attendance Question */}
-        <div className="homework-attendance-section">
+                  <div className="homework-info-row">
+                    <div>
+                      <span className="homework-info-label">Student</span>
+                      <strong className="student-name">{studentName}</strong>
+                    </div>
+                  </div>
+                </div>
 
-          <h2>
-            Will {studentName} be attending
-            Homework Support?
-          </h2>
+                <div className="homework-attendance-section">
+                  <h2>
+                    Will {studentName} be attending
+                    Homework Support?
+                  </h2>
 
-          <p className="attendance-subtitle">
-            Please select an option below.
-          </p>
+                  <p className="attendance-subtitle">
+                    Please select an option below.
+                  </p>
 
-          <div className="homework-actions">
+                  <div className="homework-actions">
+                    <button
+                      type="button"
+                      className="homework-attend-button"
+                      onClick={handleWillAttend}
+                      disabled={submitting}
+                    >
+                      Yes, my child will attend
+                      <span className="button-arrow">→</span>
+                    </button>
 
-            <button
-              type="button"
-              className="homework-attend-button"
-              onClick={() => {
-                console.log("Attendance: attending");
-              }}
-            >
-              Yes, my child will attend
-              <span className="button-arrow">→</span>
-            </button>
+                    <button
+                      type="button"
+                      className="homework-not-attend-button"
+                      onClick={handleNotAttending}
+                      disabled={submitting}
+                    >
+                      No, my child will not attend
+                      <span className="button-arrow">→</span>
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
 
-            <button
-              type="button"
-              className="homework-not-attend-button"
-              onClick={() => {
-                console.log("Attendance: not attending");
-              }}
-            >
-              No, my child will not attend
-              <span className="button-arrow">→</span>
-            </button>
+            {/* ===== TIME SLOT SELECTION SCREEN ===== */}
+            {flowState === "selecting_time_slot" && (
+              <>
+                <div className="homework-title-section">
+                  <h1>Homework Support</h1>
+                  <p>Select a time slot</p>
+                </div>
 
-          </div>
+                {loadingTimeSlots && (
+                  <div className="homework-loading">
+                    <p>Loading available times...</p>
+                  </div>
+                )}
 
-          {/* Existing Response */}
-          <button
-            type="button"
-            className="homework-existing-response"
-            onClick={() => {
-              console.log("View/change response");
-            }}
-          >
-            Already responded? View or change response
-          </button>
+                {!loadingTimeSlots && timeSlots.length > 0 && (
+                  <>
+                    <div className="homework-session-info">
+                      <div className="homework-info-row">
+                        <div>
+                          <span className="homework-info-label">Session</span>
+                          <strong>
+                            {homeworkTitle} — Week {weekNumber}
+                          </strong>
+                        </div>
+                      </div>
 
-        </div>
+                      <div className="homework-info-row">
+                        <div>
+                          <span className="homework-info-label">Date</span>
+                          <strong>{sessionDate}</strong>
+                        </div>
+                      </div>
+
+                      <div className="homework-info-row">
+                        <div>
+                          <span className="homework-info-label">Student</span>
+                          <strong className="student-name">{studentName}</strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="homework-time-slots-section">
+                      <h2>Available Time Slots</h2>
+
+                      <div className="homework-time-slots-list">
+                        {timeSlots.map((slot) => {
+                          const isDisabled = slot.available_places <= 0;
+                          const isSelected = selectedSlotId === slot.id;
+
+                          return (
+                            <button
+                              key={slot.id}
+                              type="button"
+                              className={`homework-time-slot-button ${
+                                isSelected ? "selected" : ""
+                              } ${isDisabled ? "disabled" : ""}`}
+                              onClick={() => {
+                                if (!isDisabled) {
+                                  setSelectedSlotId(slot.id);
+                                }
+                              }}
+                              disabled={isDisabled}
+                            >
+                              <div className="slot-time">
+                                {slot.start_time} - {slot.end_time}
+                              </div>
+                              <div className="slot-capacity">
+                                {slot.available_places > 0
+                                  ? `${slot.available_places} place${
+                                      slot.available_places !== 1 ? "s" : ""
+                                    } available`
+                                  : "Fully booked"}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <div className="homework-confirm-booking">
+                        <button
+                          type="button"
+                          className="homework-confirm-button"
+                          onClick={handleConfirmBooking}
+                          disabled={!selectedSlotId || submitting}
+                        >
+                          {submitting ? "Confirming Booking..." : "Confirm Booking"}
+                          <span className="button-arrow">→</span>
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {!loadingTimeSlots && timeSlots.length === 0 && (
+                  <div className="homework-no-slots">
+                    <p>No available time slots at this time.</p>
+                    <button
+                      type="button"
+                      className="homework-back-link"
+                      onClick={() => setFlowState("attendance")}
+                    >
+                      ← Back to attendance options
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* ===== NOT ATTENDING CONFIRMATION ===== */}
+            {flowState === "not_attending" && (
+              <div className="homework-response-confirmation">
+                <div className="confirmation-header">
+                  <h2>Not Attending</h2>
+                </div>
+
+                <div className="confirmation-message">
+                  <p className="thank-you">Thank you for letting us know.</p>
+
+                  <p className="confirmation-text">
+                    You have indicated that {studentName} will not attend
+                    Homework Support this week.
+                  </p>
+
+                  <p className="submission-status">
+                    Your response has been submitted successfully.
+                  </p>
+                </div>
+
+                <div className="confirmation-actions">
+                  <button
+                    type="button"
+                    className="homework-back-link"
+                    onClick={onBack}
+                  >
+                    ← Back to dashboard
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* ===== ATTENDING CONFIRMATION ===== */}
+            {flowState === "confirmation" && bookingData?.response === "ATTENDING" && (
+              <div className="homework-response-confirmation">
+                <div className="confirmation-header">
+                  <h2>Booking Confirmed</h2>
+                </div>
+
+                <div className="confirmation-message">
+                  <p className="thank-you">Thank you for confirming attendance.</p>
+
+                  <p className="confirmation-text">
+                    {studentName} is booked for Homework Support this week.
+                  </p>
+
+                  <p className="submission-status">
+                    Your booking has been confirmed successfully.
+                  </p>
+                </div>
+
+                <div className="confirmation-details">
+                  <div className="homework-info-row">
+                    <span className="homework-info-label">Session</span>
+                    <strong>
+                      {homeworkTitle} — Week {weekNumber}
+                    </strong>
+                  </div>
+                  <div className="homework-info-row">
+                    <span className="homework-info-label">Date</span>
+                    <strong>{sessionDate}</strong>
+                  </div>
+                </div>
+
+                <div className="confirmation-actions">
+                  <button
+                    type="button"
+                    className="homework-back-link"
+                    onClick={onBack}
+                  >
+                    ← Back to dashboard
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
 
       </section>
 
