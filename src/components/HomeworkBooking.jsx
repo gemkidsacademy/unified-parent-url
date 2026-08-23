@@ -45,14 +45,7 @@ function HomeworkBooking({ parentData, onBack }) {
         const data = await response.json();
         setBookingData(data);
 
-        // Check if parent has already responded
-        if (data.response === "ATTENDING") {
-          setFlowState("confirmation");
-        } else if (data.response === "NOT_ATTENDING") {
-          setFlowState("not_attending");
-        } else {
-          setFlowState("attendance");
-        }
+        setFlowState("attendance");
       } catch (err) {
         console.error("Error fetching homework booking data:", err);
         setError(
@@ -95,7 +88,12 @@ function HomeworkBooking({ parentData, onBack }) {
         );
       }
 
-      setFlowState("not_attending");
+      setBookingData((prev) => ({
+        ...prev,
+        response: "NOT_ATTENDING",
+      }));
+
+      setFlowState("attendance");
     } catch (err) {
       console.error("Error submitting not attending response:", err);
       setError(
@@ -420,38 +418,6 @@ function HomeworkBooking({ parentData, onBack }) {
                   </div>
                 )}
               </>
-            )}
-
-            {/* ===== NOT ATTENDING CONFIRMATION ===== */}
-            {flowState === "not_attending" && (
-              <div className="homework-response-confirmation">
-                <div className="confirmation-header">
-                  <h2>Not Attending</h2>
-                </div>
-
-                <div className="confirmation-message">
-                  <p className="thank-you">Thank you for letting us know.</p>
-
-                  <p className="confirmation-text">
-                    You have indicated that {studentName} will not attend
-                    Homework Support this week.
-                  </p>
-
-                  <p className="submission-status">
-                    Your response has been submitted successfully.
-                  </p>
-                </div>
-
-                <div className="confirmation-actions">
-                  <button
-                    type="button"
-                    className="homework-back-link"
-                    onClick={onBack}
-                  >
-                    ← Back to dashboard
-                  </button>
-                </div>
-              </div>
             )}
 
             {/* ===== ATTENDING CONFIRMATION ===== */}
