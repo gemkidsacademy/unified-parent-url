@@ -9,11 +9,15 @@ function HomeworkBooking({ parentData, onBack }) {
   const [error, setError] = useState(null);
 
   // Flow state
-  const [flowState, setFlowState] = useState("initial"); // "initial", "attendance", "selecting_time_slot", "not_attending", "confirmation"
+  const [flowState, setFlowState] = useState("initial");
+  // "initial", "attendance", "selecting_time_slot",
+  // "not_attending", "confirmation", "existing_booking"
   const [selectedSlotId, setSelectedSlotId] = useState(null);
   const [timeSlots, setTimeSlots] = useState([]);
+  const [existingBookingSlot, setExistingBookingSlot] = useState(null);
   const [loadingTimeSlots, setLoadingTimeSlots] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [notAttendingSaved, setNotAttendingSaved] = useState(false);
 
   // Fetch dashboard data on mount
   useEffect(() => {
@@ -43,9 +47,50 @@ function HomeworkBooking({ parentData, onBack }) {
         }
 
         const data = await response.json();
+
         setBookingData(data);
 
-        setFlowState("attendance");
+        if (
+          data.response === "ATTENDING" &&
+          data.selected_time_slot_id
+        ) {
+          try {
+            const slotsResponse = await fetch(
+              `${API_BASE_URL}/homework-support/parent/time-slots`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  parent_email: parentData?.email,
+                }),
+              },
+            );
+
+            if (slotsResponse.ok) {
+              const slotsData = await slotsResponse.json();
+
+              const bookedSlot = (slotsData.time_slots || []).find(
+                (slot) =>
+                  slot.id === data.selected_time_slot_id
+              );
+
+              setExistingBookingSlot(bookedSlot || null);
+            }
+          } catch (slotError) {
+            console.error(
+              "Error loading existing booking time slot:",
+              slotError
+            );
+
+            setExistingBookingSlot(null);
+          }
+
+          setFlowState("existing_booking");
+        } else {
+          setFlowState("attendance");
+        }
       } catch (err) {
         console.error("Error fetching homework booking data:", err);
         setError(
@@ -77,27 +122,35 @@ function HomeworkBooking({ parentData, onBack }) {
           body: JSON.stringify({
             parent_email: parentData?.email,
             response: "NOT_ATTENDING",
+            selected_time_slot_id: null,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => null);
+
         throw new Error(
-          errorData?.detail || "Unable to submit response. Please try again."
+          errorData?.detail || "Unable to submit your response."
         );
       }
 
-      setBookingData((prev) => ({
-        ...prev,
-        response: "NOT_ATTENDING",
-      }));
+      const data = await response.json();
 
-      setFlowState("attendance");
+      console.log(
+        "Homework Support NOT_ATTENDING response submitted:",
+        data
+      );
+
+      setNotAttendingSaved(true);
+
     } catch (err) {
-      console.error("Error submitting not attending response:", err);
+      console.error(
+        "Error submitting NOT_ATTENDING response:",
+        err
+      );
       setError(
-        err.message || "Unable to submit response. Please try again."
+        err.message || "Unable to submit your response."
       );
     } finally {
       setSubmitting(false);
@@ -244,9 +297,142 @@ function HomeworkBooking({ parentData, onBack }) {
         {/* Content - Only show when not loading and no error */}
         {!loadingDashboard && !error && bookingData && (
           <>
+            {/* ===== EXISTING BOOKING ===== */}
+            {flowState === "existing_booking" && (
+              <div className="homework-response-confirmation">
+                <div className="confirmation-header">
+                  <h2>Booking Confirmed</h2>
+                </div>
+
+                <div className="confirmation-message">
+                  <p className="thank-you">
+                    Your Homework Support booking is already confirmed.
+                  </p>
+
+                  <p className="confirmation-text">
+                    {studentName} is booked for Homework Support this week.
+                  </p>
+                </div>
+
+                <div className="confirmation-details">
+                  <div className="homework-info-row">
+                    <span className="homework-info-label">
+                      Session
+                    </span>
+
+                    <strong>
+                      {homeworkTitle} — Week {weekNumber}
+                    </strong>
+                  </div>
+
+                  <div className="homework-info-row">
+                    <span className="homework-info-label">
+                      Date
+                    </span>
+
+                    <strong>
+                      {sessionDate}
+                    </strong>
+                  </div>
+
+                  <div className="homework-info-row">
+                    <span className="homework-info-label">
+                      Time
+                    </span>
+
+                    <strong>
+                      {existingBookingSlot
+                        ? `${existingBookingSlot.start_time} - ${existingBookingSlot.end_time}`
+                        : "Booking time unavailable"}
+                    </strong>
+                  </div>
+
+                  <div className="homework-info-row">
+                    <span className="homework-info-label">
+                      Student
+                    </span>
+
+                    <strong className="student-name">
+                      {studentName}
+                    </strong>
+                  </div>
+                </div>
+
+                <div className="confirmation-actions">
+                  <button
+                    type="button"
+                    className="homework-back-link"
+                    onClick={onBack}
+                  >
+                    ← Back to dashboard
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* ===== ATTENDANCE SCREEN ===== */}
-            {flowState === "attendance" && (
-              <>
+            {notAttendingSaved ? (
+              <div
+                style={{
+                  textAlign: "center",
+                  padding: "45px 25px",
+                }}
+              >
+                <h2
+                  style={{
+                    margin: "0 0 18px",
+                    color: "#30206d",
+                    fontSize: "26px",
+                  }}
+                >
+                  Response Saved
+                </h2>
+
+                <p
+                  style={{
+                    margin: "0 0 12px",
+                    color: "#147f78",
+                    fontSize: "18px",
+                    fontWeight: "600",
+                  }}
+                >
+                  Your response has been saved successfully.
+                </p>
+
+                <p
+                  style={{
+                    margin: "0 0 28px",
+                    color: "#57526d",
+                    fontSize: "15px",
+                    lineHeight: "1.5",
+                  }}
+                >
+                  You have indicated that {studentName} will not attend
+                  Homework Support this week.
+                </p>
+
+                <button
+                  type="button"
+                  className="homework-back-link"
+                  onClick={() => setNotAttendingSaved(false)}
+                >
+                  Change response
+                </button>
+
+                <br />
+
+                <button
+                  type="button"
+                  className="homework-back-link"
+                  onClick={onBack}
+                  style={{ marginTop: "16px" }}
+                >
+                  ← Back to dashboard
+                </button>
+              </div>
+            ) : (
+              flowState === "attendance" && (
+                <>
                 <div className="homework-title-section">
                   <h1>Homework Support</h1>
                   <p>Confirm your child's attendance</p>
@@ -304,12 +490,15 @@ function HomeworkBooking({ parentData, onBack }) {
                       onClick={handleNotAttending}
                       disabled={submitting}
                     >
-                      No, my child will not attend
+                      {submitting
+                        ? "Submitting..."
+                        : "No, my child will not attend"}
                       <span className="button-arrow">→</span>
                     </button>
                   </div>
                 </div>
-              </>
+                </>
+              )
             )}
 
             {/* ===== TIME SLOT SELECTION SCREEN ===== */}
