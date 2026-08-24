@@ -6,6 +6,42 @@ export default function ChatbotGamifiedQuiz({
     onBack,
 }) {
   const parentEmail = parentData?.email || "";
+  const [studentName, setStudentName] = useState("");
+
+  useEffect(() => {
+    const loadParentContext = async () => {
+      try {
+        const response = await fetch(
+          `${server}/chatbot/parent-context`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: parentEmail,
+            }),
+          }
+        );
+
+        const data = await response.json().catch(() => null);
+
+        if (!response.ok) {
+          throw new Error(data?.detail || "Unable to load student information.");
+        }
+
+        setStudentName(data?.student_name || "Student");
+      } catch (error) {
+        console.error("Unable to load parent context:", error);
+        setStudentName("Student");
+      }
+    };
+
+    if (parentEmail) {
+      loadParentContext();
+    }
+  }, [parentEmail]);
+
     console.log(
       "[GAMIFIED DEBUG] ChatbotGamifiedQuiz mounted/rendered"
     );
@@ -51,6 +87,8 @@ export default function ChatbotGamifiedQuiz({
     console.log(
       "[GAMIFIED DEBUG] Quiz useEffect started"
     );
+      if (!studentName) return;
+
     console.log(
       "[GAMIFIED DEBUG] Quiz parentEmail:",
       parentEmail
@@ -74,7 +112,7 @@ export default function ChatbotGamifiedQuiz({
             {
                 sender: "bot",
                 type: "welcome",
-                welcomeText: `Welcome, Dear ${parentData?.students?.[0]?.name || "Student"}!`,
+                welcomeText: `Welcome, Dear ${studentName || "Student"}!`,
                 quote: null,
                 author: "",
                 footer: "Preparing today's quote and quiz...",
@@ -355,7 +393,7 @@ export default function ChatbotGamifiedQuiz({
 
     fetchQuiz();
 
-}, [parentEmail, server]);
+}, [parentEmail, server, studentName]);
   // ------------------ Helpers ------------------
   const parseBoldText = (text) => {
     const regex = /\*\*(.+?)\*\*/g;
@@ -508,13 +546,6 @@ export default function ChatbotGamifiedQuiz({
   // ------------------ Render ------------------
   return (
     <div className="chat-container">
-      <button
-        type="button"
-        onClick={onBack}
-      >
-        ← Back to dashboard
-      </button>
-
       <div className="chat-box">
         <div className="chat-header">GEM AI Quiz</div>
 
