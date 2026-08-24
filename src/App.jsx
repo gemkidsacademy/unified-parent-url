@@ -2,12 +2,16 @@ import { useState } from "react";
 import EmailLogin from "./components/EmailLogin";
 import ParentDashboard from "./components/ParentDashboard";
 import ChatbotGamifiedQuiz from "./components/ChatbotGamifiedQuiz";
+import DemoChatbot from "./components/DemoChatbot";
 
 function App() {
   const [parentData, setParentData] = useState(null);
   const isGamifiedQuiz =
     new URLSearchParams(window.location.search).get("view") ===
     "gamified-quiz";
+  const isChatbot =
+    new URLSearchParams(window.location.search).get("view") ===
+    "chatbot";
 
   const handleLoginSuccess = (data) => {
     console.log("APP: handleLoginSuccess received:", data);
@@ -29,6 +33,23 @@ function App() {
 
       return (
         <ChatbotGamifiedQuiz
+          parentData={parsedParentData}
+          onBack={() => {
+            window.close();
+          }}
+        />
+      );
+    }
+  }
+
+  if (isChatbot) {
+    const storedParentData = localStorage.getItem("parentData");
+
+    if (storedParentData) {
+      const parsedParentData = JSON.parse(storedParentData);
+
+      return (
+        <DemoChatbot
           parentData={parsedParentData}
           onBack={() => {
             window.close();

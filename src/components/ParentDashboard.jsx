@@ -1,11 +1,9 @@
 import { useState } from "react";
 import HomeworkBooking from "./HomeworkBooking";
-import DemoChatbot from "./DemoChatbot";
 import "./ParentDashboard.css";
 
 function ParentDashboard({ parentData, onLogout }) {
   const [showHomeworkBooking, setShowHomeworkBooking] = useState(false);
-  const [showChatbot, setShowChatbot] = useState(false);
 
   const student = parentData?.students?.[0];
 
@@ -19,15 +17,6 @@ function ParentDashboard({ parentData, onLogout }) {
       <HomeworkBooking
         parentData={parentData}
         onBack={() => setShowHomeworkBooking(false)}
-      />
-    );
-  }
-
-  if (showChatbot) {
-    return (
-      <DemoChatbot
-        parentData={parentData}
-        onBack={() => setShowChatbot(false)}
       />
     );
   }
@@ -111,7 +100,10 @@ function ParentDashboard({ parentData, onLogout }) {
               type="button"
               className="tool-button purple-button"
               onClick={() => {
-                setShowChatbot(true);
+                window.open(
+                  `${window.location.origin}${window.location.pathname}?view=chatbot`,
+                  "_blank"
+                );
               }}
             >
               <span>Open Chatbot</span>
