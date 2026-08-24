@@ -6,11 +6,26 @@ export default function ChatbotGamifiedQuiz({
     onBack,
 }) {
   const parentEmail = parentData?.email || "";
+    console.log(
+      "[GAMIFIED DEBUG] ChatbotGamifiedQuiz mounted/rendered"
+    );
+    console.log(
+      "[GAMIFIED DEBUG] parentData received:",
+      parentData
+    );
+    console.log(
+      "[GAMIFIED DEBUG] parent email:",
+      parentEmail
+    );
   // ------------------ State ------------------
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const server =
     "https://web-production-481a5.up.railway.app";
+    console.log(
+      "[GAMIFIED DEBUG] Quiz backend server:",
+      server
+    );
   const [isLoadingQuiz, setIsLoadingQuiz] = useState(true);
   const [isWaiting, setIsWaiting] = useState(false);
   const hasFetchedQuizRef = useRef(false);
@@ -33,6 +48,17 @@ export default function ChatbotGamifiedQuiz({
 
   // ------------------ Fetch Quiz ------------------
   useEffect(() => {
+    console.log(
+      "[GAMIFIED DEBUG] Quiz useEffect started"
+    );
+    console.log(
+      "[GAMIFIED DEBUG] Quiz parentEmail:",
+      parentEmail
+    );
+    console.log(
+      "[GAMIFIED DEBUG] Quiz server:",
+      server
+    );
 
     if (hasFetchedQuizRef.current) return;
 
@@ -88,6 +114,15 @@ export default function ChatbotGamifiedQuiz({
             // Fire both requests
             // -----------------------------------------
 
+            console.log(
+              "[GAMIFIED DEBUG] Calling welcome quote endpoint:",
+              quoteEndpoint
+            );
+            console.log(
+              "[GAMIFIED DEBUG] Welcome quote payload:",
+              quotePayload
+            );
+
             const quotePromise = fetch(
                 quoteEndpoint,
                 {
@@ -98,6 +133,15 @@ export default function ChatbotGamifiedQuiz({
                     body: JSON.stringify(quotePayload),
                 }
             );
+
+                console.log(
+                  "[GAMIFIED DEBUG] Calling current quiz endpoint:",
+                  quizEndpoint
+                );
+                console.log(
+                  "[GAMIFIED DEBUG] Current quiz payload:",
+                  quizPayload
+                );
 
             const quizPromise = fetch(
                 quizEndpoint,
@@ -115,6 +159,15 @@ export default function ChatbotGamifiedQuiz({
             // -----------------------------------------
 
             const quoteResponse = await quotePromise;
+
+            console.log(
+              "[GAMIFIED DEBUG] Welcome quote response:",
+              {
+                status: quoteResponse.status,
+                ok: quoteResponse.ok,
+                url: quoteResponse.url,
+              }
+            );
 
             console.log(
                 "Quote Response Status:",
@@ -152,6 +205,15 @@ export default function ChatbotGamifiedQuiz({
             // -----------------------------------------
 
             const quizResponse = await quizPromise;
+
+            console.log(
+              "[GAMIFIED DEBUG] Current quiz response:",
+              {
+                status: quizResponse.status,
+                ok: quizResponse.ok,
+                url: quizResponse.url,
+              }
+            );
 
             console.log(
                 "Quiz Response Status:",
@@ -267,7 +329,7 @@ export default function ChatbotGamifiedQuiz({
         catch (err) {
 
             console.error(
-                "Error fetching quiz:",
+              "[GAMIFIED DEBUG] Quiz loading error:",
                 err
             );
 
@@ -362,6 +424,18 @@ export default function ChatbotGamifiedQuiz({
     const submitEndpoint =
       `${server}/parent/submit-quiz-answer`;
 
+    console.log(
+      "[GAMIFIED DEBUG] Submitting quiz answer"
+    );
+    console.log(
+      "[GAMIFIED DEBUG] Submit endpoint:",
+      submitEndpoint
+    );
+    console.log(
+      "[GAMIFIED DEBUG] Submit payload:",
+      payload
+    );
+
     const response = await fetch(submitEndpoint, {
 
         method: "POST",
@@ -375,6 +449,15 @@ export default function ChatbotGamifiedQuiz({
         body: JSON.stringify(payload),
 
     });
+
+    console.log(
+      "[GAMIFIED DEBUG] Submit response:",
+      {
+        status: response.status,
+        ok: response.ok,
+        url: response.url,
+      }
+    );
 
     if (!response.ok) throw new Error(`Backend error: ${response.status}`);
     const data = await response.json();
@@ -409,7 +492,10 @@ export default function ChatbotGamifiedQuiz({
           setCurrentQuestionIndex(nextIndex);
         }
   } catch (err) {
-    console.error("Error submitting answer:", err);
+    console.error(
+      "[GAMIFIED DEBUG] Quiz answer submission error:",
+      err
+    );
     setMessages((prev) => [
       ...prev,
       { sender: "bot", text: "Sorry, there was a problem recording your answer." },

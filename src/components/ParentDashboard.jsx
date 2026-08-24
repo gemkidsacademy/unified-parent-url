@@ -34,7 +34,20 @@ function ParentDashboard({ parentData, onLogout }) {
     );
   }
 
+  console.log(
+    "[GAMIFIED DEBUG] ParentDashboard render state:",
+    {
+      showGamifiedQuiz,
+      parentData,
+      parentEmail: parentData?.email,
+    }
+  );
+
   if (showGamifiedQuiz) {
+    console.log(
+      "[GAMIFIED DEBUG] Rendering ChatbotGamifiedQuiz component"
+    );
+
     return (
       <ChatbotGamifiedQuiz
         parentData={parentData}
@@ -150,6 +163,13 @@ function ParentDashboard({ parentData, onLogout }) {
               type="button"
               className="tool-button green-button"
               onClick={() => {
+                console.log("[GAMIFIED DEBUG] Start Quiz button clicked");
+                console.log("[GAMIFIED DEBUG] Current parentData:", parentData);
+                console.log("[GAMIFIED DEBUG] Parent email:", parentData?.email);
+                console.log(
+                  "[GAMIFIED DEBUG] Setting showGamifiedQuiz to true"
+                );
+
                 setShowGamifiedQuiz(true);
               }}
             >
