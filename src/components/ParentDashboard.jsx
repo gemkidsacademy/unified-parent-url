@@ -1,11 +1,13 @@
 import { useState } from "react";
 import HomeworkBooking from "./HomeworkBooking";
 import DemoChatbot from "./DemoChatbot";
+import ChatbotGamifiedQuiz from "./ChatbotGamifiedQuiz";
 import "./ParentDashboard.css";
 
 function ParentDashboard({ parentData, onLogout }) {
   const [showHomeworkBooking, setShowHomeworkBooking] = useState(false);
   const [showChatbot, setShowChatbot] = useState(false);
+  const [showGamifiedQuiz, setShowGamifiedQuiz] = useState(false);
 
   const student = parentData?.students?.[0];
 
@@ -28,6 +30,15 @@ function ParentDashboard({ parentData, onLogout }) {
       <DemoChatbot
         parentData={parentData}
         onBack={() => setShowChatbot(false)}
+      />
+    );
+  }
+
+  if (showGamifiedQuiz) {
+    return (
+      <ChatbotGamifiedQuiz
+        parentData={parentData}
+        onBack={() => setShowGamifiedQuiz(false)}
       />
     );
   }
@@ -139,7 +150,7 @@ function ParentDashboard({ parentData, onLogout }) {
               type="button"
               className="tool-button green-button"
               onClick={() => {
-                window.location.href = "https://gamifiedquiz.gemkidsacademy.com.au/";
+                setShowGamifiedQuiz(true);
               }}
             >
               <span>Start Quiz</span>
