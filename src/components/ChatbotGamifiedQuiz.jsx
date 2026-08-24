@@ -293,7 +293,7 @@ export default function ChatbotGamifiedQuiz({
 
     fetchQuiz();
 
-}, [loggedInUser, server]);
+}, [parentEmail, server]);
   // ------------------ Helpers ------------------
   const parseBoldText = (text) => {
     const regex = /\*\*(.+?)\*\*/g;
