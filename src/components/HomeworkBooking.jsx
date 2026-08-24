@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import "./HomeworkBooking.css";
 import { API_BASE_URL } from "../config/api";
-
+import "./HomeworkBooking.css";
 function HomeworkBooking({ parentData, onBack }) {
   // Main data state
   const [bookingData, setBookingData] = useState(null);
@@ -22,6 +21,14 @@ function HomeworkBooking({ parentData, onBack }) {
   // Fetch dashboard data on mount
   useEffect(() => {
     const fetchBookingData = async () => {
+      if (!parentData?.email) {
+        setError(
+          "Parent email is missing. Please return to the dashboard and log in again."
+        );
+        setLoadingDashboard(false);
+        return;
+      }
+
       try {
         setLoadingDashboard(true);
         setError(null);
@@ -34,19 +41,19 @@ function HomeworkBooking({ parentData, onBack }) {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              parent_email: parentData?.email,
+              parent_email: parentData.email,
             }),
           }
         );
 
+        const data = await response.json().catch(() => null);
+
         if (!response.ok) {
-          const errorData = await response.json();
           throw new Error(
-            errorData?.detail || "Unable to load Homework Support information. Please try again."
+            data?.detail ||
+              "Unable to load Homework Support information. Please try again."
           );
         }
-
-        const data = await response.json();
 
         setBookingData(data);
 
@@ -54,36 +61,29 @@ function HomeworkBooking({ parentData, onBack }) {
           data.response === "ATTENDING" &&
           data.selected_time_slot_id
         ) {
-          try {
-            const slotsResponse = await fetch(
-              `${API_BASE_URL}/homework-support/parent/time-slots`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  parent_email: parentData?.email,
-                }),
+          const slotsResponse = await fetch(
+            `${API_BASE_URL}/homework-support/parent/time-slots`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
               },
-            );
-
-            if (slotsResponse.ok) {
-              const slotsData = await slotsResponse.json();
-
-              const bookedSlot = (slotsData.time_slots || []).find(
-                (slot) =>
-                  slot.id === data.selected_time_slot_id
-              );
-
-              setExistingBookingSlot(bookedSlot || null);
+              body: JSON.stringify({
+                parent_email: parentData.email,
+              }),
             }
-          } catch (slotError) {
-            console.error(
-              "Error loading existing booking time slot:",
-              slotError
+          );
+
+          if (slotsResponse.ok) {
+            const slotsData = await slotsResponse.json();
+
+            const bookedSlot = (slotsData.time_slots || []).find(
+              (slot) =>
+                slot.id === data.selected_time_slot_id
             );
 
+            setExistingBookingSlot(bookedSlot || null);
+          } else {
             setExistingBookingSlot(null);
           }
 
@@ -92,18 +92,21 @@ function HomeworkBooking({ parentData, onBack }) {
           setFlowState("attendance");
         }
       } catch (err) {
-        console.error("Error fetching homework booking data:", err);
+        console.error(
+          "Error fetching homework booking data:",
+          err
+        );
+
         setError(
-          err.message || "Unable to load Homework Support information. Please try again."
+          err.message ||
+            "Unable to load Homework Support information. Please try again."
         );
       } finally {
         setLoadingDashboard(false);
       }
     };
 
-    if (parentData?.email) {
-      fetchBookingData();
-    }
+    fetchBookingData();
   }, [parentData?.email]);
 
   // Handler for "No, will not attend"

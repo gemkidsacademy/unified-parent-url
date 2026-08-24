@@ -51,6 +51,8 @@ body,
   width: calc(100% - 24px);
   max-width: 426px;
 
+  overflow: hidden;
+
   background: #ffffff;
 
   border-radius: 28px;
@@ -152,6 +154,8 @@ body,
   width: 100%;
   height: 48px;
 
+  max-width: 100%;
+
   display: flex;
   align-items: center;
 
@@ -205,6 +209,54 @@ body,
   color: #858292;
 }
 
+.otp-input-wrapper {
+  width: 100%;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+
+  margin-top: 12px;
+
+  border: 1.5px solid #d8d5df;
+  border-radius: 12px;
+
+  padding: 0 14px;
+
+  background: #ffffff;
+
+  box-sizing: border-box;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.otp-input-wrapper:focus-within {
+  border-color: #5522b8;
+
+  box-shadow: 0 0 0 3px rgba(85, 34, 184, 0.10);
+}
+
+.otp-input-wrapper input {
+  width: 100%;
+  height: 100%;
+
+  border: none;
+  outline: none;
+
+  background: transparent;
+
+  font-family: inherit;
+  font-size: 16px;
+
+  color: #29253b;
+}
+
+.otp-input-wrapper input::placeholder {
+  color: #858292;
+}
+
 .email-error {
   margin: 8px 0 0;
 
@@ -221,6 +273,7 @@ body,
 
 .continue-button {
   width: 100%;
+  max-width: 100%;
   height: 54px;
 
   margin-top: 20px;
@@ -282,6 +335,10 @@ body,
    ========================================= */
 
 @media (max-width: 600px) {
+  .otp-input-wrapper {
+    height: 48px;
+  }
+
 
   .email-login-page {
     padding-bottom: 30px;

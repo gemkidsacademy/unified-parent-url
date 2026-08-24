@@ -1,61 +1,122 @@
 import { useState } from "react";
-import { API_BASE_URL } from "../config/api";
+
 import "./EmailLogin.css";
 
+export const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 function EmailLogin({ onLoginSuccess }) {
   const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
 
-  const handleContinue = async (event) => {
-    event.preventDefault();
+    const handleContinue = async (event) => {
+      event.preventDefault();
 
-    if (isLoading) {
-      return;
-    }
+      if (isLoading) {
+        return;
+      }
 
-    const trimmedEmail = email.trim();
+      const trimmedEmail = email.trim();
 
-    if (!trimmedEmail) {
-      setError("Please enter your registered email.");
-      return;
-    }
+      if (!trimmedEmail) {
+        setError("Please enter your registered email.");
+        return;
+      }
 
-    setError("");
-    setIsLoading(true);
+      if (!otpSent) {
+        setError("");
+        setIsLoading(true);
 
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/parent/dashboard-access`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+        try {
+          const response = await fetch(
+            `${API_BASE_URL}/send-otp`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email: trimmedEmail,
+              }),
+            },
+          );
+
+          const data = await response.json().catch(() => null);
+
+          if (!response.ok) {
+            setError(
+              data?.detail ||
+              "Unable to send OTP. Please try again."
+            );
+            return;
+          }
+
+          setOtpSent(true);
+          setError("");
+
+          console.log("OTP sent:", data);
+        } catch {
+          setError(
+            "Unable to connect to the server. Please try again."
+          );
+        } finally {
+          setIsLoading(false);
+        }
+
+        return;
+      }
+
+      const trimmedOtp = otp.trim();
+
+      if (!trimmedOtp) {
+        setError("Please enter the OTP.");
+        return;
+      }
+
+      setError("");
+      setIsLoading(true);
+
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/verify-otp`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: trimmedEmail,
+              otp: trimmedOtp,
+            }),
           },
-          body: JSON.stringify({ email: trimmedEmail }),
-        },
-      );
+        );
 
-      if (response.status === 404) {
-        setError("We couldn't find an active student account for this email.");
-        return;
+        const data = await response.json().catch(() => null);
+
+        if (!response.ok) {
+          setError(
+            data?.detail ||
+            "Invalid OTP. Please try again."
+          );
+          return;
+        }
+
+        console.log("OTP verified:", data);
+
+        onLoginSuccess({
+          ...data,
+          email: trimmedEmail,
+        });
+      } catch {
+        setError(
+          "Unable to connect to the server. Please try again."
+        );
+      } finally {
+        setIsLoading(false);
       }
-
-      if (!response.ok) {
-        setError("Unable to connect to the server. Please try again.");
-        return;
-      }
-
-      const data = await response.json();
-      console.log("Parent dashboard access:", data);
-
-      onLoginSuccess(data);
-    } catch {
-      setError("Unable to connect to the server. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
 
   return (
     <main className="email-login-page">
@@ -146,6 +207,20 @@ function EmailLogin({ onLoginSuccess }) {
 
           </div>
 
+          {otpSent && (
+            <div className="otp-input-wrapper">
+              <input
+                id="otp"
+                type="text"
+                inputMode="numeric"
+                value={otp}
+                onChange={(event) => setOtp(event.target.value)}
+                placeholder="Enter OTP"
+                autoComplete="one-time-code"
+              />
+            </div>
+          )}
+
           {error && (
             <p className="email-error" role="alert">
               {error}
@@ -157,7 +232,13 @@ function EmailLogin({ onLoginSuccess }) {
             className="continue-button"
             disabled={isLoading}
           >
-            <span>{isLoading ? "Checking..." : "Continue"}</span>
+              <span>{isLoading
+                ? otpSent
+                  ? "Verifying..."
+                  : "Sending OTP..."
+                : otpSent
+                  ? "Login"
+                  : "Generate OTP"}</span>
             <span className="arrow">→</span>
           </button>
 
