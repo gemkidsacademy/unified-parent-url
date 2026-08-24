@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import "./DemoChatbot.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { API_BASE_URL } from "../config/api";
+const API_BASE_URL = "https://krishbackend-production-9603.up.railway.app";
 
 export default function DemoChatbot({ parentData, onBack }) {
   const [messages, setMessages] = useState([]);
