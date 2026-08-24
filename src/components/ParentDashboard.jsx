@@ -1,13 +1,11 @@
 import { useState } from "react";
 import HomeworkBooking from "./HomeworkBooking";
 import DemoChatbot from "./DemoChatbot";
-import ChatbotGamifiedQuiz from "./ChatbotGamifiedQuiz";
 import "./ParentDashboard.css";
 
 function ParentDashboard({ parentData, onLogout }) {
   const [showHomeworkBooking, setShowHomeworkBooking] = useState(false);
   const [showChatbot, setShowChatbot] = useState(false);
-  const [showGamifiedQuiz, setShowGamifiedQuiz] = useState(false);
 
   const student = parentData?.students?.[0];
 
@@ -30,28 +28,6 @@ function ParentDashboard({ parentData, onLogout }) {
       <DemoChatbot
         parentData={parentData}
         onBack={() => setShowChatbot(false)}
-      />
-    );
-  }
-
-  console.log(
-    "[GAMIFIED DEBUG] ParentDashboard render state:",
-    {
-      showGamifiedQuiz,
-      parentData,
-      parentEmail: parentData?.email,
-    }
-  );
-
-  if (showGamifiedQuiz) {
-    console.log(
-      "[GAMIFIED DEBUG] Rendering ChatbotGamifiedQuiz component"
-    );
-
-    return (
-      <ChatbotGamifiedQuiz
-        parentData={parentData}
-        onBack={() => setShowGamifiedQuiz(false)}
       />
     );
   }
@@ -163,14 +139,10 @@ function ParentDashboard({ parentData, onLogout }) {
               type="button"
               className="tool-button green-button"
               onClick={() => {
-                console.log("[GAMIFIED DEBUG] Start Quiz button clicked");
-                console.log("[GAMIFIED DEBUG] Current parentData:", parentData);
-                console.log("[GAMIFIED DEBUG] Parent email:", parentData?.email);
-                console.log(
-                  "[GAMIFIED DEBUG] Setting showGamifiedQuiz to true"
+                window.open(
+                  `${window.location.origin}${window.location.pathname}?view=gamified-quiz`,
+                  "_blank"
                 );
-
-                setShowGamifiedQuiz(true);
               }}
             >
               <span>Start Quiz</span>
