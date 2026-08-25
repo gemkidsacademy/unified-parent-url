@@ -601,3 +601,27 @@
     display: none;
   }
 }
+
+/* =========================================================
+   PARENT–TEACHER INTERVIEWS
+========================================================= */
+
+.parent-teacher-card {
+  background: #fff8f2;
+}
+
+.parent-teacher-image {
+  background: #ffe9d6;
+}
+
+.parent-teacher-card h2 {
+  color: #d86b16;
+}
+
+.parent-teacher-button {
+  background: #e97918;
+}
+
+.parent-teacher-button:hover {
+  background: #c9610e;
+}

@@ -1,0 +1,134 @@
+.interview-admin-login-page {
+  min-height: 100vh;
+  padding: 32px 16px;
+  box-sizing: border-box;
+  background: #f7f5ff;
+  color: #29234f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.interview-admin-login-card {
+  width: min(100%, 460px);
+  padding: 36px;
+  border: 1px solid rgba(50, 40, 90, 0.08);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(30, 25, 70, 0.1);
+  text-align: center;
+}
+
+.interview-admin-login-brand {
+  width: 220px;
+  min-height: 86px;
+  margin: 0 auto 26px;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  border-radius: 12px;
+  background: #f5f7fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.interview-admin-login-brand img {
+  display: block;
+  width: 170px;
+  height: auto;
+}
+
+.interview-admin-login-eyebrow {
+  margin: 0 0 8px;
+  color: #d86b16;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.interview-admin-login-card h1 {
+  margin: 0;
+  color: #30206d;
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.interview-admin-login-description {
+  margin: 12px 0 26px;
+  color: #57526d;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.interview-admin-login-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.interview-admin-login-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: #48435c;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.interview-admin-login-card input {
+  min-height: 48px;
+  padding: 0 13px;
+  border: 1px solid #d9d1ee;
+  border-radius: 9px;
+  outline: none;
+  color: #29234f;
+  background: #ffffff;
+  font: inherit;
+  font-size: 15px;
+}
+
+.interview-admin-login-card input:focus {
+  border-color: #5a20b7;
+  box-shadow: 0 0 0 3px rgba(90, 32, 183, 0.1);
+}
+
+.interview-admin-login-error {
+  margin: -3px 0 0;
+  color: #c53b35;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.interview-admin-login-card button {
+  min-height: 48px;
+  margin-top: 2px;
+  border: none;
+  border-radius: 24px;
+  background: #5a20b7;
+  color: #ffffff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.interview-admin-login-card button:hover:not(:disabled) {
+  background: #481692;
+}
+
+.interview-admin-login-card button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .interview-admin-login-card {
+    padding: 26px 20px;
+  }
+
+  .interview-admin-login-card h1 {
+    font-size: 25px;
+  }
+}

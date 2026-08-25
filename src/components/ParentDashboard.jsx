@@ -1,9 +1,12 @@
 import { useState } from "react";
 import HomeworkBooking from "./HomeworkBooking";
+import ParentTeacherInterviews from "./ParentTeacherInterviews";
 import "./ParentDashboard.css";
 
 function ParentDashboard({ parentData, onLogout }) {
   const [showHomeworkBooking, setShowHomeworkBooking] = useState(false);
+  const [showParentTeacherInterviews, setShowParentTeacherInterviews] =
+    useState(false);
 
   const student = parentData?.students?.[0];
 
@@ -17,6 +20,15 @@ function ParentDashboard({ parentData, onLogout }) {
       <HomeworkBooking
         parentData={parentData}
         onBack={() => setShowHomeworkBooking(false)}
+      />
+    );
+  }
+
+  if (showParentTeacherInterviews) {
+    return (
+      <ParentTeacherInterviews
+        parentData={parentData}
+        onBack={() => setShowParentTeacherInterviews(false)}
       />
     );
   }
@@ -195,6 +207,35 @@ function ParentDashboard({ parentData, onLogout }) {
               }}
             >
               <span>Book Session</span>
+              <span>→</span>
+            </button>
+          </article>
+
+          {/* Parent–Teacher Interviews */}
+          <article className="tool-card parent-teacher-card">
+            <div className="tool-image parent-teacher-image">
+              👩‍🏫
+            </div>
+
+            <h2>Parent–Teacher Interviews</h2>
+
+            <p>
+              Book a convenient time
+              <br />
+              to meet your child's teacher
+              <br />
+              for the upcoming interview.
+            </p>
+
+            <button
+              type="button"
+              className="tool-button parent-teacher-button"
+              onClick={() => {
+                console.log("PARENT-TEACHER INTERVIEW CLICKED");
+                setShowParentTeacherInterviews(true);
+              }}
+            >
+              <span>Book Interview</span>
               <span>→</span>
             </button>
           </article>

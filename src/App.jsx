@@ -3,9 +3,17 @@ import EmailLogin from "./components/EmailLogin";
 import ParentDashboard from "./components/ParentDashboard";
 import ChatbotGamifiedQuiz from "./components/ChatbotGamifiedQuiz";
 import DemoChatbot from "./components/DemoChatbot";
+import AdminInterviewBooking from "./components/AdminInterviewBooking";
+import InterviewAdminLogin from "./components/InterviewAdminLogin";
 
 function App() {
   const [parentData, setParentData] = useState(null);
+  const [interviewAdminData, setInterviewAdminData] = useState(() => {
+    const storedData = localStorage.getItem("interviewAdminData");
+    return storedData ? JSON.parse(storedData) : null;
+  });
+  const isAdminInterviewBooking =
+    window.location.pathname === "/admin-interview-booking";
   const isGamifiedQuiz =
     new URLSearchParams(window.location.search).get("view") ===
     "gamified-quiz";
@@ -24,6 +32,18 @@ function App() {
     localStorage.removeItem("parentData");
     setParentData(null);
   };
+
+  if (isAdminInterviewBooking) {
+    if (!interviewAdminData) {
+      return (
+        <InterviewAdminLogin
+          onLoginSuccess={setInterviewAdminData}
+        />
+      );
+    }
+
+    return <AdminInterviewBooking />;
+  }
 
   if (isGamifiedQuiz) {
     const storedParentData = localStorage.getItem("parentData");

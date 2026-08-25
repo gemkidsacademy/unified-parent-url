@@ -1,0 +1,263 @@
+.teacher-allocation-page {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.teacher-allocation-intro {
+  margin-bottom: 24px;
+}
+
+.allocation-eyebrow {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #f07816;
+  text-transform: uppercase;
+}
+
+.teacher-allocation-intro h2 {
+  margin: 0 0 8px;
+  color: #25166f;
+  font-size: 28px;
+}
+
+.teacher-allocation-intro p {
+  margin: 0;
+  color: #5c5a78;
+  line-height: 1.6;
+}
+
+.allocation-card {
+  margin-bottom: 24px;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #ebe5f7;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(54, 34, 120, 0.06);
+}
+
+.allocation-card-header,
+.allocation-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.allocation-card h3 {
+  margin: 0 0 6px;
+  color: #25166f;
+  font-size: 20px;
+}
+
+.allocation-card p {
+  margin: 0;
+  color: #6b6780;
+  font-size: 14px;
+}
+
+.allocation-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 16px;
+  align-items: end;
+}
+
+.allocation-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.allocation-form label span {
+  font-size: 13px;
+  font-weight: 700;
+  color: #292060;
+}
+
+.allocation-form select {
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid #d9ccf5;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #241866;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.allocation-form select:focus {
+  outline: none;
+  border-color: #6530d8;
+  box-shadow: 0 0 0 3px rgba(101, 48, 216, 0.1);
+}
+
+.allocation-add-button {
+  height: 46px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 9px;
+  background: #6029ca;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.allocation-add-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.allocation-count {
+  padding: 7px 12px;
+  border-radius: 20px;
+  background: #f2edff;
+  color: #6029ca;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.allocation-table {
+  width: 100%;
+}
+
+.allocation-table-header,
+.allocation-row {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr 0.9fr 0.7fr 0.7fr 1.2fr;
+  align-items: center;
+  gap: 16px;
+}
+
+.allocation-table-header {
+  padding: 0 14px 10px;
+  color: #716d82;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.allocation-row {
+  min-height: 58px;
+  padding: 0 14px;
+  border: 1px solid #f0dfd1;
+  background: #fff9f4;
+  border-radius: 10px;
+  color: #312574;
+  font-size: 14px;
+}
+
+.allocation-row + .allocation-row {
+  margin-top: 8px;
+}
+
+.view-students-button {
+  justify-self: end;
+  padding: 8px 13px;
+  border: 1px solid #f07816;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #e66b0c;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.student-list {
+  margin: 0 14px 10px;
+  padding: 14px;
+  background: #faf8ff;
+  border: 1px solid #e7def8;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+}
+
+.student-list-header,
+.student-list-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.student-list-header {
+  padding-bottom: 8px;
+  color: #77728a;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.student-list-row {
+  padding: 9px 0;
+  border-top: 1px solid #eee9f7;
+  color: #33276f;
+  font-size: 13px;
+}
+
+.allocation-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 22px;
+  margin-bottom: 24px;
+  border: 1px solid #e7def8;
+  border-radius: 14px;
+  background: #faf8ff;
+}
+
+.flow-step {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: center;
+}
+
+.flow-step strong {
+  color: #332477;
+  font-size: 14px;
+}
+
+.flow-step span {
+  color: #77728a;
+  font-size: 12px;
+}
+
+.flow-arrow {
+  color: #f07816;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+@media (max-width: 800px) {
+  .allocation-form {
+    grid-template-columns: 1fr;
+  }
+
+  .allocation-table-header {
+    display: none;
+  }
+
+  .allocation-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 14px;
+  }
+
+  .view-students-button {
+    justify-self: start;
+  }
+
+  .allocation-flow {
+    flex-direction: column;
+  }
+
+  .flow-arrow {
+    transform: rotate(90deg);
+  }
+}

@@ -1,0 +1,373 @@
+.interview-panel {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 28px;
+  border: 1px solid rgba(50, 40, 90, 0.08);
+  border-radius: 18px;
+  background: #fff8f2;
+  box-shadow: 0 4px 12px rgba(30, 25, 70, 0.06);
+}
+
+.interview-event-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+
+.interview-event-icon {
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #ffe9d6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+}
+
+.interview-eyebrow {
+  display: block;
+  margin-bottom: 5px;
+  color: #d86b16;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.interview-event-heading h2 {
+  margin: 0;
+  color: #30206d;
+  font-size: 25px;
+  line-height: 1.25;
+}
+
+.interview-event-heading p {
+  margin: 6px 0 0;
+  color: #57526d;
+  font-size: 15px;
+}
+
+.interview-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 28px 0 0;
+  border: 1px solid #f0dfd1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f0dfd1;
+}
+
+.interview-detail {
+  padding: 15px 17px;
+  background: #ffffff;
+}
+
+.interview-detail dt {
+  margin-bottom: 5px;
+  color: #746d80;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.interview-detail dd {
+  margin: 0;
+  color: #29234f;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.interview-slots {
+  margin-top: 28px;
+}
+
+.interview-slots h3 {
+  margin: 0 0 14px;
+  color: #30206d;
+  font-size: 20px;
+}
+
+.time-slot-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.time-slot {
+  min-height: 52px;
+  padding: 0 15px;
+  border: 1px solid #e97918;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #30206d;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.time-slot:hover:not(:disabled) {
+  background: #fff0e3;
+  transform: translateY(-1px);
+}
+
+.time-slot.selected {
+  background: #e97918;
+  color: #ffffff;
+}
+
+.time-slot.booked,
+.time-slot:disabled {
+  border-color: #d8d5dc;
+  background: #f2f1f4;
+  color: #918d99;
+  cursor: not-allowed;
+}
+
+.slot-status {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.interview-confirmation,
+.interview-success {
+  margin-top: 18px;
+  padding: 16px 18px;
+  border: 1px solid #f0dfd1;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.interview-confirmation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.confirmation-label {
+  display: block;
+  margin-bottom: 5px;
+  color: #746d80;
+  font-size: 13px;
+}
+
+.interview-confirmation strong {
+  color: #30206d;
+  font-size: 16px;
+}
+
+.confirm-interview-button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 22px;
+  background: #e97918;
+  color: #ffffff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.confirm-interview-button:hover {
+  background: #c9610e;
+}
+
+.interview-success {
+  border-color: #b9dfc4;
+  background: #f1fbf3;
+}
+
+.interview-success strong {
+  color: #218b4d;
+  font-size: 16px;
+}
+
+.interview-success p {
+  margin: 6px 0 0;
+  color: #48435c;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.booking-confirmation-details {
+  display: grid;
+  gap: 5px;
+  margin-top: 14px;
+  color: #48435c;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.existing-booking-view {
+  display: grid;
+  gap: 16px;
+}
+
+.booked-interview-card {
+  padding: 18px;
+  border: 1px solid #d8cef0;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.booked-interview-card h3 {
+  margin: 0 0 15px;
+  color: #30206d;
+  font-size: 20px;
+}
+
+.booked-interview-card dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 18px;
+  margin: 0 0 18px;
+}
+
+.booked-interview-card dt {
+  margin-bottom: 4px;
+  color: #746d80;
+  font-size: 13px;
+}
+
+.booked-interview-card dd {
+  margin: 0;
+  color: #29234f;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.booked-interview-card .confirm-interview-button {
+  width: auto;
+}
+
+.no-other-slots {
+  margin: 15px 0 0;
+  color: #c9610e;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.interview-change-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  padding: 20px;
+  background: rgba(31, 26, 46, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.interview-change-modal {
+  position: relative;
+  width: min(100%, 480px);
+  padding: 28px;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(31, 26, 46, 0.2);
+}
+
+.interview-change-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  border: none;
+  background: transparent;
+  color: #746d80;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.interview-change-modal h2 {
+  margin: 8px 0 10px;
+  color: #30206d;
+  font-size: 22px;
+}
+
+.interview-change-modal p {
+  margin: 0;
+  color: #57526d;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.interview-time-comparison {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0;
+  padding: 14px;
+  border-radius: 10px;
+  background: #fff8f2;
+  color: #48435c;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.interview-change-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.interview-cancel-button {
+  min-height: 42px;
+  padding: 0 16px;
+  border: 1px solid #d9d1ee;
+  border-radius: 22px;
+  background: #ffffff;
+  color: #57526d;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 560px) {
+  .interview-panel {
+    padding: 20px 16px;
+  }
+
+  .interview-event-heading h2 {
+    font-size: 21px;
+  }
+
+  .interview-details,
+  .time-slot-list {
+    grid-template-columns: 1fr;
+  }
+
+  .interview-confirmation {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .confirm-interview-button {
+    width: 100%;
+  }
+
+  .booked-interview-card dl {
+    grid-template-columns: 1fr;
+  }
+
+  .booked-interview-card .confirm-interview-button {
+    width: 100%;
+  }
+
+  .interview-change-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .interview-cancel-button {
+    width: 100%;
+  }
+}
