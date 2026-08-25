@@ -3,8 +3,10 @@ import "./DemoChatbot.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 const API_BASE_URL = "https://krishbackend-production-9603.up.railway.app";
+const API_BASE_URL2 = "https://web-production-481a5.up.railway.app";
 
 export default function DemoChatbot({ parentData, onBack }) {
+  console.log("🔥🔥🔥 CURRENT DEMO CHATBOT COMPONENT IS RUNNING 🔥🔥🔥");
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isWaiting, setIsWaiting] = useState(false);
@@ -51,7 +53,7 @@ export default function DemoChatbot({ parentData, onBack }) {
         setStudentContextError("");
 
         const response = await fetch(
-          `${API_BASE_URL}/chatbot/parent-context`,
+          `${API_BASE_URL2}/chatbot/parent-context`,
           {
             method: "POST",
             headers: {
@@ -111,7 +113,7 @@ export default function DemoChatbot({ parentData, onBack }) {
     setIsLoadingQuote(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/welcome-quote`, {
+      const response = await fetch(`${API_BASE_URL2}/welcome-quote`, {
         method: "POST",
       });
 
@@ -192,10 +194,6 @@ export default function DemoChatbot({ parentData, onBack }) {
   if (studentContextLoading) {
     return (
       <div className="demo-chatbot-page">
-        <button type="button" onClick={onBack}>
-          ← Back to dashboard
-        </button>
-
         <p>Loading chatbot...</p>
       </div>
     );
@@ -204,10 +202,6 @@ export default function DemoChatbot({ parentData, onBack }) {
   if (studentContextError) {
     return (
       <div className="demo-chatbot-page">
-        <button type="button" onClick={onBack}>
-          ← Back to dashboard
-        </button>
-
         <p>{studentContextError}</p>
       </div>
     );
@@ -239,13 +233,21 @@ export default function DemoChatbot({ parentData, onBack }) {
 
   // ------------------ Handle submit ------------------
   const handleSubmit = async (e) => {
+    console.log("🔥🔥🔥 HANDLE SUBMIT FIRED 🔥🔥🔥");
   e.preventDefault();
+  console.log("[CHATBOT DEBUG] input:", input);
+  console.log("[CHATBOT DEBUG] isTimeUp:", isTimeUp);
+  console.log("[CHATBOT DEBUG] studentContext:", studentContext);
+  console.log("[CHATBOT DEBUG] API_BASE_URL:", API_BASE_URL);
 
   if (!input.trim() || isTimeUp) return;
 
   const userInput = input.trim();
 
-  setMessages((prev) => [...prev, { sender: "user", text: userInput }]);
+  setMessages((prev) => [
+    ...prev,
+    { sender: "user", text: userInput },
+  ]);
 
   setInput("");
   setIsWaiting(true);
@@ -259,19 +261,117 @@ export default function DemoChatbot({ parentData, onBack }) {
       studentContext?.student_name || ""
     )}&conversation_uuid=${encodeURIComponent(
       conversationUuid
-    )}&class_name=${encodeURIComponent(studentContext?.class_name || "")}`;
+    )}&class_name=${encodeURIComponent(
+      studentContext?.class_name || ""
+    )}`;
+
+    // ==========================================
+    // CHATBOT REQUEST DEBUG
+    // ==========================================
+
+    console.log("==========================================");
+    console.log("CHATBOT REQUEST DEBUG");
+    console.log("==========================================");
+    console.log("[CHATBOT] API_BASE_URL:", API_BASE_URL);
+    console.log("[CHATBOT] Request URL:", url);
+    console.log("[CHATBOT] User input:", userInput);
+    console.log("[CHATBOT] reasoningLevel:", reasoningLevel);
+    console.log("[CHATBOT] studentContext:", studentContext);
+    console.log(
+      "[CHATBOT] student_name:",
+      studentContext?.student_name
+    );
+    console.log(
+      "[CHATBOT] class_name:",
+      studentContext?.class_name
+    );
+    console.log(
+      "[CHATBOT] conversationUuid:",
+      conversationUuid
+    );
+    console.log("==========================================");
+
+    console.log("========== CHATBOT REQUEST ==========");
+    console.log("[CHATBOT DEBUG] URL:", url);
+    console.log("[CHATBOT DEBUG] userInput:", userInput);
+    console.log("[CHATBOT DEBUG] reasoningLevel:", reasoningLevel);
+    console.log("[CHATBOT DEBUG] studentContext:", studentContext);
+    console.log("[CHATBOT DEBUG] conversationUuid:", conversationUuid);
+    console.log("====================================");
 
     const response = await fetch(url);
 
+    console.log("========== CHATBOT RESPONSE ==========");
+    console.log("[CHATBOT DEBUG] status:", response.status);
+    console.log("[CHATBOT DEBUG] ok:", response.ok);
+    console.log("[CHATBOT DEBUG] url:", response.url);
+    console.log("======================================");
+
+    // ==========================================
+    // CHATBOT RESPONSE DEBUG
+    // ==========================================
+
+    console.log("==========================================");
+    console.log("CHATBOT RESPONSE DEBUG");
+    console.log("==========================================");
+    console.log("[CHATBOT] Response status:", response.status);
+    console.log("[CHATBOT] Response OK:", response.ok);
+    console.log("[CHATBOT] Response statusText:", response.statusText);
+    console.log("[CHATBOT] Response URL:", response.url);
+    console.log(
+      "[CHATBOT] Content-Type:",
+      response.headers.get("content-type")
+    );
+    console.log("==========================================");
+
+    // Read response as TEXT first so we can see
+    // exactly what the backend returned.
+    const rawResponse = await response.text();
+
+    console.log("==========================================");
+    console.log("CHATBOT RAW BACKEND RESPONSE");
+    console.log("==========================================");
+    console.log(rawResponse);
+    console.log("==========================================");
+
     if (!response.ok) {
-      throw new Error(`Backend returned status ${response.status}`);
+      console.error(
+        "[CHATBOT] Backend request failed:",
+        response.status,
+        rawResponse
+      );
+
+      throw new Error(
+        `Backend returned status ${response.status}: ${rawResponse}`
+      );
     }
 
-    const data = await response.json();
-    console.log("========== RAW BACKEND RESPONSE ==========");
-    console.log(data);
+    // ==========================================
+    // PARSE RESPONSE
+    // ==========================================
+
+    let data;
+
+    try {
+      data = JSON.parse(rawResponse);
+
+      console.log("==========================================");
+      console.log("CHATBOT PARSED RESPONSE");
+      console.log("==========================================");
+      console.log(data);
+      console.log("==========================================");
+    } catch (parseError) {
+      console.error(
+        "[CHATBOT] Failed to parse backend response as JSON:",
+        parseError
+      );
+
+      throw parseError;
+    }
+
     console.log("========== answer_markdown ==========");
     console.log(data.answer_markdown);
+
     console.log("========== JSON STRING ==========");
     console.log(JSON.stringify(data.answer_markdown));
 
@@ -283,31 +383,47 @@ export default function DemoChatbot({ parentData, onBack }) {
       botMessage = {
         sender: "bot",
         text: cleanMarkdownSpacing(
-          firstItem.snippet || "Sorry, I couldn't generate a response."
+          firstItem.snippet ||
+            "Sorry, I couldn't generate a response."
         ),
         name: firstItem.name
           ? firstItem.name.replace(/\*\*/g, "")
           : "Gem AI",
-        links: Array.isArray(firstItem.links) ? firstItem.links : [],
+        links: Array.isArray(firstItem.links)
+          ? firstItem.links
+          : [],
       };
     } else {
       botMessage = {
         sender: "bot",
         text: cleanMarkdownSpacing(
-          data.answer_markdown || "Sorry, I couldn't generate a response."
+          data.answer_markdown ||
+            "Sorry, I couldn't generate a response."
         ),
         name: data.source_name || "Gem AI",
-        links: Array.isArray(data.links) ? data.links : [],
-        pdfs: Array.isArray(data.pdfs) ? data.pdfs : [],
-
-        // NEW
+        links: Array.isArray(data.links)
+          ? data.links
+          : [],
+        pdfs: Array.isArray(data.pdfs)
+          ? data.pdfs
+          : [],
         messageId: data.message_id,
       };
     }
 
-    setMessages((prev) => [...prev, botMessage]);
+    setMessages((prev) => [
+      ...prev,
+      botMessage,
+    ]);
+
   } catch (error) {
-    console.error("Chatbot fetch error:", error);
+    console.error("==========================================");
+    console.error("CHATBOT ERROR DEBUG");
+    console.error("==========================================");
+    console.error("[CHATBOT] Error:", error);
+    console.error("[CHATBOT] Message:", error?.message);
+    console.error("[CHATBOT] Stack:", error?.stack);
+    console.error("==========================================");
 
     setMessages((prev) => [
       ...prev,
@@ -404,10 +520,6 @@ export default function DemoChatbot({ parentData, onBack }) {
 
   return (
     <div className="chat-container">
-      <button type="button" onClick={onBack}>
-        ← Back to dashboard
-      </button>
-
       <div className="bg-img bg-img-1"></div>
       <div className="bg-img bg-img-2"></div>
       <div className="bg-img bg-img-3"></div>
