@@ -53,7 +53,7 @@ export default function DemoChatbot({ parentData, onBack }) {
         setStudentContextError("");
 
         const response = await fetch(
-          `${API_BASE_URL2}/chatbot/parent-context`,
+          `${API_BASE_URL2}/chatbot/parent-context-new`,
           {
             method: "POST",
             headers: {
