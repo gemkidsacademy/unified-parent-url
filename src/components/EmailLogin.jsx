@@ -159,13 +159,20 @@ function EmailLogin({ onLoginSuccess }) {
 
           {/* Hero Text */}
           <div
-            className="hero-copy"
-            style={{
-              marginBottom: "35px",
-            }}
-          >
+  className="hero-copy"
+  style={{
+    width: "100%",
+    position: "relative",
+    left: "calc((100vw - 100%) / 2)",
+    textAlign: "center",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    marginBottom: "35px",
+  }}
+>
             <p className="welcome-text">
-              Welcome to
+            Welcome to
             </p>
 
             <h1 className="gem-ai-title">
@@ -179,10 +186,9 @@ function EmailLogin({ onLoginSuccess }) {
 
             <p className="hero-description">
               All your Gem Kids learning tools
-
               in <strong>one smart place.</strong>
             </p>
-          </div>
+          </div>|
 
           {/* =================================================
               LOGIN CARD
