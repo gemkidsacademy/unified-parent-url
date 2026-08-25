@@ -13,7 +13,7 @@ function App() {
     return storedData ? JSON.parse(storedData) : null;
   });
   const isAdminInterviewBooking =
-    window.location.pathname === "/admin-interview-booking";
+    window.location.pathname === "/admin";
   const isGamifiedQuiz =
     new URLSearchParams(window.location.search).get("view") ===
     "gamified-quiz";
