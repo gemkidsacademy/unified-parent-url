@@ -158,8 +158,12 @@ function EmailLogin({ onLoginSuccess }) {
         />
 
           {/* Hero Text */}
-          <div className="hero-copy">
-
+          <div
+            className="hero-copy"
+            style={{
+              marginBottom: "35px",
+            }}
+          >
             <p className="welcome-text">
               Welcome to
             </p>
@@ -175,10 +179,9 @@ function EmailLogin({ onLoginSuccess }) {
 
             <p className="hero-description">
               All your Gem Kids learning tools
-              
+
               in <strong>one smart place.</strong>
             </p>
-
           </div>
 
           {/* =================================================
@@ -344,9 +347,11 @@ function EmailLogin({ onLoginSuccess }) {
             alt="Gem AI student and robot"
             className="gem-ai-hero"
             style={{
-              height: "450px",
+              height: "465px",
               width: "auto",
               objectFit: "contain",
+              display: "block",
+              marginTop: "35px",
             }}
           />
 

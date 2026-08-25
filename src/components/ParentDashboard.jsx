@@ -162,7 +162,7 @@ function ParentDashboard({ parentData, onLogout }) {
               type="button"
               className="tool-button orange-button"
               onClick={() => {
-                window.location.href = "https://exam.gemkidsacademy.com.au/";
+                window.open("https://exam.gemkidsacademy.com.au/", "_blank", "noopener,noreferrer");
               }}
             >
               <span>Open Exams</span>
