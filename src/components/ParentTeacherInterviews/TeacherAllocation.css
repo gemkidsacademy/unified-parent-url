@@ -129,7 +129,7 @@
 .allocation-table-header,
 .allocation-row {
   display: grid;
-  grid-template-columns: 1.35fr 1fr 0.9fr 0.7fr 0.7fr 1.2fr;
+  grid-template-columns: 1.35fr 1fr 0.9fr 0.7fr 1.2fr;
   align-items: center;
   gap: 16px;
 }
@@ -154,6 +154,23 @@
 
 .allocation-row + .allocation-row {
   margin-top: 8px;
+}
+.allocation-edit-button {
+  justify-self: end;
+  padding: 8px 12px;
+  border: 1px solid #d9ccf5;
+  border-radius: 7px;
+  background: #f2edff;
+  color: #6029ca;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.allocation-edit-button:hover {
+  background: #e7def8;
+  border-color: #bda5ed;
 }
 
 .view-students-button {
@@ -249,9 +266,10 @@
     padding: 14px;
   }
 
-  .view-students-button {
-    justify-self: start;
-  }
+    .allocation-edit-button,
+    .view-students-button {
+      justify-self: start;
+    }
 
   .allocation-flow {
     flex-direction: column;
@@ -260,4 +278,21 @@
   .flow-arrow {
     transform: rotate(90deg);
   }
+}
+.allocation-delete-button {
+  padding: 8px 13px;
+  border: 1px solid #e7b8b8;
+  border-radius: 7px;
+  background: #fff5f5;
+  color: #c0392b;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.allocation-delete-button:hover {
+  background: #fde8e8;
+  border-color: #d98b8b;
+  color: #a93226;
 }

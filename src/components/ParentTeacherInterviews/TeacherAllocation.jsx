@@ -1,77 +1,288 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./TeacherAllocation.css";
-
-const initialAllocations = [
-  {
-    teacher: "Mrs Sarah Johnson",
-    className: "Selective",
-    classYear: "Year 5",
-    students: [
-      { name: "Oliver Brown", parent: "Emma Brown" },
-      { name: "Sophie Wilson", parent: "James Wilson" },
-      { name: "Liam Taylor", parent: "Sarah Taylor" },
-    ],
-  },
-];
-
-const teacherOptions = [
-  "Mrs Sarah Johnson",
-  "Mrs Emily Williams",
-  "Mr David Smith",
-];
-
-const classNameOptions = [
-  "Selective",
-  "OC",
-  "Foundation",
-  "NAPLAN",
-];
-
-const classYearOptions = ["Year 4", "Year 5", "Year 6"];
+import { API_BASE_URL } from "../../config/api";
 
 function TeacherAllocation() {
-  const [allocations, setAllocations] = useState(initialAllocations);
+  const interviewAdmin = (() => {
+    try {
+      return JSON.parse(
+        localStorage.getItem("interviewAdminData") || "null"
+      ) || {};
+    } catch {
+      return {};
+    }
+  })();
+  const [allocations, setAllocations] = useState([]);
+  const [classOptions, setClassOptions] = useState([]);
+  const [classYearOptions, setClassYearOptions] = useState([]);
+  const [teacherOptions, setTeacherOptions] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState("");
   const [selectedClassName, setSelectedClassName] = useState("");
   const [selectedClassYear, setSelectedClassYear] = useState("");
-  const [expandedTeacher, setExpandedTeacher] = useState(null);
+  const [editingAllocation, setEditingAllocation] = useState(null);
 
-  const addAllocation = () => {
-    if (!selectedTeacher || !selectedClassName || !selectedClassYear) return;
+  useEffect(() => {
+    const loadClasses = async () => {
+      const response = await fetch(
+        `${API_BASE_URL}/parent-teacher-interview/classes?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}`
+      );
+      const data = await response.json();
+      setClassOptions(data.classes || []);
+    };
 
-    const alreadyExists = allocations.some(
-      (allocation) =>
-        allocation.teacher === selectedTeacher ||
-        allocation.className === selectedClassName ||
-        allocation.classYear === selectedClassYear
+    loadClasses();
+  }, []);
+
+  useEffect(() => {
+    const loadAllocations = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/parent-teacher-interview/teacher-allocations?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}`
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.detail || "Failed to load teacher allocations."
+          );
+        }
+
+        setAllocations(
+          (data.allocations || []).map((allocation) => ({
+            id: allocation.id,
+            teacherId: allocation.teacher_id,
+            classId: allocation.class_id,
+            classYearId: allocation.class_year_id,
+            teacher: allocation.teacher_name,
+            className: allocation.class_name,
+            classYear: allocation.class_year,
+            parentCount: allocation.parent_count,
+          }))
+        );
+      } catch (error) {
+        console.error("Failed to load teacher allocations:", error);
+        setAllocations([]);
+      }
+    };
+
+    loadAllocations();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedClassName) {
+      setClassYearOptions([]);
+      return;
+    }
+
+    const loadClassYears = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/parent-teacher-interview/class-years?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}&class_name=${encodeURIComponent(selectedClassName)}`
+        );
+        const data = await response.json();
+        setClassYearOptions(data.class_years || []);
+      } catch (error) {
+        console.error("Failed to load class years:", error);
+        setClassYearOptions([]);
+      }
+    };
+
+    loadClassYears();
+  }, [selectedClassName]);
+
+  useEffect(() => {
+    if (!editingAllocation || classYearOptions.length === 0) {
+      return;
+    }
+
+    const matchingClassYear = classYearOptions.find(
+      (classYear) =>
+        Number(classYear.id) === Number(editingAllocation.classYearId)
     );
 
-    if (alreadyExists) return;
+    if (matchingClassYear) {
+      setSelectedClassYear(matchingClassYear.year_name);
+    }
+  }, [editingAllocation, classYearOptions]);
 
-    setAllocations((current) => [
-      ...current,
-      {
-        teacher: selectedTeacher,
-        className: selectedClassName,
-        classYear: selectedClassYear,
-        students: [
-          {
-            name: "Demo Student",
-            parent: "Demo Parent",
-          },
-        ],
-      },
-    ]);
+  useEffect(() => {
+    const loadTeachers = async () => {
+      const response = await fetch(
+        `${API_BASE_URL}/parent-teacher-interview/teachers?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}`
+      );
+      const data = await response.json();
+      setTeacherOptions(data.teachers || []);
+    };
 
-    setSelectedTeacher("");
-    setSelectedClassName("");
-    setSelectedClassYear("");
+    loadTeachers();
+  }, []);
+
+  const deleteAllocation = async (allocationId) => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/parent-teacher-interview/teacher-allocations/${allocationId}?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail || "Failed to delete teacher allocation."
+        );
+      }
+
+      setAllocations((current) =>
+        current.filter((allocation) => allocation.id !== allocationId)
+      );
+
+      if (editingAllocation?.id === allocationId) {
+        setEditingAllocation(null);
+        setSelectedTeacher("");
+        setSelectedClassName("");
+        setSelectedClassYear("");
+      }
+    } catch (error) {
+      console.error("Failed to delete teacher allocation:", error);
+      window.alert(
+        error.message || "Failed to delete teacher allocation."
+      );
+    }
   };
 
-  const toggleStudents = (teacher) => {
-    setExpandedTeacher((current) =>
-      current === teacher ? null : teacher
+    const addAllocation = async () => {
+    if (!selectedTeacher || !selectedClassName || !selectedClassYear) {
+      return;
+    }
+
+    const selectedTeacherRecord = teacherOptions.find(
+      (teacher) => teacher.full_name === selectedTeacher
     );
+
+    const selectedClassRecord = classOptions.find(
+      (classItem) => classItem.class_name === selectedClassName
+    );
+
+    const selectedClassYearRecord = classYearOptions.find(
+      (classYear) => classYear.year_name === selectedClassYear
+    );
+
+    if (
+      !selectedTeacherRecord ||
+      !selectedClassRecord ||
+      !selectedClassYearRecord
+    ) {
+      return;
+    }
+
+    try {
+      if (editingAllocation) {
+        const response = await fetch(
+          `${API_BASE_URL}/parent-teacher-interview/teacher-allocations/${editingAllocation.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              center_code: interviewAdmin.center_code,
+              teacher_id: Number(selectedTeacherRecord.id),
+              class_id: Number(selectedClassRecord.id),
+              class_year_id: Number(selectedClassYearRecord.id),
+            }),
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.detail || "Failed to update teacher allocation."
+          );
+        }
+
+        setAllocations((current) =>
+          current.map((allocation) =>
+            allocation.id === editingAllocation.id
+              ? {
+                  ...allocation,
+                  teacherId: Number(selectedTeacherRecord.id),
+                  classId: Number(selectedClassRecord.id),
+                  classYearId: Number(selectedClassYearRecord.id),
+                  teacher: selectedTeacher,
+                  className: selectedClassName,
+                  classYear: selectedClassYear,
+                }
+              : allocation
+          )
+        );
+
+        setEditingAllocation(null);
+      } else {
+        const alreadyExists = allocations.some(
+          (allocation) =>
+            allocation.teacherId === Number(selectedTeacherRecord.id) &&
+            allocation.classId === Number(selectedClassRecord.id) &&
+            allocation.classYearId === Number(selectedClassYearRecord.id)
+        );
+
+        if (alreadyExists) {
+          window.alert(
+            "This teacher is already allocated to this class and class year."
+          );
+          return;
+        }
+
+        const response = await fetch(
+          `${API_BASE_URL}/parent-teacher-interview/teacher-allocations`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              center_code: interviewAdmin.center_code,
+              teacher_id: Number(selectedTeacherRecord.id),
+              class_id: Number(selectedClassRecord.id),
+              class_year_id: Number(selectedClassYearRecord.id),
+            }),
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.detail || "Failed to save teacher allocation."
+          );
+        }
+
+        setAllocations((current) => [
+          ...current,
+          {
+            id: data.allocation_id,
+            teacherId: Number(selectedTeacherRecord.id),
+            classId: Number(selectedClassRecord.id),
+            classYearId: Number(selectedClassYearRecord.id),
+            teacher: selectedTeacher,
+            className: selectedClassName,
+            classYear: selectedClassYear,
+          },
+        ]);
+      }
+
+      setSelectedTeacher("");
+      setSelectedClassName("");
+      setSelectedClassYear("");
+    } catch (error) {
+      console.error("Failed to save teacher allocation:", error);
+      window.alert(
+        error.message || "Failed to save teacher allocation."
+      );
+    }
   };
 
   return (
@@ -111,20 +322,18 @@ function TeacherAllocation() {
 
             <select
               value={selectedClassName}
-              onChange={(event) =>
-                setSelectedClassName(event.target.value)
-              }
+              onChange={(event) => {
+                setSelectedClassName(event.target.value);
+                setSelectedClassYear("");
+              }}
             >
               <option value="">
                 Select a class name
               </option>
 
-              {classNameOptions.map((className) => (
-                <option
-                  key={className}
-                  value={className}
-                >
-                  {className}
+              {classOptions.map((classItem) => (
+                <option key={classItem.id} value={classItem.class_name}>
+                  {classItem.class_name}
                 </option>
               ))}
             </select>
@@ -144,8 +353,8 @@ function TeacherAllocation() {
               </option>
 
               {classYearOptions.map((classYear) => (
-                <option key={classYear} value={classYear}>
-                  {classYear}
+                <option key={classYear.id} value={classYear.year_name}>
+                  {classYear.year_name}
                 </option>
               ))}
             </select>
@@ -165,8 +374,8 @@ function TeacherAllocation() {
               </option>
 
               {teacherOptions.map((teacher) => (
-                <option key={teacher} value={teacher}>
-                  {teacher}
+                <option key={teacher.id} value={teacher.full_name}>
+                  {teacher.full_name}
                 </option>
               ))}
             </select>
@@ -178,7 +387,7 @@ function TeacherAllocation() {
             onClick={addAllocation}
             disabled={!selectedTeacher || !selectedClassName || !selectedClassYear}
           >
-            + Assign Teacher
+            {editingAllocation ? "Save Changes" : "+ Assign Teacher"}
           </button>
 
         </div>
@@ -207,7 +416,6 @@ function TeacherAllocation() {
             <span>Teacher</span>
             <span>Class Name</span>
             <span>Class Year</span>
-            <span>Students</span>
             <span>Parents</span>
             <span></span>
           </div>
@@ -230,47 +438,33 @@ function TeacherAllocation() {
                 </span>
 
                 <span>
-                  {allocation.students.length}
+                  {allocation.parentCount ?? 0}
                 </span>
 
-                <span>
-                  {allocation.students.length}
-                </span>
+                <div className="allocation-action-buttons">
+                  <button
+                    type="button"
+                    className="allocation-edit-button"
+                    onClick={() => {
+                      setEditingAllocation(allocation);
+                      setSelectedTeacher(allocation.teacher);
+                      setSelectedClassName(allocation.className);
+                      setSelectedClassYear("");
+                    }}
+                  >
+                    Edit
+                  </button>
 
-                <button
-                  type="button"
-                  className="view-students-button"
-                  onClick={() =>
-                    toggleStudents(allocation.teacher)
-                  }
-                >
-                  {expandedTeacher === allocation.teacher
-                    ? "Hide Students"
-                    : "View Students"}
-                </button>
+                  <button
+                    type="button"
+                    className="allocation-delete-button"
+                    onClick={() => deleteAllocation(allocation.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
 
               </div>
-
-              {expandedTeacher === allocation.teacher && (
-                <div className="student-list">
-
-                  <div className="student-list-header">
-                    <span>Student</span>
-                    <span>Parent</span>
-                  </div>
-
-                  {allocation.students.map((student) => (
-                    <div
-                      className="student-list-row"
-                      key={student.name}
-                    >
-                      <span>{student.name}</span>
-                      <span>{student.parent}</span>
-                    </div>
-                  ))}
-
-                </div>
-              )}
 
             </div>
           ))}
@@ -278,36 +472,7 @@ function TeacherAllocation() {
         </div>
       </section>
 
-      {/* Automation explanation */}
-      <section className="allocation-flow">
-
-        <div className="flow-step">
-          <strong>Teacher</strong>
-          <span>Mrs Sarah Johnson</span>
-        </div>
-
-        <span className="flow-arrow">→</span>
-
-        <div className="flow-step">
-          <strong>Class</strong>
-          <span>Selective · Year 5</span>
-        </div>
-
-        <span className="flow-arrow">→</span>
-
-        <div className="flow-step">
-          <strong>Students</strong>
-          <span>Automatically linked</span>
-        </div>
-
-        <span className="flow-arrow">→</span>
-
-        <div className="flow-step">
-          <strong>Parents</strong>
-          <span>Correct teacher link</span>
-        </div>
-
-      </section>
+      
 
     </div>
   );
