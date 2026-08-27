@@ -111,7 +111,7 @@ function AdminInterviewBooking() {
     date: "",
     location: "",
   });
-  const [activeTab, setActiveTab] = useState("setup");
+  const [activeTab, setActiveTab] = useState("parentTeacherInterview");
   const [bookingFilters, setBookingFilters] = useState({
     event: "Term 3 Parent–Teacher Interviews 2026",
     teacher: "All",
