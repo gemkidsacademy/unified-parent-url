@@ -355,7 +355,7 @@ function EmailLogin({ onLoginSuccess }) {
       {/* =====================================================
           FEATURES
       ===================================================== */}
-
+      {/*
       <section className="feature-strip">
 
         <div className="feature">
@@ -415,7 +415,7 @@ function EmailLogin({ onLoginSuccess }) {
         </div>
 
       </section>
-
+        */}
       {/* =====================================================
           FOOTER
       ===================================================== */}
