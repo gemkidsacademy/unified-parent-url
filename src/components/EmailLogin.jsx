@@ -174,7 +174,7 @@ function EmailLogin({ onLoginSuccess }) {
             
 
             
-          </div>|
+          </div>
 
           {/* =================================================
               LOGIN CARD
