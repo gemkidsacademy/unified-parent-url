@@ -171,23 +171,9 @@ function EmailLogin({ onLoginSuccess }) {
     marginBottom: "35px",
   }}
 >
-            <p className="welcome-text">
-            Welcome to
-            </p>
+            
 
-            <h1 className="gem-ai-title">
-              <span className="gem-text">
-                Gem
-              </span>{" "}
-              <span className="ai-text">
-                AI
-              </span>
-            </h1>
-
-            <p className="hero-description">
-              All your Gem Kids learning tools
-              in <strong>one smart place.</strong>
-            </p>
+            
           </div>|
 
           {/* =================================================
@@ -345,7 +331,7 @@ function EmailLogin({ onLoginSuccess }) {
         {/* ===================================================
             RIGHT SIDE
         =================================================== */}
-
+        {/*
         <div className="hero-right">
 
           <img
@@ -362,6 +348,7 @@ function EmailLogin({ onLoginSuccess }) {
           />
 
         </div>
+        */}
 
       </section>
 

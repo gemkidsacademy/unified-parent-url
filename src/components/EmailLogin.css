@@ -53,7 +53,7 @@ input {
 
   display: grid;
 
-  grid-template-columns: 46% 54%;
+  grid-template-columns: 1fr;
 
   align-items: stretch;
 
@@ -74,10 +74,11 @@ input {
    LEFT SIDE
 ========================================================= */
 .hero-left {
-  padding: 145px 10px 0 20px;
+  width: 100%;
+  padding: 145px 20px 0;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   box-sizing: border-box;
 }
 
@@ -141,20 +142,15 @@ input {
 
 .email-login-card {
   width: min(100%, 520px);
-
   min-height: 465px;
-
   background: rgba(255, 255, 255, 0.94);
-
   border-radius: 26px;
-
   box-shadow: 0 18px 35px rgba(92, 69, 155, 0.09);
-
   padding: 36px 30px 36px;
-
   box-sizing: border-box;
-
   border: 1px solid rgba(130, 110, 201, 0.06);
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .email-icon-wrapper {
