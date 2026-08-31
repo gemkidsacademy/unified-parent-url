@@ -986,7 +986,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
           </div>
           <div>
             <span className="admin-eyebrow">Admin workspace</span>
-            <h1>Parent–Teacher Interviews</h1>
+            
             <p className="admin-identity">
               Center: {interviewAdmin.center_code || "—"} · Admin: {interviewAdmin.full_name || "—"}
             </p>
