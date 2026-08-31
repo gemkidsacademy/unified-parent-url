@@ -1,70 +1,335 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { API_BASE_URL } from "../config/api";
 import "./ParentDashboard.css";
 import "./ParentTeacherInterviews.css";
 
+// Picks the first event that hasn't happened yet, falling back to the
+// first event returned when every event is in the past (or none is).
+const findCurrentEvent = (eventsList) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return (
+    eventsList.find((event) => {
+      if (!event?.event_date) return false;
+      return new Date(`${event.event_date}T00:00:00`) >= today;
+    }) ||
+    eventsList[0] ||
+    null
+  );
+};
+
+const formatSlotTime = (timeValue) => {
+  const [hours, minutes] = String(timeValue || "")
+    .split(":")
+    .map(Number);
+
+  if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+    return "";
+  }
+
+  const period = hours >= 12 ? "PM" : "AM";
+  return `${hours % 12 || 12}:${String(minutes).padStart(2, "0")} ${period}`;
+};
+
 function ParentTeacherInterviews({ parentData, onBack }) {
-  const studentName = parentData?.students?.[0]?.name || "Oliver Brown";
-  const studentClass = parentData?.students?.[0]?.className || "Year 5";
-  const [selectedSlot, setSelectedSlot] = useState("");
+  const student = parentData?.student || null;
+
+  const studentName = student?.name || "Not available";
+  const studentClass = student?.class_name || "Not available";
+
+  const studentId = student?.student_id || "";
+  const parentEmail = student?.parent_email || "";
+
+  const centerCode =
+    student?.center_code ||
+    parentData?.admin?.center_code ||
+    "";
+
+  console.log("PTI parentData:", parentData);
+  console.log("PTI student:", student);
+  console.log("PTI student center_code:", centerCode);
+  console.log("PTI student_id:", studentId);
+  console.log("PTI parent_email:", parentEmail);
+  const [selectedSlot, setSelectedSlot] = useState(null);
   const [booking, setBooking] = useState(null);
   const [isChangingTime, setIsChangingTime] = useState(false);
-  const [bookedSlots, setBookedSlots] = useState(new Set(["6:30 PM"]));
+  
   const [showChangeConfirmation, setShowChangeConfirmation] = useState(false);
 
+  const [events, setEvents] = useState([]);
+  // Not yet read in JSX — wired up for the teacher-allocation/time-slot step.
+  // eslint-disable-next-line no-unused-vars
+  const [slots, setSlots] = useState([]);
+  // eslint-disable-next-line no-unused-vars
+  const [existingBookings, setExistingBookings] = useState([]);
+  // eslint-disable-next-line no-unused-vars
+  const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line no-unused-vars
+  const [error, setError] = useState("");
+  
+  useEffect(() => {
+    console.log("PTI parentData:", parentData);
+    console.log("PTI student:", parentData?.student);
+    console.log(
+      "PTI student center_code:",
+      parentData?.student?.center_code
+    );
+    console.log(
+      "PTI student_id:",
+      parentData?.student?.student_id
+    );
+    console.log(
+      "PTI parent_email:",
+      parentData?.student?.parent_email
+    );
+  }, [parentData]);
+  const currentEvent = findCurrentEvent(events);
+
+  const bookedSlotIds = new Set(
+    existingBookings
+      .filter(
+        (item) =>
+          item.event_id === currentEvent?.id &&
+          item.booking_status === "BOOKED"
+      )
+      .map((item) => item.slot_id)
+  );
+
+  
+  useEffect(() => {
+    let isCancelled = false;
+
+    const loadInterviewData = async () => {
+      console.log("PTI centerCode:", centerCode);
+
+      if (!centerCode) {
+        setLoading(false);
+        setError("Missing center code for this student.");
+        return;
+      }
+
+      setLoading(true);
+      setError("");
+
+      try {
+        const eventsUrl = `${API_BASE_URL}/parent-teacher-interview/events?center_code=${encodeURIComponent(centerCode)}`;
+        console.log("PTI events URL:", eventsUrl);
+
+        const eventsResponse = await fetch(eventsUrl);
+
+        if (!eventsResponse.ok) {
+          throw new Error(`Unable to load events (${eventsResponse.status})`);
+        }
+
+        const eventsData = await eventsResponse.json();
+        console.log("PTI events response:", eventsData);
+
+        const loadedEvents = eventsData.events || [];
+        console.log("PTI loaded events:", loadedEvents);
+
+        if (isCancelled) return;
+        setEvents(loadedEvents);
+
+        const bookingsUrl = `${API_BASE_URL}/parent-teacher-interview/bookings?center_code=${encodeURIComponent(centerCode)}`;
+        console.log("PTI bookings URL:", bookingsUrl);
+
+        const bookingsResponse = await fetch(bookingsUrl);
+
+        if (!bookingsResponse.ok) {
+          throw new Error(`Unable to load bookings (${bookingsResponse.status})`);
+        }
+
+        const bookingsData = await bookingsResponse.json();
+        console.log("PTI bookings response:", bookingsData);
+
+        if (isCancelled) return;
+        setExistingBookings(bookingsData.bookings || []);
+
+        const selectedEvent = findCurrentEvent(loadedEvents);
+        console.log("PTI selected event:", selectedEvent);
+
+        if (selectedEvent?.id) {
+          const availabilityUrl = `${API_BASE_URL}/parent-teacher-interview/slots?center_code=${encodeURIComponent(centerCode)}&event_id=${selectedEvent.id}`;
+          console.log("PTI availability URL:", availabilityUrl);
+
+          const availabilityResponse = await fetch(availabilityUrl);
+
+          if (!availabilityResponse.ok) {
+            throw new Error(
+              `Unable to load teacher availability (${availabilityResponse.status})`
+            );
+          }
+
+          const availabilityData = await availabilityResponse.json();
+          console.log("PTI availability response:", availabilityData);
+
+          if (isCancelled) return;
+          setSlots(availabilityData.slots || []);
+        } else {
+          setSlots([]);
+        }
+      } catch (loadError) {
+        console.error("PTI load error:", loadError);
+        if (!isCancelled) {
+          setError(loadError.message || "Unable to load interview data.");
+        }
+      } finally {
+        if (!isCancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadInterviewData();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [centerCode]);
+
+  useEffect(() => {
+    console.log("PTI events:", events);
+    console.log("PTI currentEvent:", currentEvent);
+    console.log("PTI slots:", slots);
+    console.log("PTI existingBookings:", existingBookings);
+    console.log("PTI booking:", booking);
+    console.log("PTI centerCode:", centerCode);
+  }, [events, currentEvent, slots, existingBookings, booking, centerCode]);
+
   const eventDetails = [
-    ["Date", "Friday, 18 September 2026"],
-    ["Location", "Marsden Park Centre"],
-    ["Teacher", "Mrs Sarah Johnson"],
+    ["Date", currentEvent?.event_date || "Not available"],
+    ["Location", currentEvent?.location || "Not available"],
+    [
+      "Teacher",
+      slots.length > 0
+        ? slots[0].teacher_name || "Not available"
+        : "Not available",
+    ],
     ["Booking status", booking ? "Booked" : "Not booked"],
   ];
 
-  const timeSlots = [
-    { time: "6:00 PM", endTime: "6:10 PM", status: "Available" },
-    { time: "6:15 PM", endTime: "6:25 PM", status: "Available" },
-    { time: "6:30 PM", endTime: "6:40 PM", status: "Booked" },
-    { time: "6:45 PM", endTime: "6:55 PM", status: "Available" },
-  ];
+  const timeSlots = slots
+    .filter((slot) => slot.is_available === true)
+    .map((slot) => ({
+      id: slot.id,
+      teacherId: slot.teacher_id,
+      time: `${formatSlotTime(slot.start_time)} – ${formatSlotTime(
+        slot.end_time
+      )}`,
+      status: "Available",
+    }));
 
-  const getSlot = (time) => timeSlots.find((slot) => slot.time === time);
+  const getSlot = (slotId) => timeSlots.find((slot) => slot.id === slotId);
   const selectedSlotDetails = getSlot(selectedSlot);
   const otherAvailableSlots = timeSlots.filter(
-    (slot) =>
-      slot.status === "Available" &&
-      !bookedSlots.has(slot.time) &&
-      slot.time !== booking?.time
-  );
+  (slot) =>
+    slot.status === "Available" &&
+    !bookedSlotIds.has(slot.id) &&
+    slot.time !== booking?.time
+);
 
-  const confirmInterview = () => {
-    if (!selectedSlotDetails) return;
-
-    setBookedSlots((currentSlots) => new Set([...currentSlots, selectedSlotDetails.time]));
-    setBooking({
-      time: selectedSlotDetails.time,
-      endTime: selectedSlotDetails.endTime,
+  const confirmInterview = async () => {
+  if (!selectedSlotDetails || !currentEvent?.id) {
+    console.error("[PTI BOOKING] Missing booking selection", {
+      eventId: currentEvent?.id,
+      slotId: selectedSlotDetails?.id,
     });
+    return;
+  }
+
+  const student = parentData?.student;
+
+  if (!student?.student_id) {
+    console.error("[PTI BOOKING] Missing student information", {
+      studentId: student?.student_id,
+      parentEmail: student?.parent_email,
+    });
+    setError("Student information is missing. Please log in as a parent.");
+    return;
+  }
+
+  try {
+    setError("");
+
+    const bookingUrl = `${API_BASE_URL}/parent-teacher-interview/bookings`;
+    const bookingPayload = {
+      center_code: centerCode,
+      event_id: currentEvent.id,
+      slot_id: selectedSlotDetails.id,
+      teacher_id: selectedSlotDetails.teacherId,
+      student_id: student.student_id,
+      parent_email: student.parent_email,
+    };
+
+    console.log("[PTI BOOKING] Creating booking", {
+      eventId: currentEvent.id,
+      slotId: selectedSlotDetails.id,
+      teacherId: selectedSlotDetails.teacherId,
+      studentId: student.student_id,
+      centerCode,
+      requestUrl: bookingUrl,
+      requestPayload: bookingPayload,
+    });
+
+    const response = await fetch(bookingUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bookingPayload),
+    });
+
+    console.log("[PTI BOOKING] Response status:", response.status);
+
+    const data = await response.json();
+
+    console.log("[PTI BOOKING] Response body:", data);
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail || `Unable to book interview (${response.status})`
+      );
+    }
+
+    setBooking({
+      id: data.booking_id,
+      eventId: data.event_id,
+      slotId: data.slot_id,
+      teacherId: data.teacher_id,
+      studentId: data.student_id,
+      time: selectedSlotDetails.time,
+      teacherName: eventDetails.find(
+        ([label]) => label === "Teacher"
+      )?.[1],
+    });
+
+    setSelectedSlot(null);
     setIsChangingTime(false);
-  };
+
+    const bookingsResponse = await fetch(
+      `${API_BASE_URL}/parent-teacher-interview/bookings?center_code=${encodeURIComponent(
+        centerCode
+      )}`
+    );
+
+    if (bookingsResponse.ok) {
+      const bookingsData = await bookingsResponse.json();
+      setExistingBookings(bookingsData.bookings || []);
+    }
+  } catch (bookingError) {
+    console.error("PTI booking error:", bookingError);
+    setError(bookingError.message || "Unable to book interview.");
+  }
+};
 
   const changeInterviewTime = () => {
-    setSelectedSlot(booking.time);
+    setSelectedSlot(booking.slotId);
     setIsChangingTime(true);
     setShowChangeConfirmation(false);
   };
 
   const confirmChange = () => {
-    if (!booking || !selectedSlotDetails || selectedSlotDetails.time === booking.time) {
-      return;
-    }
-
-    setBookedSlots((currentSlots) => {
-      const updatedSlots = new Set(currentSlots);
-      updatedSlots.delete(booking.time);
-      updatedSlots.add(selectedSlotDetails.time);
-      return updatedSlots;
-    });
-    setBooking(selectedSlotDetails);
-    setSelectedSlot("");
-    setIsChangingTime(false);
     setShowChangeConfirmation(false);
   };
 
@@ -103,7 +368,7 @@ function ParentTeacherInterviews({ parentData, onBack }) {
             <div className="interview-event-icon">📅</div>
             <div>
               <span className="interview-eyebrow">Upcoming interview</span>
-              <h2>Term 3 Parent–Teacher Interviews 2026</h2>
+              <h2>{currentEvent?.name || "No upcoming interview event"}</h2>
               <p>Student: {studentName} · {studentClass}</p>
             </div>
           </div>
@@ -122,20 +387,20 @@ function ParentTeacherInterviews({ parentData, onBack }) {
               <h3>Choose an available time</h3>
               <div className="time-slot-list">
                 {timeSlots.map((slot) => {
-                  const isCurrentBooking = booking?.time === slot.time;
-                  const isBooked = bookedSlots.has(slot.time) && !isCurrentBooking;
-                  const isSelected = selectedSlot === slot.time;
+                  const isCurrentBooking = booking?.slotId === slot.id;
+                  const isBooked = bookedSlotIds.has(slot.id) && !isCurrentBooking;
+                  const isSelected = selectedSlot === slot.id;
 
                   return (
                     <button
                       type="button"
-                      key={slot.time}
+                      key={slot.id}
                       className={`time-slot ${isBooked ? "booked" : ""} ${
                         isSelected ? "selected" : ""
                       }`}
                       disabled={isBooked}
                       onClick={() => {
-                        if (!isBooked) setSelectedSlot(slot.time);
+                        if (!isBooked) setSelectedSlot(slot.id);
                       }}
                     >
                       <span>{slot.time}</span>
@@ -158,7 +423,7 @@ function ParentTeacherInterviews({ parentData, onBack }) {
                   <div>
                     <span className="confirmation-label">Your selected time</span>
                     <strong>
-                      {selectedSlotDetails.time} – {selectedSlotDetails.endTime}
+                      {selectedSlotDetails.time}
                     </strong>
                   </div>
                   <button
@@ -177,10 +442,18 @@ function ParentTeacherInterviews({ parentData, onBack }) {
                 <strong>Interview booked successfully</strong>
                 <div className="booking-confirmation-details">
                   <span>Student: {studentName}</span>
-                  <span>Teacher: Mrs Sarah Johnson</span>
-                  <span>Date: Friday, 18 September 2026</span>
-                  <span>Time: {booking.time} – {booking.endTime}</span>
-                  <span>Location: Marsden Park Centre</span>
+                  <span>
+                    Teacher: {booking?.teacherName || "Not available"}
+                  </span>
+                  <span>
+                    Date: {currentEvent?.event_date || "Not available"}
+                  </span>
+                  <span>
+                    Time: {booking?.time}
+                  </span>
+                  <span>
+                    Location: {currentEvent?.location || "Not available"}
+                  </span>
                 </div>
                 <p>A confirmation email has been sent to you.</p>
               </div>
@@ -188,12 +461,34 @@ function ParentTeacherInterviews({ parentData, onBack }) {
               <div className="booked-interview-card">
                 <h3>Your interview is booked</h3>
                 <dl>
-                  <div><dt>Student</dt><dd>{studentName}</dd></div>
-                  <div><dt>Teacher</dt><dd>Mrs Sarah Johnson</dd></div>
-                  <div><dt>Date</dt><dd>Friday, 18 September 2026</dd></div>
-                  <div><dt>Interview time</dt><dd>{booking.time} – {booking.endTime}</dd></div>
-                  <div><dt>Location</dt><dd>Marsden Park Centre</dd></div>
+                  <div>
+                    <dt>Student</dt>
+                    <dd>{studentName}</dd>
+                  </div>
+
+                  <div>
+                    <dt>Teacher</dt>
+                    <dd>{booking?.teacherName || "Not available"}</dd>
+                  </div>
+
+                  <div>
+                    <dt>Date</dt>
+                    <dd>{currentEvent?.event_date || "Not available"}</dd>
+                  </div>
+
+                  <div>
+                    <dt>Interview time</dt>
+                    <dd>
+                      {booking?.time}
+                    </dd>
+                  </div>
+
+                  <div>
+                    <dt>Location</dt>
+                    <dd>{currentEvent?.location || "Not available"}</dd>
+                  </div>
                 </dl>
+
                 <button
                   type="button"
                   className="confirm-interview-button"

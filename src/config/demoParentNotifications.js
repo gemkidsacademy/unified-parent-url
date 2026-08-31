@@ -1,0 +1,32 @@
+export const demoParentNotifications = [
+  {
+    id: "gem-ai-parent-demo-1",
+    title: "Welcome to Gem AI",
+    text: "Gem AI is ready to support your child's learning journey with personalised tools and guidance.",
+    image: null,
+    displayMode: "text",
+    startDate: "2026-01-01",
+    endDate: "2026-12-31",
+    active: true,
+  },
+  {
+    id: "gem-ai-parent-demo-2",
+    title: "Gem AI notification",
+    text: "",
+    image: "/images/Image_Notification.png",
+    displayMode: "image",
+    startDate: "2026-01-01",
+    endDate: "2026-12-31",
+    active: true,
+  },
+  {
+    id: "gem-ai-parent-demo-3",
+    title: "Discover more with Gem AI",
+    text: "Explore personalised learning support, helpful guidance, and engaging activities designed for your child.",
+    image: "/images/imageTextNotificationimage.png",
+    displayMode: "text-image",
+    startDate: "2026-01-01",
+    endDate: "2026-12-31",
+    active: true,
+  },
+];

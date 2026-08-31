@@ -4,6 +4,10 @@ import { API_BASE_URL } from "../config/api";
 import TeacherAllocation from "./ParentTeacherInterviews/TeacherAllocation";
 import InterviewReminders from "./ParentTeacherInterviews/InterviewReminders";
 import EventHistory from "./ParentTeacherInterviews/EventHistory";
+import HomeworkConfiguration from "../pages/HomeworkConfiguration";
+import HomeworkAutomation from "../pages/HomeworkAutomation";
+import HomeworkWeeklyDashboard from "../pages/HomeworkWeeklyDashboard";
+import TestEmail from "../pages/TestEmail";
 
 const parseTime = (time) => {
   const match = time.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
@@ -85,6 +89,15 @@ const getEventStatus = (eventDate) => {
   return date >= today ? "Upcoming" : "Completed";
 };
 
+const getBookingDisplayStatus = (bookingStatus) =>
+  bookingStatus === "BOOKED" ? "Booked" : "Not Booked";
+
+const formatBookingTime = (startTime, endTime) => {
+  if (!startTime || !endTime) return "—";
+
+  return `${formatAvailabilityTime(startTime)} – ${formatAvailabilityTime(endTime)}`;
+};
+
 function AdminInterviewBooking() {
   const interviewAdmin = (() => {
     try {
@@ -93,6 +106,7 @@ function AdminInterviewBooking() {
       return {};
     }
   })();
+  const [eventSlots, setEventSlots] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [expandedTeacherIds, setExpandedTeacherIds] = useState(new Set());
   const [teacherOptions, setTeacherOptions] = useState([]);
@@ -111,18 +125,22 @@ function AdminInterviewBooking() {
     date: "",
     location: "",
   });
+  
   const [activeTab, setActiveTab] = useState("parentTeacherInterview");
   const [bookingFilters, setBookingFilters] = useState({
-    event: "Term 3 Parent–Teacher Interviews 2026",
+    event: "All",
     teacher: "All",
     className: "All",
     status: "All",
     time: "All",
   });
+  const [bookings, setBookings] = useState([]);
+  const [teacherAllocations, setTeacherAllocations] = useState([]);
+  const [bookingClassOptions, setBookingClassOptions] = useState([]);
   const [invitations, setInvitations] = useState([]);
   const [selectedInvitationIds, setSelectedInvitationIds] = useState([]);
   const [invitationFilters, setInvitationFilters] = useState({
-    event: "Term 3 Parent–Teacher Interviews 2026",
+    event: "All",
     className: "All",
     classYear: "All",
     status: "All",
@@ -160,6 +178,139 @@ function AdminInterviewBooking() {
 
     const data = await response.json();
     setTeacherOptions(data.teachers || []);
+  };
+  const loadEventSlots = async (eventId) => {
+  if (!eventId || eventId === "All") {
+    setEventSlots([]);
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/parent-teacher-interview/slots?center_code=${encodeURIComponent(
+        interviewAdmin.center_code || ""
+      )}&event_id=${encodeURIComponent(eventId)}`
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Unable to load event slots (${response.status})`
+      );
+    }
+
+    const data = await response.json();
+    setEventSlots(data.slots || []);
+  } catch (error) {
+    console.error("Failed to load event slots:", error);
+    setEventSlots([]);
+  }
+};
+  const loadTeacherAllocations = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/parent-teacher-interview/teacher-allocations?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}`
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Unable to load teacher allocations (${response.status})`
+        );
+      }
+
+      const data = await response.json();
+      setTeacherAllocations(data.allocations || []);
+    } catch (error) {
+      console.error("Failed to load teacher allocations:", error);
+      setTeacherAllocations([]);
+    }
+  };
+  const loadInvitations = async (eventId) => {
+  if (!eventId || eventId === "All") {
+    setInvitations([]);
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/parent-teacher-interview/invitations?center_code=${encodeURIComponent(
+        interviewAdmin.center_code || ""
+      )}&event_id=${encodeURIComponent(eventId)}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`Unable to load invitations (${response.status})`);
+    }
+
+    const data = await response.json();
+
+    setInvitations(
+      (data.invitations || []).map((invitation) => ({
+        id: invitation.id,
+        eventId: invitation.event_id,
+        teacherId: invitation.teacher_id,
+        teacher: invitation.teacher_name,
+        studentId: invitation.student_id,
+        student: invitation.student_name,
+        parent: invitation.parent_email,
+        className: invitation.class_name,
+        classYear: invitation.class_year,
+        status:
+          invitation.status === "SENT"
+            ? "Sent"
+            : "Not Sent",
+        sentAt: invitation.sent_at,
+      }))
+    );
+
+    setSelectedInvitationIds([]);
+    setInvitationMessage("");
+  } catch (error) {
+    console.error("Failed to load invitations:", error);
+    setInvitations([]);
+  }
+};
+
+  const loadBookings = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/parent-teacher-interview/bookings?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Unable to load bookings (${response.status})`);
+      }
+
+      const data = await response.json();
+      setBookings(data.bookings || []);
+    } catch (error) {
+      console.error("Unable to load interview bookings:", error);
+      setBookings([]);
+    }
+  };
+
+  const loadBookingClassOptions = async (teacherName) => {
+    try {
+      const selectedTeacherOption = teacherOptions.find(
+        (teacher) => teacher.full_name === teacherName
+      );
+      const teacherQuery =
+        teacherName && teacherName !== "All" && selectedTeacherOption?.id
+          ? `&teacher_id=${encodeURIComponent(selectedTeacherOption.id)}`
+          : "";
+      const response = await fetch(
+        `${API_BASE_URL}/parent-teacher-interview/classes?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}${teacherQuery}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Unable to load classes (${response.status})`);
+      }
+
+      const data = await response.json();
+      setBookingClassOptions(data.classes || []);
+    } catch (error) {
+      console.error("Unable to load booking class options:", error);
+      setBookingClassOptions([]);
+    }
   };
 
   const loadTeacherAvailability = async () => {
@@ -233,6 +384,26 @@ function AdminInterviewBooking() {
   useEffect(() => {
     loadTeacherAvailability();
   }, [availabilityEventId]);
+
+  useEffect(() => {
+    if (activeTab === "bookings") {
+      loadBookings();
+      loadTeacherAllocations();
+    }
+
+    if (activeTab === "invitations") {
+      loadTeacherAllocations();
+      loadInvitations(invitationFilters.event);
+    }
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (activeTab === "bookings") {
+      loadBookingClassOptions(bookingFilters.teacher);
+    }
+  }, [activeTab, bookingFilters.teacher, teacherOptions]);
+
+  
 
   const selectTeacher = (teacherId) => {
     const teacher = teacherOptions.find(
@@ -528,7 +699,121 @@ const handleSaveEvent = async () => {
     }
   };
 
-  const filteredBookings = [];
+    const bookingRows = [
+  ...bookings.map((booking) => {
+    const allocation = teacherAllocations.find(
+      (item) =>
+        String(item.student_id ?? item.studentId) ===
+        String(booking.student_id)
+    );
+
+    return {
+      ...booking,
+      class_name:
+        booking.class_name ??
+        booking.className ??
+        allocation?.class_name ??
+        allocation?.className ??
+        "—",
+    };
+  }),
+
+  ...teacherAllocations
+    .filter((allocation) => {
+      const allocationStudentId =
+        allocation.student_id ?? allocation.studentId;
+
+      const allocationStudentName =
+        allocation.student_name ?? allocation.studentName;
+
+      const alreadyBooked = bookings.some((booking) => {
+        const sameStudent =
+          allocationStudentId &&
+          booking.student_id &&
+          String(allocationStudentId) === String(booking.student_id);
+
+        const sameStudentName =
+          allocationStudentName &&
+          booking.student_name &&
+          allocationStudentName === booking.student_name;
+
+        return sameStudent || sameStudentName;
+      });
+
+      return !alreadyBooked;
+    })
+    .map((allocation, index) => ({
+      id: `not-booked-${allocation.student_id ?? allocation.studentId ?? allocation.student_name ?? allocation.studentName}-${index}`,
+      event_id:
+        bookingFilters.event !== "All"
+          ? Number(bookingFilters.event)
+          : null,
+      event_name:
+        bookingFilters.event !== "All"
+          ? events.find(
+              (event) => String(event.id) === String(bookingFilters.event)
+            )?.name
+          : "All",
+      event_date: null,
+      slot_id: null,
+      start_time: null,
+      end_time: null,
+      teacher_id: allocation.teacher_id ?? allocation.teacherId,
+      teacher_name: allocation.teacher_name,
+      student_id: allocation.student_id ?? allocation.studentId,
+      student_name: allocation.student_name ?? allocation.studentName,
+      parent_email: allocation.parent_email ?? allocation.parentEmail ?? "—",
+      class_name: allocation.class_name ?? allocation.className ?? "—",
+      booking_status: "NOT_BOOKED",
+      booked_at: null,
+    })),
+];
+
+const visibleBookingRows = bookingRows.filter(
+  (row) => row.start_time && row.end_time
+);
+
+const filteredBookings = visibleBookingRows.filter((booking) => {
+  
+  const displayStatus = getBookingDisplayStatus(booking.booking_status);
+
+  const eventMatches =
+    bookingFilters.event === "All" ||
+    bookingFilters.event === "any" ||
+    String(booking.event_id) === String(bookingFilters.event);
+
+  const teacherMatches =
+    bookingFilters.teacher === "All" ||
+    booking.teacher_name === bookingFilters.teacher;
+
+  const classMatches =
+    bookingFilters.className === "All" ||
+    booking.class_name === bookingFilters.className;
+
+  const statusMatches =
+    bookingFilters.status === "All" ||
+    displayStatus === bookingFilters.status;
+
+  const timeMatches =
+    bookingFilters.time === "All";
+
+  return (
+    eventMatches &&
+    teacherMatches &&
+    classMatches &&
+    statusMatches &&
+    timeMatches
+  );
+});
+console.log("[FILTERED BOOKINGS RESULT]", filteredBookings);
+
+  const bookedBookingCount = filteredBookings.filter(
+    (booking) => booking.booking_status === "BOOKED"
+  ).length;
+
+  const notBookedBookingCount = filteredBookings.filter(
+    (booking) => booking.booking_status === "NOT_BOOKED"
+  ).length;
 
   const updateBookingFilter = (field, value) => {
     setBookingFilters((currentFilters) => ({
@@ -564,26 +849,94 @@ const handleSaveEvent = async () => {
     );
     setInvitationMessage("");
   };
+  const eventTeacherIds = new Set(
+  eventSlots.map((slot) => String(slot.teacher_id))
+);
 
-  const sendInvitations = () => {
-    const notSentIds = new Set(
-      selectedInvitationIds.filter((id) =>
-        invitations.some((invitation) => invitation.id === id && invitation.status === "Not Sent")
-      )
+const eventTeacherAllocations = teacherAllocations.filter(
+  (allocation) =>
+    eventTeacherIds.has(String(allocation.teacher_id))
+);
+
+
+  const sendInvitations = async () => {
+  if (selectedInvitationIds.length === 0) {
+    return;
+  }
+
+  const eventId = invitationFilters.event;
+
+  if (!eventId || eventId === "All" || eventId === "any") {
+    setInvitationMessage("Please select an event first.");
+    return;
+  }
+
+  const selectedInvitations = invitations.filter((invitation) =>
+    selectedInvitationIds.includes(invitation.id)
+  );
+
+  const studentIds = selectedInvitations
+    .map((invitation) => invitation.studentId)
+    .filter(Boolean);
+
+  if (studentIds.length === 0) {
+    setInvitationMessage("No valid students selected.");
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/parent-teacher-interview/send-invitations`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          center_code: interviewAdmin.center_code || "",
+          event_id: Number(eventId),
+          student_ids: studentIds,
+        }),
+      }
     );
 
-    if (notSentIds.size === 0) return;
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.detail || "Failed to send interview invitations."
+      );
+    }
 
     setInvitations((currentInvitations) =>
       currentInvitations.map((invitation) =>
-        notSentIds.has(invitation.id)
-          ? { ...invitation, status: "Sent" }
+        studentIds.includes(invitation.studentId)
+          ? {
+              ...invitation,
+              status: "Sent",
+            }
           : invitation
       )
     );
+
     setSelectedInvitationIds([]);
-    setInvitationMessage("Interview invitations sent successfully.");
-  };
+
+    setInvitationMessage(
+      `${data.sent_count} invitation${
+        data.sent_count === 1 ? "" : "s"
+      } sent successfully.`
+    );
+  } catch (error) {
+    console.error(
+      "Failed to send parent-teacher interview invitations:",
+      error
+    );
+
+    setInvitationMessage(
+      error.message || "Failed to send interview invitations."
+    );
+  }
+};
 
   const handleOpenEventSetup = () => {
     window.history.pushState({}, "", "/admin-interview-booking");
@@ -593,6 +946,33 @@ const handleSaveEvent = async () => {
   const handleOpenTeacherAvailability = () => {
     setActiveTab("availability");
   };
+
+  const bookingTeacherOptions = [
+    "All",
+    ...Array.from(
+      new Set(
+        teacherAllocations
+          .map((allocation) => allocation.teacher_name)
+          .filter(Boolean)
+      )
+    ),
+  ];
+
+  const bookingClassFilterOptions = [
+    "All",
+    ...Array.from(
+      new Set(
+        teacherAllocations
+          .filter(
+            (allocation) =>
+              bookingFilters.teacher === "All" ||
+              allocation.teacher_name === bookingFilters.teacher
+          )
+          .map((allocation) => allocation.class_name)
+          .filter(Boolean)
+      )
+    ),
+  ];
 
   return (
     <div className="admin-interview-page">
@@ -616,7 +996,9 @@ const handleSaveEvent = async () => {
 
       <nav className="admin-tabs" aria-label="Admin interview sections">
         {[
+          ["unified", "Unified"],
           ["parentTeacherInterview", "Parent Teacher Interview"],
+          ["homeworkPortal", "Homework Portal"],
         ].map(([tab, label]) => (
           <button
             type="button"
@@ -631,6 +1013,38 @@ const handleSaveEvent = async () => {
       </nav>
 
       <main className="admin-interview-main">
+        {activeTab === "unified" && (
+          <div className="admin-overview-grid">
+            <article
+              role="button"
+              tabIndex="0"
+              className="admin-page-intro admin-overview-card"
+              onClick={() => {
+                window.location.href = "/admin/notifications";
+              }}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  window.location.href = "/admin/notifications";
+                }
+              }}
+            >
+              <div className="admin-overview-icon" aria-hidden="true">
+                🔔
+              </div>
+
+              <div className="admin-event-setup-content">
+                <h2>Gem AI Notifications</h2>
+                <p>Create and manage notifications shown when parents log in.</p>
+
+                <span className="admin-overview-action">
+                  Open Gem AI Notifications →
+                </span>
+              </div>
+            </article>
+          </div>
+        )}
+
         {activeTab === "parentTeacherInterview" && (
           <div className="admin-overview-grid">
             <article
@@ -757,6 +1171,7 @@ const handleSaveEvent = async () => {
                   Open Send Invitations →
                 </span>
               </div>
+      
             </article>
             <article
               role="button"
@@ -809,6 +1224,163 @@ const handleSaveEvent = async () => {
               </div>
             </article>
           </div>
+        )}
+
+        {activeTab === "homeworkPortal" && (
+          <div className="admin-overview-grid">
+            <article
+              role="button"
+              tabIndex="0"
+              className="admin-page-intro admin-overview-card"
+              onClick={() => setActiveTab("homeworkConfiguration")}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setActiveTab("homeworkConfiguration");
+                }
+              }}
+            >
+              <div className="admin-overview-icon" aria-hidden="true">
+                📚
+              </div>
+
+              <div className="admin-event-setup-content">
+                <h2>Homework Configuration</h2>
+                <p>Configure Homework Support sessions, time slots, and booking cut-offs.</p>
+
+                <span className="admin-overview-action">
+                  Open Homework Configuration →
+                </span>
+              </div>
+            </article>
+            <article
+              role="button"
+              tabIndex="0"
+              className="admin-page-intro admin-overview-card"
+              onClick={() => setActiveTab("homeworkAutomation")}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setActiveTab("homeworkAutomation");
+                }
+              }}
+            >
+              <div className="admin-overview-icon" aria-hidden="true">
+                ⚙️
+              </div>
+
+              <div className="admin-event-setup-content">
+                <h2>Homework Automation</h2>
+                <p>Configure automatic parent invitations and Homework Support email schedules.</p>
+
+                <span className="admin-overview-action">
+                  Open Homework Automation →
+                </span>
+              </div>
+            </article>
+            <article
+              role="button"
+              tabIndex="0"
+              className="admin-page-intro admin-overview-card"
+              onClick={() => setActiveTab("homeworkWeeklyDashboard")}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setActiveTab("homeworkWeeklyDashboard");
+                }
+              }}
+            >
+              <div className="admin-overview-icon" aria-hidden="true">
+                📊
+              </div>
+
+              <div className="admin-event-setup-content">
+                <h2>Homework Weekly Dashboard</h2>
+                <p>View weekly Homework Support attendance, responses, and slot capacity.</p>
+
+                <span className="admin-overview-action">
+                  Open Homework Weekly Dashboard →
+                </span>
+              </div>
+            </article>
+            <article
+              role="button"
+              tabIndex="0"
+              className="admin-page-intro admin-overview-card"
+              onClick={() => setActiveTab("homeworkTestEmail")}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setActiveTab("homeworkTestEmail");
+                }
+              }}
+            >
+              <div className="admin-overview-icon" aria-hidden="true">
+                ✉️
+              </div>
+
+              <div className="admin-event-setup-content">
+                <h2>Test Email</h2>
+                <p>Send a Homework Support test email to selected parents.</p>
+
+                <span className="admin-overview-action">
+                  Open Test Email →
+                </span>
+              </div>
+            </article>
+          </div>
+        )}
+
+        {activeTab === "homeworkConfiguration" && (
+          <>
+            <button
+              type="button"
+              className="admin-secondary-button"
+              onClick={() => setActiveTab("homeworkPortal")}
+            >
+              ← Back to Homework Portal
+            </button>
+            <HomeworkConfiguration loggedInUser={interviewAdmin} />
+          </>
+        )}
+
+        {activeTab === "homeworkAutomation" && (
+          <>
+            <button
+              type="button"
+              className="admin-secondary-button"
+              onClick={() => setActiveTab("homeworkPortal")}
+            >
+              ← Back to Homework Portal
+            </button>
+            <HomeworkAutomation loggedInUser={interviewAdmin} />
+          </>
+        )}
+
+        {activeTab === "homeworkWeeklyDashboard" && (
+          <>
+            <button
+              type="button"
+              className="admin-secondary-button"
+              onClick={() => setActiveTab("homeworkPortal")}
+            >
+              ← Back to Homework Portal
+            </button>
+            <HomeworkWeeklyDashboard loggedInUser={interviewAdmin} />
+          </>
+        )}
+
+        {activeTab === "homeworkTestEmail" && (
+          <>
+            <button
+              type="button"
+              className="admin-secondary-button"
+              onClick={() => setActiveTab("homeworkPortal")}
+            >
+              ← Back to Homework Portal
+            </button>
+            <TestEmail loggedInUser={interviewAdmin} />
+          </>
         )}
 
         {activeTab === "setup" && <>
@@ -1203,29 +1775,58 @@ const handleSaveEvent = async () => {
 
             <div className="booking-filters">
               {[
-                ["event", "Event", ["Term 3 Parent–Teacher Interviews 2026"]],
-                ["teacher", "Teacher", ["All"]],
-                ["className", "Class", ["All", "Year 4", "Year 5", "Year 6"]],
+                [
+                  "event",
+                  "Event",
+                  [
+                    { value: "All", label: "All" },
+                    ...events.map((event) => ({
+                      value: String(event.id),
+                      label: event.name,
+                    })),
+                  ],
+                ],
+                ["teacher", "Teacher", bookingTeacherOptions],
+                ["className", "Class", bookingClassFilterOptions],
                 ["status", "Booking Status", ["All", "Booked", "Not Booked"]],
-                ["time", "Interview Time", ["All"]],
               ].map(([field, label, options]) => (
                 <label key={field}>
                   <span>{label}</span>
                   <select
                     value={bookingFilters[field]}
-                    onChange={(event) => updateBookingFilter(field, event.target.value)}
+                    onChange={(event) => {
+                      const value = event.target.value;
+                      updateBookingFilter(field, value);
+
+                      if (field === "teacher") {
+                        updateBookingFilter("className", "All");
+                      }
+                    }}
                   >
-                    {options.map((option) => <option value={option} key={option}>{option}</option>)}
+                    {options.map((option) => {
+                      const optionValue =
+                        typeof option === "string" ? option : option.value;
+                      const optionLabel =
+                        typeof option === "string" ? option : option.label;
+
+                      return (
+                        <option value={optionValue} key={optionValue}>
+                          {optionLabel}
+                        </option>
+                      );
+                    })}
                   </select>
                 </label>
               ))}
             </div>
 
-            <div className="booking-summary">
-              <span><strong>0</strong> Students</span>
-              <span><strong>0</strong> Booked</span>
-              <span><strong>0</strong> Not Booked</span>
-            </div>
+            {bookingFilters.status !== "Not Booked" && (
+              <div className="booking-summary"> 
+                <span><strong>{filteredBookings.length}</strong> Students</span> 
+                <span><strong>{bookedBookingCount}</strong> Booked</span> 
+                <span><strong>{notBookedBookingCount}</strong> Not Booked</span> 
+              </div>
+            )}
 
             <div className="booking-table-wrap">
               <table className="booking-table">
@@ -1240,16 +1841,50 @@ const handleSaveEvent = async () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredBookings.map((booking) => (
-                    <tr key={`${booking.student}-${booking.time}`}>
-                      <td>{booking.teacher}</td>
-                      <td>{booking.className}</td>
-                      <td>{booking.student}</td>
-                      <td>{booking.parent}</td>
-                      <td><span className={`booking-status ${booking.status === "Booked" ? "booked" : "not-booked"}`}>{booking.status}</span></td>
-                      <td>{booking.time}</td>
+                  {filteredBookings.map((booking) => {
+                    const displayStatus = getBookingDisplayStatus(
+                      booking.booking_status
+                    );
+
+                    return (
+                    <tr key={booking.id}>
+                      <td>{booking.teacher_name}</td>
+
+                      <td>{booking.class_name || "—"}</td>
+
+                      <td>
+                        {displayStatus === "Booked"
+                          ? booking.student_name
+                          : "—"}
+                      </td>
+
+                      <td>
+                        {displayStatus === "Booked"
+                          ? booking.parent_email
+                          : "—"}
+                      </td>
+
+                      <td>
+                        <span
+                          className={`booking-status ${
+                            displayStatus === "Booked"
+                              ? "booked"
+                              : "not-booked"
+                          }`}
+                        >
+                          {displayStatus}
+                        </span>
+                      </td>
+
+                      <td>
+                        {formatBookingTime(
+                          booking.start_time,
+                          booking.end_time
+                        )}
+                      </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                   {filteredBookings.length === 0 && (
                     <tr><td colSpan="6" className="no-bookings">No matching bookings</td></tr>
                   )}
@@ -1283,9 +1918,41 @@ const handleSaveEvent = async () => {
 
             <div className="invitation-filters">
               {[
-                ["event", "Event", ["Term 3 Parent–Teacher Interviews 2026"]],
-                ["className", "Class Name", ["All", "Selective", "Koalas", "Year 5A", "Year 5B"]],
-                ["classYear", "Class Year", ["All", "Year 4", "Year 5", "Year 6"]],
+                [
+                  "event",
+                  "Event",
+                  [
+                    { value: "All", label: "All" },
+                    ...events.map((event) => ({
+                      value: String(event.id),
+                      label: event.name,
+                    })),
+                  ],
+                ],
+                [
+                  "className",
+                  "Class Name",
+                  [
+                    "All",
+                    ...new Set(
+                      eventTeacherAllocations
+                        .map((allocation) => allocation.class_name)
+                        .filter(Boolean)
+                    ),
+                  ],
+                ],
+                [
+                  "classYear",
+                  "Class Year",
+                  [
+                    "All",
+                    ...new Set(
+                      eventTeacherAllocations
+                        .map((allocation) => allocation.class_year)
+                        .filter(Boolean)
+                    ),
+                  ],
+                ],
                 ["status", "Invitation Status", ["All", "Not Sent", "Sent"]],
               ].map(([field, label, options]) => (
                 <label key={field}>
@@ -1293,16 +1960,32 @@ const handleSaveEvent = async () => {
                   <select
                     value={invitationFilters[field]}
                     onChange={(event) => {
+                      const value = event.target.value;
+
                       setInvitationFilters((currentFilters) => ({
                         ...currentFilters,
-                        [field]: event.target.value,
+                        [field]: value,
                       }));
+
                       setInvitationMessage("");
+
+                      if (field === "event") {
+                        loadInvitations(value);
+                      }
                     }}
                   >
-                    {options.map((option) => (
-                      <option value={option} key={option}>{option}</option>
-                    ))}
+                    {options.map((option) => {
+                      const optionValue =
+                        typeof option === "object" ? option.value : option;
+                      const optionLabel =
+                        typeof option === "object" ? option.label : option;
+
+                      return (
+                        <option value={optionValue} key={optionValue}>
+                          {optionLabel}
+                        </option>
+                      );
+                    })}
                   </select>
                 </label>
               ))}
@@ -1385,7 +2068,7 @@ const handleSaveEvent = async () => {
           >
             ← Back to Parent Teacher Interview
           </button>
-          <InterviewReminders />
+          <InterviewReminders events={events} />
           </>
         )}
 

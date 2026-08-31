@@ -1,0 +1,375 @@
+.homework-configuration {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 28px;
+  padding: 26px;
+  border: 1px solid #e5eaf2;
+  border-radius: 10px;
+  color: #172033;
+  background: #fff;
+  box-shadow: 0 5px 15px rgb(35 54 87 / 4%);
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+}
+
+.homework-configuration .homework-notice,
+.homework-configuration .homework-helper,
+.homework-configuration .homework-card-header p {
+  color: #78869b;
+  font-size: 12px;
+}
+
+.homework-configuration .homework-notice {
+  margin: 16px 0 24px;
+  padding: 11px 13px;
+  border: 1px solid #e3eaf5;
+  border-radius: 6px;
+  background: #f7f9fc;
+}
+
+.homework-configuration .homework-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.homework-configuration label {
+  display: grid;
+  gap: 7px;
+  color: #56657c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.homework-configuration select,
+.homework-configuration input {
+  width: 100%;
+  min-height: 38px;
+  box-sizing: border-box;
+  padding: 0 11px;
+  border: 1px solid #dce3ee;
+  border-radius: 5px;
+  outline: none;
+  color: #2b3a52;
+  background: #fff;
+  font: inherit;
+  font-size: 12px;
+}
+
+.homework-configuration select:focus,
+.homework-configuration input:focus {
+  border-color: #7fa7f1;
+  box-shadow: 0 0 0 3px rgb(40 102 232 / 10%);
+}
+
+.homework-configuration select:disabled,
+.homework-configuration input:disabled {
+  color: #94a0b4;
+  background: #f4f6f9;
+  cursor: not-allowed;
+}
+
+.homework-configuration .homework-helper {
+  margin: 8px 0 14px;
+}
+
+.homework-configuration .homework-card {
+  margin-top: 22px;
+  padding: 18px;
+  border: 1px solid #e5eaf2;
+  border-radius: 8px;
+  background: #fbfcff;
+}
+
+.homework-configuration .homework-card h3,
+.homework-configuration .homework-card h4 {
+  margin: 0;
+  color: #263650;
+  font-size: 14px;
+}
+
+.homework-configuration .homework-card h4 {
+  font-size: 12px;
+}
+
+.homework-configuration .homework-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.homework-configuration .homework-card-header p {
+  margin: 6px 0 0;
+}
+
+.homework-configuration .homework-card-header.collapsible-header,
+.homework-configuration .homework-card-header.collapsible-week-header {
+  margin: -8px;
+  padding: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 150ms ease;
+}
+
+.homework-configuration .homework-card-header.collapsible-header:hover,
+.homework-configuration .homework-card-header.collapsible-week-header:hover {
+  background-color: rgb(255 255 255 / 50%);
+}
+
+.homework-configuration .collapse-indicator {
+  flex-shrink: 0;
+  color: #78869b;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.homework-configuration .session-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 13px;
+}
+
+.homework-configuration .session-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 14px;
+  border: 1px solid #e0e7f1;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.homework-configuration .session-row > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.homework-configuration .session-row strong {
+  color: #263650;
+  font-size: 12px;
+}
+
+.homework-configuration .session-row span,
+.homework-configuration .session-row small {
+  color: #78869b;
+  font-size: 11px;
+}
+
+.homework-configuration .homework-empty {
+  margin: 13px 0 0;
+  color: #78869b;
+  font-size: 12px;
+}
+
+.homework-configuration .slot-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.homework-configuration .slot-card {
+  display: grid;
+  gap: 13px;
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid #dfe6f0;
+  border-radius: 7px;
+  background: #fff;
+}
+
+.homework-configuration .slot-card > strong {
+  color: #263650;
+  font-size: 12px;
+}
+
+.homework-configuration .slot-card > small {
+  color: #78869b;
+  font-size: 11px;
+}
+
+.homework-configuration .slot-card label {
+  font-size: 11px;
+}
+
+.homework-configuration .slot-card input {
+  min-height: 34px;
+}
+
+.homework-configuration .slot-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.homework-configuration .slot-actions p {
+  flex-basis: 100%;
+  margin: 0;
+  color: #bf4e58;
+  font-size: 11px;
+}
+
+.homework-configuration .available-default-slot {
+  display: flex;
+  min-height: 110px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border: 2px dashed #d9dde1;
+  border-radius: 7px;
+  background: #f8f9fa;
+}
+
+.homework-configuration .available-default-slot > div {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+}
+
+.homework-configuration .available-default-slot strong {
+  color: #78869b;
+  font-size: 12px;
+}
+
+.homework-configuration .available-default-slot span {
+  color: #a1a7ad;
+  font-size: 11px;
+}
+
+.homework-configuration .available-default-slot .status-text {
+  color: #a1a7ad;
+  font-size: 10px;
+  font-style: italic;
+}
+
+.homework-configuration .available-default-slot button {
+  align-self: flex-start;
+}
+
+.homework-configuration .homework-primary-button,
+.homework-configuration .homework-secondary-button,
+.homework-configuration .homework-danger-button {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  transition: background-color 150ms ease, opacity 150ms ease;
+}
+
+.homework-configuration .homework-primary-button {
+  color: #fff;
+  background: #438ce2;
+}
+
+.homework-configuration .homework-primary-button:hover:not(:disabled) {
+  background: #2866c4;
+}
+
+.homework-configuration .homework-secondary-button {
+  color: #2866c4;
+  background: #eaf1fd;
+}
+
+.homework-configuration .homework-secondary-button:hover:not(:disabled) {
+  background: #dce8fb;
+}
+
+.homework-configuration .homework-danger-button {
+  color: #bf4e58;
+  background: #fff0f1;
+}
+
+.homework-configuration .homework-danger-button:hover:not(:disabled) {
+  background: #ffe2e4;
+}
+
+.homework-configuration .homework-primary-button:focus-visible,
+.homework-configuration .homework-secondary-button:focus-visible,
+.homework-configuration .homework-danger-button:focus-visible {
+  outline: 3px solid rgb(40 102 232 / 20%);
+  outline-offset: 2px;
+}
+
+.homework-configuration .homework-primary-button:disabled,
+.homework-configuration .homework-secondary-button:disabled,
+.homework-configuration .homework-danger-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.homework-configuration .booking-cutoff {
+  max-width: 360px;
+  margin-top: 20px;
+}
+
+.homework-configuration .booking-cutoff .homework-helper {
+  grid-column: 1 / -1;
+  margin: -10px 0 0;
+}
+
+.homework-configuration .configuration-footer {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.homework-configuration .configuration-footer span[role="status"] {
+  color: #3f876d;
+  font-size: 12px;
+}
+
+.homework-configuration .configuration-footer .login-error {
+  margin: 0;
+  color: #bd4f50;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+@media (max-width: 1050px) {
+  .homework-configuration .slot-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 500px) {
+  .homework-configuration {
+    padding: 20px;
+  }
+
+  .homework-configuration .homework-form-grid,
+  .homework-configuration .slot-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .homework-configuration .homework-card-header {
+    display: grid;
+  }
+
+  .homework-configuration .homework-card-header .homework-primary-button {
+    justify-self: start;
+  }
+
+  .homework-configuration .session-row {
+    align-items: flex-start;
+  }
+
+  .homework-configuration .booking-cutoff .homework-helper {
+    grid-column: auto;
+    margin-top: -10px;
+  }
+
+  .homework-configuration .configuration-footer {
+    align-items: flex-start;
+  }
+}

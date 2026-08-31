@@ -8,10 +8,11 @@ function ParentDashboard({ parentData, onLogout }) {
   const [showParentTeacherInterviews, setShowParentTeacherInterviews] =
     useState(false);
 
-  const student = parentData?.students?.[0];
-
+  const student = parentData?.student;
+  console.log("PARENT DASHBOARD parentData:", parentData);
+console.log("PARENT DASHBOARD student:", student);
   const studentName = student?.name || "Student";
-  const email = parentData?.email || "";
+  const email = student?.parent_email || "";
 
   console.log("ParentDashboard showHomeworkBooking:", showHomeworkBooking);
 

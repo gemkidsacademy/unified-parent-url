@@ -1,63 +1,138 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./EventHistory.css";
+import { API_BASE_URL } from "../../config/api";
 
-const events = [
-  {
-    id: "term-3-2026",
-    name: "Term 3 Parent–Teacher Interviews 2026",
-    date: "18 September 2026",
-    location: "Marsden Park Centre",
-    teachers: 3,
-    students: 24,
-    booked: 18,
-    notBooked: 6,
-  },
-  {
-    id: "term-2-2026",
-    name: "Term 2 Parent–Teacher Interviews 2026",
-    date: "26 June 2026",
-    location: "Marsden Park Centre",
-    teachers: 3,
-    students: 22,
-    booked: 20,
-    notBooked: 2,
-  },
-];
+const formatTime = (timeValue) => {
+  if (!timeValue) return "—";
 
-const historicalBookings = [
-  {
-    teacher: "Mrs Sarah Johnson",
-    className: "Selective",
-    student: "Oliver Brown",
-    parent: "Emma Brown",
-    status: "Booked",
-    time: "6:45 PM – 6:55 PM",
-  },
-  {
-    teacher: "Mrs Sarah Johnson",
-    className: "Selective",
-    student: "Sophie Wilson",
-    parent: "James Wilson",
-    status: "Booked",
-    time: "6:00 PM – 6:10 PM",
-  },
-  {
-    teacher: "Mrs Emily Williams",
-    className: "Foundation",
-    student: "Liam Taylor",
-    parent: "Sarah Taylor",
-    status: "Not Booked",
-    time: "—",
-  },
-];
+  const [hours, minutes] = timeValue.split(":").map(Number);
+  const period = hours >= 12 ? "PM" : "AM";
+
+  return `${hours % 12 || 12}:${String(minutes).padStart(2, "0")} ${period}`;
+};
+
+const formatBookingTime = (startTime, endTime) => {
+  if (!startTime || !endTime) return "—";
+
+  return `${formatTime(startTime)} – ${formatTime(endTime)}`;
+};
 
 function EventHistory() {
-  const [selectedEventId, setSelectedEventId] =
-    useState(events[0].id);
+  const interviewAdmin = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("interviewAdminData") || "null") || {};
+    } catch {
+      return {};
+    }
+  })();
+  const centerCode = interviewAdmin.center_code || "";
+  const [events, setEvents] = useState([]);
+  const [selectedEventId, setSelectedEventId] = useState("");
+  const [historicalBookings, setHistoricalBookings] = useState([]);
+  const [eventSummary, setEventSummary] = useState(null);
+
+  useEffect(() => {
+    const loadCompletedEvents = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/parent-teacher-interview/completed-events?center_code=${encodeURIComponent(centerCode)}`
+        );
+
+        if (!response.ok) {
+          throw new Error(`Unable to load completed events (${response.status})`);
+        }
+
+        const data = await response.json();
+        const completedEvents = data.events || [];
+
+        setEvents(completedEvents);
+        setSelectedEventId(completedEvents[0]?.id ?? "");
+      } catch (error) {
+        console.error("Unable to load completed interview events:", error);
+        setEvents([]);
+        setSelectedEventId("");
+      }
+    };
+
+    loadCompletedEvents();
+  }, []);
+
+  useEffect(() => {
+    if (!selectedEventId) {
+      setHistoricalBookings([]);
+      return;
+    }
+
+    const loadHistoricalBookings = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/parent-teacher-interview/completed-events/${encodeURIComponent(selectedEventId)}/bookings?center_code=${encodeURIComponent(centerCode)}`
+        );
+
+        if (!response.ok) {
+          throw new Error(`Unable to load historical bookings (${response.status})`);
+        }
+
+        const data = await response.json();
+
+        setHistoricalBookings(data.bookings || []);
+      } catch (error) {
+        console.error("Unable to load historical bookings:", error);
+        setHistoricalBookings([]);
+      }
+    };
+
+    loadHistoricalBookings();
+  }, [selectedEventId, centerCode]);
+
+  useEffect(() => {
+    if (!selectedEventId) {
+      setEventSummary(null);
+      return;
+    }
+
+    const loadEventSummary = async () => {
+      try {
+        console.log("[EVENT HISTORY] Loading summary", {
+          selectedEventId,
+          centerCode,
+        });
+
+        const summaryUrl =
+          `${API_BASE_URL}/parent-teacher-interview/completed-events/${encodeURIComponent(selectedEventId)}/summary?center_code=${encodeURIComponent(centerCode)}`;
+
+        console.log("[EVENT HISTORY] Summary URL:", summaryUrl);
+
+        const response = await fetch(summaryUrl);
+
+        console.log("[EVENT HISTORY] Summary response status:", response.status);
+
+        if (!response.ok) {
+          throw new Error(`Unable to load event summary (${response.status})`);
+        }
+
+        const data = await response.json();
+        console.log("[EVENT HISTORY] Summary response data:", data);
+        console.log("[EVENT HISTORY] Setting summary:", {
+          teachers: data.teachers,
+          students: data.students,
+          booked: data.booked,
+          not_booked: data.not_booked,
+        });
+        setEventSummary(data);
+      } catch (error) {
+        console.error("[EVENT HISTORY] Summary request failed:", error);
+        setEventSummary(null);
+      }
+    };
+
+    loadEventSummary();
+  }, [selectedEventId, centerCode]);
 
   const selectedEvent =
-    events.find((event) => event.id === selectedEventId) ||
-    events[0];
+    events.find((event) => String(event.id) === String(selectedEventId)) ||
+    events[0] ||
+    {};
 
   return (
     <div className="event-history-page">
@@ -115,7 +190,7 @@ function EventHistory() {
 
           <div>
             <span>Date</span>
-            <strong>{selectedEvent.date}</strong>
+            <strong>{selectedEvent.event_date}</strong>
           </div>
 
           <div>
@@ -128,22 +203,22 @@ function EventHistory() {
         <div className="history-summary">
 
           <div>
-            <strong>{selectedEvent.teachers}</strong>
+            <strong>{eventSummary?.teachers}</strong>
             <span>Teachers</span>
           </div>
 
           <div>
-            <strong>{selectedEvent.students}</strong>
-            <span>Students</span>
+            <strong>{eventSummary?.students}</strong>
+            <span>Slots</span>
           </div>
 
           <div>
-            <strong>{selectedEvent.booked}</strong>
+            <strong>{eventSummary?.booked}</strong>
             <span>Booked</span>
           </div>
 
           <div>
-            <strong>{selectedEvent.notBooked}</strong>
+            <strong>{eventSummary?.not_booked}</strong>
             <span>Not Booked</span>
           </div>
 
@@ -177,10 +252,10 @@ function EventHistory() {
           {historicalBookings.map((booking, index) => (
             <div
               className="history-table-row"
-              key={`${booking.student}-${index}`}
+              key={booking.booking_id ?? `${booking.student}-${index}`}
             >
               <span>{booking.teacher}</span>
-              <span>{booking.className}</span>
+              <span>{booking.class_name}</span>
               <span>{booking.student}</span>
               <span>{booking.parent}</span>
 
@@ -196,9 +271,17 @@ function EventHistory() {
                 </span>
               </span>
 
-              <span>{booking.time}</span>
+              <span>
+                {formatBookingTime(booking.start_time, booking.end_time)}
+              </span>
             </div>
           ))}
+
+          {historicalBookings.length === 0 && (
+            <div className="history-table-row">
+              <span>No historical bookings found.</span>
+            </div>
+          )}
 
         </div>
 
