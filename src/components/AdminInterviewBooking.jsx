@@ -1971,6 +1971,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
 
                       if (field === "event") {
                         loadInvitations(value);
+                        loadEventSlots(value);
                       }
                     }}
                   >
