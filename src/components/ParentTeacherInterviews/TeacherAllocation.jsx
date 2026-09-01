@@ -15,11 +15,14 @@ function TeacherAllocation() {
   const [allocations, setAllocations] = useState([]);
   const [classOptions, setClassOptions] = useState([]);
   const [classYearOptions, setClassYearOptions] = useState([]);
+  const [classDayOptions, setClassDayOptions] = useState([]);
   const [teacherOptions, setTeacherOptions] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState("");
   const [selectedClassName, setSelectedClassName] = useState("");
   const [selectedClassYear, setSelectedClassYear] = useState("");
+  const [selectedClassDay, setSelectedClassDay] = useState("");
   const [editingAllocation, setEditingAllocation] = useState(null);
+  const [allocationMessage, setAllocationMessage] = useState("");
 
   useEffect(() => {
     const loadClasses = async () => {
@@ -33,40 +36,45 @@ function TeacherAllocation() {
     loadClasses();
   }, []);
 
-  useEffect(() => {
-    const loadAllocations = async () => {
-      try {
-        const response = await fetch(
-          `${API_BASE_URL}/parent-teacher-interview/teacher-allocations?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}`
+  const loadAllocations = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/parent-teacher-interview/teacher-allocations?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}`
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail || "Failed to load teacher allocations."
         );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(
-            data.detail || "Failed to load teacher allocations."
-          );
-        }
-
-        setAllocations(
-          (data.allocations || []).map((allocation) => ({
-            id: allocation.id,
-            teacherId: allocation.teacher_id,
-            classId: allocation.class_id,
-            classYearId: allocation.class_year_id,
-            teacher: allocation.teacher_name,
-            className: allocation.class_name,
-            classYear: allocation.class_year,
-            parentCount: allocation.parent_count,
-          }))
-        );
-      } catch (error) {
-        console.error("Failed to load teacher allocations:", error);
-        setAllocations([]);
       }
+
+      setAllocations(
+        (data.allocations || []).map((allocation) => ({
+          id: allocation.id,
+          teacherId: allocation.teacher_id,
+          classId: allocation.class_id,
+          classYearId: allocation.class_year_id,
+          teacher: allocation.teacher_name,
+          className: allocation.class_name,
+          classYear: allocation.class_year,
+          classDay: allocation.class_day,
+          parentCount: allocation.parent_count,
+        }))
+      );
+    } catch (error) {
+      console.error("Failed to load teacher allocations:", error);
+      setAllocations([]);
+    }
+  };
+
+  useEffect(() => {
+    const loadInitialAllocations = async () => {
+      await loadAllocations();
     };
 
-    loadAllocations();
+    loadInitialAllocations();
   }, []);
 
   useEffect(() => {
@@ -107,6 +115,42 @@ function TeacherAllocation() {
   }, [editingAllocation, classYearOptions]);
 
   useEffect(() => {
+    if (
+      !interviewAdmin.center_code ||
+      !selectedClassName ||
+      !selectedClassYear
+    ) {
+      return;
+    }
+
+    const loadClassDays = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/parent-teacher-interview/class-days?center_code=${encodeURIComponent(interviewAdmin.center_code)}&class_name=${encodeURIComponent(selectedClassName)}&class_year=${encodeURIComponent(selectedClassYear)}`
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            typeof data?.detail === "string"
+              ? data.detail
+              : "Unable to load class days."
+          );
+        }
+
+        setClassDayOptions(
+          (data.class_days || []).filter(Boolean)
+        );
+      } catch (error) {
+        console.error("Failed to load class days:", error);
+        setClassDayOptions([]);
+      }
+    };
+
+    loadClassDays();
+  }, [interviewAdmin.center_code, selectedClassName, selectedClassYear]);
+
+  useEffect(() => {
     const loadTeachers = async () => {
       const response = await fetch(
         `${API_BASE_URL}/parent-teacher-interview/teachers?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}`
@@ -144,6 +188,8 @@ function TeacherAllocation() {
         setSelectedTeacher("");
         setSelectedClassName("");
         setSelectedClassYear("");
+        setSelectedClassDay("");
+        setClassDayOptions([]);
       }
     } catch (error) {
       console.error("Failed to delete teacher allocation:", error);
@@ -154,7 +200,14 @@ function TeacherAllocation() {
   };
 
     const addAllocation = async () => {
-    if (!selectedTeacher || !selectedClassName || !selectedClassYear) {
+    setAllocationMessage("");
+
+    if (
+      !selectedTeacher ||
+      !selectedClassName ||
+      !selectedClassYear ||
+      !selectedClassDay
+    ) {
       return;
     }
 
@@ -192,6 +245,7 @@ function TeacherAllocation() {
               teacher_id: Number(selectedTeacherRecord.id),
               class_id: Number(selectedClassRecord.id),
               class_year_id: Number(selectedClassYearRecord.id),
+              class_day: selectedClassDay,
             }),
           }
         );
@@ -215,23 +269,26 @@ function TeacherAllocation() {
                   teacher: selectedTeacher,
                   className: selectedClassName,
                   classYear: selectedClassYear,
+                  classDay: selectedClassDay,
                 }
               : allocation
           )
         );
 
         setEditingAllocation(null);
+        setAllocationMessage("Teacher allocation updated successfully.");
       } else {
         const alreadyExists = allocations.some(
           (allocation) =>
             allocation.teacherId === Number(selectedTeacherRecord.id) &&
             allocation.classId === Number(selectedClassRecord.id) &&
-            allocation.classYearId === Number(selectedClassYearRecord.id)
+            allocation.classYearId === Number(selectedClassYearRecord.id) &&
+            allocation.classDay === selectedClassDay
         );
 
         if (alreadyExists) {
           window.alert(
-            "This teacher is already allocated to this class and class year."
+            "This teacher is already allocated to this class, class year, and class day."
           );
           return;
         }
@@ -248,6 +305,7 @@ function TeacherAllocation() {
               teacher_id: Number(selectedTeacherRecord.id),
               class_id: Number(selectedClassRecord.id),
               class_year_id: Number(selectedClassYearRecord.id),
+              class_day: selectedClassDay,
             }),
           }
         );
@@ -260,23 +318,18 @@ function TeacherAllocation() {
           );
         }
 
-        setAllocations((current) => [
-          ...current,
-          {
-            id: data.allocation_id,
-            teacherId: Number(selectedTeacherRecord.id),
-            classId: Number(selectedClassRecord.id),
-            classYearId: Number(selectedClassYearRecord.id),
-            teacher: selectedTeacher,
-            className: selectedClassName,
-            classYear: selectedClassYear,
-          },
-        ]);
+        setAllocationMessage("Teacher assigned successfully.");
+
+        // Reload allocations from the backend so the newly created
+        // allocation receives the backend-calculated parent_count.
+        await loadAllocations();
       }
 
       setSelectedTeacher("");
       setSelectedClassName("");
       setSelectedClassYear("");
+      setSelectedClassDay("");
+      setClassDayOptions([]);
     } catch (error) {
       console.error("Failed to save teacher allocation:", error);
       window.alert(
@@ -325,6 +378,8 @@ function TeacherAllocation() {
               onChange={(event) => {
                 setSelectedClassName(event.target.value);
                 setSelectedClassYear("");
+                setSelectedClassDay("");
+                setClassDayOptions([]);
               }}
             >
               <option value="">
@@ -344,9 +399,11 @@ function TeacherAllocation() {
 
             <select
               value={selectedClassYear}
-              onChange={(event) =>
-                setSelectedClassYear(event.target.value)
-              }
+              onChange={(event) => {
+                setSelectedClassYear(event.target.value);
+                setSelectedClassDay("");
+                setClassDayOptions([]);
+              }}
             >
               <option value="">
                 Select a class year
@@ -355,6 +412,24 @@ function TeacherAllocation() {
               {classYearOptions.map((classYear) => (
                 <option key={classYear.id} value={classYear.year_name}>
                   {classYear.year_name}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            <span>Class Day</span>
+
+            <select
+              value={selectedClassDay}
+              onChange={(event) => setSelectedClassDay(event.target.value)}
+              disabled={classDayOptions.length === 0}
+            >
+              <option value="">Select Class Day</option>
+
+              {classDayOptions.map((day) => (
+                <option key={day} value={day}>
+                  {day}
                 </option>
               ))}
             </select>
@@ -385,7 +460,12 @@ function TeacherAllocation() {
             type="button"
             className="allocation-add-button"
             onClick={addAllocation}
-            disabled={!selectedTeacher || !selectedClassName || !selectedClassYear}
+            disabled={
+              !selectedClassName ||
+              !selectedClassYear ||
+              !selectedClassDay ||
+              !selectedTeacher
+            }
           >
             {editingAllocation ? "Save Changes" : "+ Assign Teacher"}
           </button>
@@ -416,12 +496,13 @@ function TeacherAllocation() {
             <span>Teacher</span>
             <span>Class Name</span>
             <span>Class Year</span>
+            <span>Class Day</span>
             <span>Parents</span>
             <span></span>
           </div>
 
           {allocations.map((allocation) => (
-            <div key={allocation.teacher}>
+            <div key={allocation.id}>
 
               <div className="allocation-row">
 
@@ -438,6 +519,10 @@ function TeacherAllocation() {
                 </span>
 
                 <span>
+                  {allocation.classDay || "—"}
+                </span>
+
+                <span>
                   {allocation.parentCount ?? 0}
                 </span>
 
@@ -450,6 +535,8 @@ function TeacherAllocation() {
                       setSelectedTeacher(allocation.teacher);
                       setSelectedClassName(allocation.className);
                       setSelectedClassYear("");
+                      setSelectedClassDay("");
+                      setClassDayOptions([]);
                     }}
                   >
                     Edit
@@ -470,6 +557,12 @@ function TeacherAllocation() {
           ))}
 
         </div>
+
+        {allocationMessage && (
+          <p className="allocation-success-message" role="status">
+            {allocationMessage}
+          </p>
+        )}
       </section>
 
       

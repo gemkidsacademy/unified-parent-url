@@ -62,7 +62,7 @@
 
 .allocation-form {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr 1fr 1fr auto;
   gap: 16px;
   align-items: end;
 }
@@ -129,7 +129,7 @@
 .allocation-table-header,
 .allocation-row {
   display: grid;
-  grid-template-columns: 1.35fr 1fr 0.9fr 0.7fr 1.2fr;
+  grid-template-columns: 1.35fr 1fr 0.9fr 0.9fr 0.7fr 1.2fr;
   align-items: center;
   gap: 16px;
 }
@@ -295,4 +295,12 @@
   background: #fde8e8;
   border-color: #d98b8b;
   color: #a93226;
+}
+
+.allocation-success-message {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
 }
