@@ -12,12 +12,21 @@ function ParentNotificationModal({ notification, onAcknowledge }) {
   return (
     <div className="parent-notification-overlay">
       <section
-        className="parent-notification-modal"
+        className="parent-notification-modal notification-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby={showText ? "parent-notification-title" : undefined}
         aria-label={showText ? undefined : "Gem AI notification"}
       >
+        <button
+          type="button"
+          className="notification-close-button"
+          onClick={onAcknowledge}
+          aria-label="Close notification"
+        >
+          ×
+        </button>
+
         {showImage && (
           <img
             className="parent-notification-image"

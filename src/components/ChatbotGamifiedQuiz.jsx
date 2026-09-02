@@ -551,7 +551,12 @@ export default function ChatbotGamifiedQuiz({
 
         <div className="chat-messages">
           {messages.map((msg, idx) => (
-            <div key={idx} className={`message ${msg.sender}`}>
+            <div
+              key={idx}
+              className={`message ${msg.sender} ${
+                msg.type === "welcome" ? "welcome-message" : ""
+              }`}
+            >
               {msg.sender === "bot" ? (
                 <>
                   {msg.type === "welcome" ? (
@@ -560,7 +565,7 @@ export default function ChatbotGamifiedQuiz({
 
                       {msg.quote ? (
                         <>
-                          <div className="quote-label">Quote of the day</div>
+                          <div className="quote-label">QUOTE OF THE DAY (new)</div>
 
                           <div className="quote-text">“{msg.quote}”</div>
 
@@ -693,41 +698,57 @@ export default function ChatbotGamifiedQuiz({
             </>
 
         </form>
-        {quizCompleted && reviewData.length > 0 && (
-  <div className="quiz-review">
-    <h3>Quiz Review</h3>
-    <p className="review-score">
-      Score: {finalScore}/{reviewData.length || 0}
-    </p>
+            {quizCompleted && reviewData.length > 0 && (
+              <div className="quiz-review">
+                <div className="review-header">
+                  <h3>Quiz Review</h3>
+                  <div className="review-score">
+                    Score: <strong>{finalScore}/{reviewData.length || 0}</strong>
+                  </div>
+                </div>
 
-    {reviewData.map((item, idx) => (
-      <div
-        key={idx}
-        className={`review-card ${item.is_correct ? "correct" : "wrong"}`}
-      >
-        <div className="review-question">
-          <strong>Question {item.question_number}:</strong> {item.prompt}
-        </div>
+                <div className="review-list">
+                  {reviewData.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className={`review-card ${item.is_correct ? "correct" : "wrong"}`}
+                    >
+                      <div className="review-card-header">
+                        <span className="review-question-number">
+                          Question {item.question_number}
+                        </span>
 
-        <div className="review-answer">
-          <strong>Your answer:</strong> {item.selected_option || "No answer"}
-        </div>
+                        <span
+                          className={`review-result ${
+                            item.is_correct ? "correct-text" : "wrong-text"
+                          }`}
+                        >
+                          {item.is_correct ? "✔ Correct" : "✘ Incorrect"}
+                        </span>
+                      </div>
 
-        <div className="review-answer">
-          <strong>Correct answer:</strong> {item.correct_answer}
-        </div>
+                      <div className="review-question">
+                        {item.prompt}
+                      </div>
 
-        <div
-          className={`review-result ${
-            item.is_correct ? "correct-text" : "wrong-text"
-          }`}
-        >
-          {item.is_correct ? "✔ Correct" : "✘ Incorrect"}
-        </div>
-      </div>
-    ))}
-  </div>
-)}
+                      <div className="review-answer">
+                        <span className="review-answer-label">Your answer</span>
+                        <span className="review-answer-value">
+                          {item.selected_option || "No answer"}
+                        </span>
+                      </div>
+
+                      <div className="review-answer">
+                        <span className="review-answer-label">Correct answer</span>
+                        <span className="review-answer-value">
+                          {item.correct_answer}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
 
       </div>

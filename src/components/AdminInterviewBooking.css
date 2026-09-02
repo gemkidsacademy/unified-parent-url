@@ -1144,6 +1144,14 @@
   box-shadow: 0 4px 12px rgba(30, 25, 70, 0.06);
 }
 
+.bookings-download-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  flex-shrink: 0;
+}
+
 .booking-filters {
   display: grid;
   grid-template-columns: 2fr repeat(4, 1fr);
@@ -1272,6 +1280,15 @@
 @media (max-width: 480px) {
   .admin-bookings-section {
     padding: 20px 16px;
+  }
+
+  .admin-bookings-section .admin-section-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .bookings-download-button {
+    width: 100%;
   }
 
   .booking-filters {

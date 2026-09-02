@@ -668,7 +668,7 @@ export default function DemoChatbot({ parentData, onBack }) {
           marginBottom: "18px",
         }}
       >
-        Quote of the Day
+        Quote of the Day (new)
       </div>
 
       {msg.quote ? (

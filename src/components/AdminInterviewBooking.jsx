@@ -822,6 +822,52 @@ console.log("[FILTERED BOOKINGS RESULT]", filteredBookings);
     }));
   };
 
+  const downloadBookingsCsv = () => {
+    const escapeCsvValue = (value) => {
+      const stringValue = String(value ?? "");
+
+      return /[",\r\n]/.test(stringValue)
+        ? `"${stringValue.replace(/"/g, '""')}"`
+        : stringValue;
+    };
+    const headers = [
+      "Teacher",
+      "Class",
+      "Student",
+      "Parent",
+      "Booking Status",
+      "Interview Date",
+      "Interview Time",
+    ];
+    const rows = filteredBookings.map((booking) => {
+      const displayStatus = getBookingDisplayStatus(booking.booking_status);
+
+      return [
+        booking.teacher_name,
+        booking.class_name || "—",
+        displayStatus === "Booked" ? booking.student_name : "—",
+        displayStatus === "Booked" ? booking.parent_email : "—",
+        displayStatus,
+        booking.event_date,
+        formatBookingTime(booking.start_time, booking.end_time),
+      ];
+    });
+    const csv = [headers, ...rows]
+      .map((row) => row.map(escapeCsvValue).join(","))
+      .join("\r\n");
+    const downloadUrl = URL.createObjectURL(
+      new Blob(["\uFEFF", csv], { type: "text/csv;charset=utf-8" })
+    );
+    const link = document.createElement("a");
+
+    link.href = downloadUrl;
+    link.download = "interview-bookings-report.csv";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(downloadUrl);
+  };
+
   const filteredInvitations = invitations.filter((invitation) =>
     (invitationFilters.className === "All" || invitation.className === invitationFilters.className) &&
     (invitationFilters.classYear === "All" || invitation.classYear === invitationFilters.classYear) &&
@@ -1771,6 +1817,13 @@ const eventTeacherAllocations = teacherAllocations.filter(
                 <p className="admin-section-kicker">Demo view</p>
                 <h2>Interview Bookings</h2>
               </div>
+              <button
+                type="button"
+                className="admin-save-button bookings-download-button"
+                onClick={downloadBookingsCsv}
+              >
+                <span aria-hidden="true">↓</span> Download CSV
+              </button>
             </div>
 
             <div className="booking-filters">

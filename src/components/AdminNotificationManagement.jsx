@@ -1,20 +1,12 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ParentNotificationModal from "./ParentNotificationModal";
-import {
-  getStoredNotifications,
-  saveStoredNotifications,
-} from "../utils/notificationStorage";
+import { API_BASE_URL } from "../config/api";
 import "./AdminNotificationManagement.css";
 
 const DISPLAY_MODES = [
   { value: "text", label: "Text only" },
   { value: "image", label: "Image only" },
   { value: "text-image", label: "Text + Image" },
-];
-
-const IMAGE_OPTIONS = [
-  "/images/Image_Notification.png",
-  "/images/imageTextNotificationimage.png",
 ];
 
 const FILTERS = ["All", "Active", "Upcoming", "Expired", "Inactive"];
@@ -49,22 +41,83 @@ const getNotificationStatus = (notification) => {
 };
 
 function AdminNotificationManagement() {
-  const [notifications, setNotifications] = useState(getStoredNotifications);
+  const [notifications, setNotifications] = useState([]);
+  const [isLoadingNotifications, setIsLoadingNotifications] = useState(true);
+  const [notificationError, setNotificationError] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [editingNotification, setEditingNotification] = useState(null);
   const [previewNotification, setPreviewNotification] = useState(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [imageUploadError, setImageUploadError] = useState("");
+  const [notificationImages, setNotificationImages] = useState([]);
+  const [isLoadingNotificationImages, setIsLoadingNotificationImages] = useState(false);
+  const [notificationImagesError, setNotificationImagesError] = useState("");
+  const imageFileInputRef = useRef(null);
 
-  const updateNotifications = (nextNotifications) => {
-    setNotifications(nextNotifications);
-    saveStoredNotifications(nextNotifications);
+  useEffect(() => {
+    const loadNotifications = async () => {
+      setIsLoadingNotifications(true);
+      setNotificationError("");
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/notifications`);
+        const data = await response.json().catch(() => null);
+
+        if (!response.ok || data?.status !== "success") {
+          throw new Error(
+            data?.detail || "Unable to load notifications."
+          );
+        }
+
+        setNotifications(
+          Array.isArray(data.notifications)
+            ? data.notifications
+            : []
+        );
+      } catch (error) {
+        setNotificationError(
+          error.message || "Unable to load notifications."
+        );
+      } finally {
+        setIsLoadingNotifications(false);
+      }
+    };
+
+    loadNotifications();
+  }, []);
+
+  const loadNotificationImages = async () => {
+    setIsLoadingNotificationImages(true);
+    setNotificationImagesError("");
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/notifications/images`);
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok || data?.status !== "success" || !Array.isArray(data?.images)) {
+        throw new Error(data?.detail || "Unable to load notification images.");
+      }
+
+      setNotificationImages(data.images);
+    } catch (error) {
+      setNotificationImagesError(
+        error.message || "Unable to load notification images."
+      );
+    } finally {
+      setIsLoadingNotificationImages(false);
+    }
   };
 
   const openCreateForm = () => {
+    setImageUploadError("");
     setEditingNotification(createEmptyNotification());
+    loadNotificationImages();
   };
 
   const openEditForm = (notification) => {
+    setImageUploadError("");
     setEditingNotification({ ...notification });
+    loadNotificationImages();
   };
 
   const updateField = (field, value) => {
@@ -74,42 +127,139 @@ function AdminNotificationManagement() {
     }));
   };
 
-  const saveNotification = (event) => {
+  const uploadImage = async (event) => {
+    const selectedFile = event.target.files?.[0];
+
+    if (!selectedFile) return;
+
+    const formData = new FormData();
+    formData.append("image", selectedFile);
+    setIsUploadingImage(true);
+    setImageUploadError("");
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/notifications/upload-image`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok || data?.status !== "success" || !data?.url) {
+        throw new Error(data?.detail || "Unable to upload image.");
+      }
+
+      updateField("image", data.url);
+      await loadNotificationImages();
+    } catch (error) {
+      setImageUploadError(error.message || "Unable to upload image.");
+    } finally {
+      setIsUploadingImage(false);
+      event.target.value = "";
+    }
+  };
+
+  const saveNotification = async (event) => {
     event.preventDefault();
 
-    const notificationToSave = {
-      ...editingNotification,
-      id:
-        editingNotification.id ||
-        `gem-ai-notification-${Date.now()}`,
+    const notificationPayload = {
+      title: editingNotification.title,
+      text: editingNotification.text,
       image:
         editingNotification.displayMode === "text"
           ? null
           : editingNotification.image,
+      displayMode: editingNotification.displayMode,
+      startDate: editingNotification.startDate,
+      endDate: editingNotification.endDate,
+      active: editingNotification.active,
     };
-    const existingIndex = notifications.findIndex(
-      (notification) => notification.id === notificationToSave.id
-    );
-    const nextNotifications = [...notifications];
 
-    if (existingIndex >= 0) {
-      nextNotifications[existingIndex] = notificationToSave;
-    } else {
-      nextNotifications.push(notificationToSave);
+    const isEditing = Boolean(editingNotification.id);
+    const url = isEditing
+      ? `${API_BASE_URL}/notifications/${editingNotification.id}`
+      : `${API_BASE_URL}/notifications`;
+
+    try {
+      setNotificationError("");
+
+      const response = await fetch(url, {
+        method: isEditing ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(notificationPayload),
+      });
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok || data?.status !== "success") {
+        throw new Error(
+          data?.detail || "Unable to save notification."
+        );
+      }
+
+      const savedNotification = data.notification;
+
+      setNotifications((currentNotifications) => {
+        const existingIndex = currentNotifications.findIndex(
+          (notification) => notification.id === savedNotification.id
+        );
+        const nextNotifications = [...currentNotifications];
+
+        if (existingIndex >= 0) {
+          nextNotifications[existingIndex] = savedNotification;
+        } else {
+          nextNotifications.push(savedNotification);
+        }
+
+        return nextNotifications;
+      });
+
+      setEditingNotification(null);
+    } catch (error) {
+      setNotificationError(
+        error.message || "Unable to save notification."
+      );
     }
-
-    updateNotifications(nextNotifications);
-    setEditingNotification(null);
   };
 
-  const toggleNotification = (notificationId) => {
-    updateNotifications(
-      notifications.map((notification) =>
-        notification.id === notificationId
-          ? { ...notification, active: !notification.active }
-          : notification
-      )
-    );
+  const toggleNotification = async (notificationId) => {
+    try {
+      setNotificationError("");
+
+      const response = await fetch(
+        `${API_BASE_URL}/notifications/${notificationId}/active`,
+        {
+          method: "PATCH",
+        }
+      );
+
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok || data?.status !== "success") {
+        throw new Error(
+          data?.detail || "Unable to update notification status."
+        );
+      }
+
+      setNotifications((currentNotifications) =>
+        currentNotifications.map((notification) =>
+          notification.id === notificationId
+            ? {
+                ...notification,
+                active: data.active,
+              }
+            : notification
+        )
+      );
+    } catch (error) {
+      setNotificationError(
+        error.message || "Unable to update notification status."
+      );
+    }
   };
 
   const visibleNotifications = notifications.filter(
@@ -179,6 +329,12 @@ function AdminNotificationManagement() {
             </label>
           </div>
 
+          {notificationError && (
+            <p className="notification-image-upload-error" role="alert">
+              {notificationError}
+            </p>
+          )}
+
           <div className="notification-table-wrap">
             <table className="notification-table">
               <thead>
@@ -192,6 +348,14 @@ function AdminNotificationManagement() {
                 </tr>
               </thead>
               <tbody>
+                {isLoadingNotifications ? (
+                  <tr>
+                    <td colSpan="6" className="notification-empty-state">
+                      Loading notifications...
+                    </td>
+                  </tr>
+                ) : (
+                  <>
                 {visibleNotifications.map((notification) => {
                   const status = getNotificationStatus(notification);
                   const modeLabel = DISPLAY_MODES.find(
@@ -228,6 +392,8 @@ function AdminNotificationManagement() {
                       No notifications match this filter.
                     </td>
                   </tr>
+                )}
+                  </>
                 )}
               </tbody>
             </table>
@@ -289,19 +455,49 @@ function AdminNotificationManagement() {
               {showImageField && (
                 <fieldset className="notification-image-options">
                   <legend>Banner image</legend>
-                  {IMAGE_OPTIONS.map((imagePath) => (
-                    <label key={imagePath} className={editingNotification.image === imagePath ? "selected" : ""}>
-                      <input
-                        type="radio"
-                        name="notification-image"
-                        value={imagePath}
-                        checked={editingNotification.image === imagePath}
-                        onChange={(event) => updateField("image", event.target.value)}
-                        required
-                      />
-                      <img src={imagePath} alt="Notification option" />
-                      <span>{imagePath.split("/").pop()}</span>
-                    </label>
+                  <input
+                    ref={imageFileInputRef}
+                    type="file"
+                    accept=".png,.jpg,.jpeg"
+                    onChange={uploadImage}
+                    hidden
+                  />
+                  <div className="notification-form-actions notification-image-upload-action">
+                    <button
+                      type="button"
+                      className="notification-primary-button"
+                      onClick={() => imageFileInputRef.current?.click()}
+                      disabled={isUploadingImage}
+                    >
+                      {isUploadingImage ? "Uploading..." : "Upload Image"}
+                    </button>
+                  </div>
+                  {isLoadingNotificationImages && (
+                    <p className="notification-image-status">
+                      Loading images...
+                    </p>
+                  )}
+                  {notificationImagesError && (
+                    <p className="notification-image-upload-error" role="alert">
+                      {notificationImagesError}
+                    </p>
+                  )}
+                  {imageUploadError && (
+                    <p className="notification-image-upload-error" role="alert">
+                      {imageUploadError}
+                    </p>
+                  )}
+                  {!isLoadingNotificationImages && notificationImages.map((image) => (
+                    <button
+                      key={image.url}
+                      type="button"
+                      className={`notification-image-card${editingNotification.image === image.url ? " selected" : ""}`}
+                      onClick={() => updateField("image", image.url)}
+                      aria-pressed={editingNotification.image === image.url}
+                    >
+                      <img src={image.url} alt="" />
+                      <span>{image.filename}</span>
+                    </button>
                   ))}
                 </fieldset>
               )}

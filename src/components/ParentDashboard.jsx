@@ -74,7 +74,21 @@ console.log("PARENT DASHBOARD student:", student);
       </header>
 
       {/* Main content */}
-      <main className="dashboard-main">
+      <main
+        className="dashboard-main"
+        style={{
+          width: "100%",
+          height: "100dvh",
+          maxHeight: "100dvh",
+          overflowY: "scroll",
+          overflowX: "hidden",
+          boxSizing: "border-box",
+          flex: "1 1 auto",
+          minHeight: 0,
+          scrollbarWidth: "auto",
+          scrollbarColor: "#666 #e5e7eb",
+        }}
+      >
 
         {/* Welcome */}
         <section className="dashboard-welcome">
