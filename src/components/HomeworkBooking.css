@@ -723,3 +723,17 @@
     font-size: 14px;
   }
 }
+
+/* =========================================
+   MOBILE PAGE SCROLL FIX
+   ========================================= */
+
+@media (max-width: 600px) {
+  html,
+  body,
+  #root {
+    height: auto;
+    min-height: 100%;
+    overflow-y: auto;
+  }
+}
