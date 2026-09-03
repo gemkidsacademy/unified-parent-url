@@ -679,6 +679,9 @@
 
   .homework-booking-page {
     padding: 20px 14px 30px;
+    min-height: 100vh;
+    height: auto;
+    overflow-y: auto;
   }
 
   .homework-academy-logo {

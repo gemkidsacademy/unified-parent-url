@@ -324,7 +324,7 @@ function HomeworkBooking({ parentData, onBack }) {
                     </span>
 
                     <strong>
-                      {homeworkTitle} — Week {weekNumber}
+                      {homeworkTitle}
                     </strong>
                   </div>
 
@@ -446,7 +446,7 @@ function HomeworkBooking({ parentData, onBack }) {
                     <div>
                       <span className="homework-info-label">Session</span>
                       <strong>
-                        {homeworkTitle} — Week {weekNumber}
+                        {homeworkTitle} 
                       </strong>
                     </div>
                   </div>
@@ -525,7 +525,7 @@ function HomeworkBooking({ parentData, onBack }) {
                         <div>
                           <span className="homework-info-label">Session</span>
                           <strong>
-                            {homeworkTitle} — Week {weekNumber}
+                            {homeworkTitle}
                           </strong>
                         </div>
                       </div>
@@ -635,7 +635,7 @@ function HomeworkBooking({ parentData, onBack }) {
                   <div className="homework-info-row">
                     <span className="homework-info-label">Session</span>
                     <strong>
-                      {homeworkTitle} — Week {weekNumber}
+                      {homeworkTitle} 
                     </strong>
                   </div>
                   <div className="homework-info-row">

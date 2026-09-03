@@ -108,6 +108,7 @@ function AdminInterviewBooking() {
   })();
   const [eventSlots, setEventSlots] = useState([]);
   const [teachers, setTeachers] = useState([]);
+  const [teacherAssignedStudents, setTeacherAssignedStudents] = useState([]);
   const [expandedTeacherIds, setExpandedTeacherIds] = useState(new Set());
   const [teacherOptions, setTeacherOptions] = useState([]);
   const [selectedTeacher, setSelectedTeacher] = useState("");
@@ -376,6 +377,26 @@ function AdminInterviewBooking() {
     }
   };
 
+  const loadTeacherAssignedStudents = async () => {
+    if (!availabilityEventId) return;
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/parent-teacher-interview/teacher-assigned-students?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}&event_id=${availabilityEventId}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Unable to load assigned students (${response.status})`);
+      }
+
+      const data = await response.json();
+      setTeacherAssignedStudents(data.assignments || []);
+    } catch (error) {
+      console.error("Failed to load assigned students:", error);
+      setTeacherAssignedStudents([]);
+    }
+  };
+
   useEffect(() => {
     loadEvents();
     loadTeacherOptions();
@@ -383,6 +404,7 @@ function AdminInterviewBooking() {
 
   useEffect(() => {
     loadTeacherAvailability();
+    loadTeacherAssignedStudents();
   }, [availabilityEventId]);
 
   useEffect(() => {
@@ -536,7 +558,11 @@ function AdminInterviewBooking() {
           teacher.gap
         )
       : [];
-    const requiredSlots = 0;
+    const assignedStudents = teacherAssignedStudents.find(
+      (assignment) =>
+        Number(assignment.teacher_id) === Number(teacher.id)
+    );
+    const requiredSlots = assignedStudents?.assigned_students ?? 0;
 
     return {
       ...teacher,

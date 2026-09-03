@@ -131,6 +131,9 @@ function ParentTeacherInterviews({ parentData, onBack }) {
         if (isCancelled) return;
         setEvents(loadedEvents);
 
+        const selectedEvent = findCurrentEvent(loadedEvents);
+        console.log("PTI selected event:", selectedEvent);
+
         const bookingsUrl = `${API_BASE_URL}/parent-teacher-interview/bookings?center_code=${encodeURIComponent(centerCode)}`;
         console.log("PTI bookings URL:", bookingsUrl);
 
@@ -144,13 +147,35 @@ function ParentTeacherInterviews({ parentData, onBack }) {
         console.log("PTI bookings response:", bookingsData);
 
         if (isCancelled) return;
-        setExistingBookings(bookingsData.bookings || []);
 
-        const selectedEvent = findCurrentEvent(loadedEvents);
-        console.log("PTI selected event:", selectedEvent);
+          const loadedBookings = bookingsData.bookings || [];
+          setExistingBookings(loadedBookings);
+
+          const studentBooking = loadedBookings.find(
+            (item) =>
+              item.event_id === selectedEvent?.id &&
+              item.student_id === student.student_id &&
+              item.booking_status === "BOOKED"
+          );
+
+          if (studentBooking) {
+            setBooking({
+              id: studentBooking.id,
+              eventId: studentBooking.event_id,
+              slotId: studentBooking.slot_id,
+              teacherId: studentBooking.teacher_id,
+              studentId: studentBooking.student_id,
+              time: `${formatSlotTime(studentBooking.start_time)} – ${formatSlotTime(
+                studentBooking.end_time
+              )}`,
+              teacherName: studentBooking.teacher_name,
+              startTime: studentBooking.start_time,
+              endTime: studentBooking.end_time,
+            });
+          }
 
         if (selectedEvent?.id) {
-          const availabilityUrl = `${API_BASE_URL}/parent-teacher-interview/slots?center_code=${encodeURIComponent(centerCode)}&event_id=${selectedEvent.id}`;
+          const availabilityUrl = `${API_BASE_URL}/parent-teacher-interview/slots?center_code=${encodeURIComponent(centerCode)}&event_id=${selectedEvent.id}&student_id=${encodeURIComponent(student.student_id)}`;
           console.log("PTI availability URL:", availabilityUrl);
 
           const availabilityResponse = await fetch(availabilityUrl);
@@ -210,30 +235,36 @@ function ParentTeacherInterviews({ parentData, onBack }) {
   ];
 
   const timeSlots = slots
-    .filter((slot) => slot.is_available === true)
-    .map((slot) => ({
-      id: slot.id,
-      teacherId: slot.teacher_id,
-      time: `${formatSlotTime(slot.start_time)} – ${formatSlotTime(
-        slot.end_time
-      )}`,
-      status: "Available",
-    }));
+  .filter((slot) => slot.is_available === true)
+  .map((slot) => ({
+    id: slot.id,
+    teacherId: slot.teacher_id,
+    startTime: slot.start_time,
+    endTime: slot.end_time,
+    time: `${formatSlotTime(slot.start_time)} – ${formatSlotTime(slot.end_time)}`,
+    status: "Available",
+  }));
 
-  const getSlot = (slotId) => timeSlots.find((slot) => slot.id === slotId);
+  const getSlot = (slotKey) =>
+    timeSlots.find(
+      (slot) => `${slot.startTime}-${slot.endTime}` === slotKey
+    );
+
   const selectedSlotDetails = getSlot(selectedSlot);
+
   const otherAvailableSlots = timeSlots.filter(
-  (slot) =>
-    slot.status === "Available" &&
-    !bookedSlotIds.has(slot.id) &&
-    slot.time !== booking?.time
-);
+    (slot) =>
+      slot.status === "Available" &&
+      `${slot.startTime}-${slot.endTime}` !== selectedSlot &&
+      slot.time !== booking?.time
+  );
 
   const confirmInterview = async () => {
   if (!selectedSlotDetails || !currentEvent?.id) {
     console.error("[PTI BOOKING] Missing booking selection", {
       eventId: currentEvent?.id,
-      slotId: selectedSlotDetails?.id,
+      startTime: selectedSlotDetails?.startTime,
+      endTime: selectedSlotDetails?.endTime,
     });
     return;
   }
@@ -256,7 +287,8 @@ function ParentTeacherInterviews({ parentData, onBack }) {
     const bookingPayload = {
       center_code: centerCode,
       event_id: currentEvent.id,
-      slot_id: selectedSlotDetails.id,
+      start_time: selectedSlotDetails.startTime,
+      end_time: selectedSlotDetails.endTime,
       teacher_id: selectedSlotDetails.teacherId,
       student_id: student.student_id,
       parent_email: student.parent_email,
@@ -264,7 +296,8 @@ function ParentTeacherInterviews({ parentData, onBack }) {
 
     console.log("[PTI BOOKING] Creating booking", {
       eventId: currentEvent.id,
-      slotId: selectedSlotDetails.id,
+      startTime: selectedSlotDetails.startTime,
+      endTime: selectedSlotDetails.endTime,
       teacherId: selectedSlotDetails.teacherId,
       studentId: student.student_id,
       centerCode,
@@ -324,13 +357,84 @@ function ParentTeacherInterviews({ parentData, onBack }) {
 };
 
   const changeInterviewTime = () => {
-    setSelectedSlot(booking.slotId);
+    setSelectedSlot(`${booking.startTime}-${booking.endTime}`);
     setIsChangingTime(true);
     setShowChangeConfirmation(false);
   };
 
-  const confirmChange = () => {
-    setShowChangeConfirmation(false);
+  const confirmChange = async () => {
+    if (!booking?.id || !selectedSlotDetails) {
+      return;
+    }
+
+    try {
+      setError("");
+
+      const changeUrl = `${API_BASE_URL}/parent-teacher-interview/bookings/${booking.id}`;
+
+      const changePayload = {
+        center_code: centerCode,
+        start_time: selectedSlotDetails.startTime,
+        end_time: selectedSlotDetails.endTime,
+      };
+
+      console.log("[PTI BOOKING CHANGE] Updating booking", {
+        bookingId: booking.id,
+        startTime: selectedSlotDetails.startTime,
+        endTime: selectedSlotDetails.endTime,
+        requestUrl: changeUrl,
+        requestPayload: changePayload,
+      });
+
+      const response = await fetch(changeUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(changePayload),
+      });
+
+      const data = await response.json();
+
+      console.log("[PTI BOOKING CHANGE] Response status:", response.status);
+      console.log("[PTI BOOKING CHANGE] Response body:", data);
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail || `Unable to change interview time (${response.status})`
+        );
+      }
+
+      setBooking({
+        ...booking,
+        slotId: data.slot_id,
+        time: `${formatSlotTime(data.start_time)} – ${formatSlotTime(
+          data.end_time
+        )}`,
+        startTime: data.start_time,
+        endTime: data.end_time,
+      });
+
+      setSelectedSlot(null);
+      setIsChangingTime(false);
+      setShowChangeConfirmation(false);
+
+      const bookingsResponse = await fetch(
+        `${API_BASE_URL}/parent-teacher-interview/bookings?center_code=${encodeURIComponent(
+          centerCode
+        )}`
+      );
+
+      if (bookingsResponse.ok) {
+        const bookingsData = await bookingsResponse.json();
+        setExistingBookings(bookingsData.bookings || []);
+      }
+    } catch (changeError) {
+      console.error("[PTI BOOKING CHANGE] Error:", changeError);
+      setError(
+        changeError.message || "Unable to change interview time."
+      );
+    }
   };
 
   return (
@@ -387,20 +491,21 @@ function ParentTeacherInterviews({ parentData, onBack }) {
               <h3>Choose an available time</h3>
               <div className="time-slot-list">
                 {timeSlots.map((slot) => {
-                  const isCurrentBooking = booking?.slotId === slot.id;
-                  const isBooked = bookedSlotIds.has(slot.id) && !isCurrentBooking;
-                  const isSelected = selectedSlot === slot.id;
+                  const slotKey = `${slot.startTime}-${slot.endTime}`;
+                  const isCurrentBooking = booking?.time === slot.time;
+                  const isBooked = false;
+                  const isSelected = selectedSlot === slotKey;
 
                   return (
                     <button
                       type="button"
-                      key={slot.id}
+                      key={slotKey}
                       className={`time-slot ${isBooked ? "booked" : ""} ${
                         isSelected ? "selected" : ""
                       }`}
                       disabled={isBooked}
                       onClick={() => {
-                        if (!isBooked) setSelectedSlot(slot.id);
+                        if (!isBooked) setSelectedSlot(slotKey);
                       }}
                     >
                       <span>{slot.time}</span>

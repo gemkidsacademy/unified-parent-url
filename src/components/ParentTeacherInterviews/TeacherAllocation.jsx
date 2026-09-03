@@ -17,6 +17,8 @@ function TeacherAllocation() {
   const [classYearOptions, setClassYearOptions] = useState([]);
   const [classDayOptions, setClassDayOptions] = useState([]);
   const [teacherOptions, setTeacherOptions] = useState([]);
+  const [eventOptions, setEventOptions] = useState([]);
+  const [selectedEventId, setSelectedEventId] = useState("");
   const [selectedTeacher, setSelectedTeacher] = useState("");
   const [selectedClassName, setSelectedClassName] = useState("");
   const [selectedClassYear, setSelectedClassYear] = useState("");
@@ -36,6 +38,28 @@ function TeacherAllocation() {
     loadClasses();
   }, []);
 
+  useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/parent-teacher-interview/events-with-id?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}`
+        );
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.detail || "Failed to load interview events.");
+        }
+
+        setEventOptions(data.events || []);
+      } catch (error) {
+        console.error("Failed to load interview events:", error);
+        setEventOptions([]);
+      }
+    };
+
+    loadEvents();
+  }, []);
+
   const loadAllocations = async () => {
     try {
       const response = await fetch(
@@ -53,6 +77,7 @@ function TeacherAllocation() {
       setAllocations(
         (data.allocations || []).map((allocation) => ({
           id: allocation.id,
+          eventId: allocation.event_id,
           teacherId: allocation.teacher_id,
           classId: allocation.class_id,
           classYearId: allocation.class_year_id,
@@ -203,6 +228,7 @@ function TeacherAllocation() {
     setAllocationMessage("");
 
     if (
+      !selectedEventId ||
       !selectedTeacher ||
       !selectedClassName ||
       !selectedClassYear ||
@@ -242,6 +268,7 @@ function TeacherAllocation() {
             },
             body: JSON.stringify({
               center_code: interviewAdmin.center_code,
+              event_id: Number(selectedEventId),
               teacher_id: Number(selectedTeacherRecord.id),
               class_id: Number(selectedClassRecord.id),
               class_year_id: Number(selectedClassYearRecord.id),
@@ -302,6 +329,7 @@ function TeacherAllocation() {
             },
             body: JSON.stringify({
               center_code: interviewAdmin.center_code,
+              event_id: Number(selectedEventId),
               teacher_id: Number(selectedTeacherRecord.id),
               class_id: Number(selectedClassRecord.id),
               class_year_id: Number(selectedClassYearRecord.id),
@@ -369,6 +397,23 @@ function TeacherAllocation() {
         </div>
 
         <div className="allocation-form">
+
+          <label>
+            <span>Interview Event</span>
+
+            <select
+              value={selectedEventId}
+              onChange={(event) => setSelectedEventId(event.target.value)}
+            >
+              <option value="">Select an interview event</option>
+
+              {eventOptions.map((event) => (
+                <option key={event.id} value={event.id}>
+                  {event.name}
+                </option>
+              ))}
+            </select>
+          </label>
 
           <label>
             <span>Class Name</span>
@@ -493,6 +538,7 @@ function TeacherAllocation() {
         <div className="allocation-table">
 
           <div className="allocation-table-header">
+            <span>Interview Event</span>
             <span>Teacher</span>
             <span>Class Name</span>
             <span>Class Year</span>
@@ -505,6 +551,12 @@ function TeacherAllocation() {
             <div key={allocation.id}>
 
               <div className="allocation-row">
+
+                <span>
+                  {eventOptions.find(
+                    (event) => Number(event.id) === Number(allocation.eventId)
+                  )?.name || "—"}
+                </span>
 
                 <strong>
                   {allocation.teacher}
@@ -532,6 +584,7 @@ function TeacherAllocation() {
                     className="allocation-edit-button"
                     onClick={() => {
                       setEditingAllocation(allocation);
+                      setSelectedEventId(String(allocation.eventId));
                       setSelectedTeacher(allocation.teacher);
                       setSelectedClassName(allocation.className);
                       setSelectedClassYear("");
