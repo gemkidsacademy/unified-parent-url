@@ -261,7 +261,21 @@ function HomeworkBooking({ parentData, onBack }) {
   const sessionDate = bookingData?.session_date || "Saturday, September 12, 2026";
 
   return (
-    <main className="homework-booking-page">
+    <main
+      className="homework-booking-page"
+      style={{
+        width: "100%",
+        height: "100dvh",
+        maxHeight: "100dvh",
+        overflowY: "scroll",
+        overflowX: "hidden",
+        boxSizing: "border-box",
+        flex: "1 1 auto",
+        minHeight: 0,
+        scrollbarWidth: "auto",
+        scrollbarColor: "#666 #e5e7eb",
+      }}
+    >
 
       {/* Academy Logo */}
       <div className="homework-academy-logo">
