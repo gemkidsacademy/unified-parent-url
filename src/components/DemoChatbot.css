@@ -262,8 +262,11 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow: hidden;
   background: linear-gradient(to bottom right, #ffe3d4, #ffd1c0);
+}
+
+.chat-container {
+  overflow: hidden;
 }
 .chat-header {
   display: flex;
