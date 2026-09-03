@@ -749,6 +749,8 @@ html, body {
   .quiz-review {
     margin-top: 18px;
     padding: 0 2px 20px;
+    min-height: 0;
+    overflow-y: auto;
   }
 
   .review-header {
