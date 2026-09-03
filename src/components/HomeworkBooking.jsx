@@ -265,15 +265,9 @@ function HomeworkBooking({ parentData, onBack }) {
       className="homework-booking-page"
       style={{
         width: "100%",
-        height: "100dvh",
-        maxHeight: "100dvh",
-        overflowY: "scroll",
+        overflowY: "auto",
         overflowX: "hidden",
         boxSizing: "border-box",
-        flex: "1 1 auto",
-        minHeight: 0,
-        scrollbarWidth: "auto",
-        scrollbarColor: "#666 #e5e7eb",
       }}
     >
 

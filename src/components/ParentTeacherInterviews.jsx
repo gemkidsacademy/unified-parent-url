@@ -131,9 +131,6 @@ function ParentTeacherInterviews({ parentData, onBack }) {
         if (isCancelled) return;
         setEvents(loadedEvents);
 
-        const selectedEvent = findCurrentEvent(loadedEvents);
-        console.log("PTI selected event:", selectedEvent);
-
         const bookingsUrl = `${API_BASE_URL}/parent-teacher-interview/bookings?center_code=${encodeURIComponent(centerCode)}`;
         console.log("PTI bookings URL:", bookingsUrl);
 
@@ -173,6 +170,9 @@ function ParentTeacherInterviews({ parentData, onBack }) {
               endTime: studentBooking.end_time,
             });
           }
+
+        const selectedEvent = findCurrentEvent(loadedEvents);
+        console.log("PTI selected event:", selectedEvent);
 
         if (selectedEvent?.id) {
           const availabilityUrl = `${API_BASE_URL}/parent-teacher-interview/slots?center_code=${encodeURIComponent(centerCode)}&event_id=${selectedEvent.id}&student_id=${encodeURIComponent(student.student_id)}`;
@@ -245,19 +245,14 @@ function ParentTeacherInterviews({ parentData, onBack }) {
     status: "Available",
   }));
 
-  const getSlot = (slotKey) =>
-    timeSlots.find(
-      (slot) => `${slot.startTime}-${slot.endTime}` === slotKey
-    );
-
+  const getSlot = (slotId) => timeSlots.find((slot) => slot.id === slotId);
   const selectedSlotDetails = getSlot(selectedSlot);
-
   const otherAvailableSlots = timeSlots.filter(
-    (slot) =>
-      slot.status === "Available" &&
-      `${slot.startTime}-${slot.endTime}` !== selectedSlot &&
-      slot.time !== booking?.time
-  );
+  (slot) =>
+    slot.status === "Available" &&
+    !bookedSlotIds.has(slot.id) &&
+    slot.time !== booking?.time
+);
 
   const confirmInterview = async () => {
   if (!selectedSlotDetails || !currentEvent?.id) {
@@ -491,21 +486,20 @@ function ParentTeacherInterviews({ parentData, onBack }) {
               <h3>Choose an available time</h3>
               <div className="time-slot-list">
                 {timeSlots.map((slot) => {
-                  const slotKey = `${slot.startTime}-${slot.endTime}`;
-                  const isCurrentBooking = booking?.time === slot.time;
-                  const isBooked = false;
-                  const isSelected = selectedSlot === slotKey;
+                  const isCurrentBooking = booking?.slotId === slot.id;
+                  const isBooked = bookedSlotIds.has(slot.id) && !isCurrentBooking;
+                  const isSelected = selectedSlot === slot.id;
 
                   return (
                     <button
                       type="button"
-                      key={slotKey}
+                      key={slot.id}
                       className={`time-slot ${isBooked ? "booked" : ""} ${
                         isSelected ? "selected" : ""
                       }`}
                       disabled={isBooked}
                       onClick={() => {
-                        if (!isBooked) setSelectedSlot(slotKey);
+                        if (!isBooked) setSelectedSlot(slot.id);
                       }}
                     >
                       <span>{slot.time}</span>
