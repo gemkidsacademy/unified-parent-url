@@ -131,6 +131,9 @@ function ParentTeacherInterviews({ parentData, onBack }) {
         if (isCancelled) return;
         setEvents(loadedEvents);
 
+        const selectedEvent = findCurrentEvent(loadedEvents);
+        console.log("PTI selected event:", selectedEvent);
+
         const bookingsUrl = `${API_BASE_URL}/parent-teacher-interview/bookings?center_code=${encodeURIComponent(centerCode)}`;
         console.log("PTI bookings URL:", bookingsUrl);
 
@@ -170,9 +173,6 @@ function ParentTeacherInterviews({ parentData, onBack }) {
               endTime: studentBooking.end_time,
             });
           }
-
-        const selectedEvent = findCurrentEvent(loadedEvents);
-        console.log("PTI selected event:", selectedEvent);
 
         if (selectedEvent?.id) {
           const availabilityUrl = `${API_BASE_URL}/parent-teacher-interview/slots?center_code=${encodeURIComponent(centerCode)}&event_id=${selectedEvent.id}&student_id=${encodeURIComponent(student.student_id)}`;
@@ -237,7 +237,7 @@ function ParentTeacherInterviews({ parentData, onBack }) {
   const timeSlots = slots
   .filter((slot) => slot.is_available === true)
   .map((slot) => ({
-    id: slot.id,
+    id: `${slot.start_time}-${slot.end_time}`,
     teacherId: slot.teacher_id,
     startTime: slot.start_time,
     endTime: slot.end_time,
@@ -245,7 +245,11 @@ function ParentTeacherInterviews({ parentData, onBack }) {
     status: "Available",
   }));
 
-  const getSlot = (slotId) => timeSlots.find((slot) => slot.id === slotId);
+  const getSlot = (slotKey) =>
+    timeSlots.find(
+      (slot) => `${slot.startTime}-${slot.endTime}` === slotKey
+    );
+
   const selectedSlotDetails = getSlot(selectedSlot);
   const otherAvailableSlots = timeSlots.filter(
   (slot) =>
