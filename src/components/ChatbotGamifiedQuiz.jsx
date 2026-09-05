@@ -699,7 +699,18 @@ export default function ChatbotGamifiedQuiz({
 
         </form>
             {quizCompleted && reviewData.length > 0 && (
-              <div className="quiz-review">
+              <div
+                className="quiz-review"
+                style={{
+                  height: "100vh",
+                  maxHeight: "100vh",
+                  overflowY: "scroll",
+                  overflowX: "hidden",
+                  boxSizing: "border-box",
+                  scrollbarWidth: "auto",
+                  scrollbarColor: "#666 #e5e7eb",
+                }}
+              >
                 <div className="review-header">
                   <h3>Quiz Review</h3>
                   <div className="review-score">
