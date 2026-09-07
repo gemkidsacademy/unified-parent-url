@@ -11,7 +11,21 @@ import { getActiveNotifications } from "./utils/getActiveNotifications";
 import { API_BASE_URL } from "./config/api";
 
 function App() {
-  const [parentData, setParentData] = useState(null);
+  const [parentData, setParentData] = useState(() => {
+    const storedData = localStorage.getItem("parentData");
+
+    if (!storedData) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(storedData);
+    } catch (error) {
+      console.error("APP: invalid stored parentData:", error);
+      localStorage.removeItem("parentData");
+      return null;
+    }
+  });
   const [pendingParentNotifications, setPendingParentNotifications] = useState([]);
   const [interviewAdminData, setInterviewAdminData] = useState(() => {
     const storedData = localStorage.getItem("interviewAdminData");
