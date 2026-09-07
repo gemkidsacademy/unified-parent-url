@@ -13,9 +13,7 @@ const findCurrentEvent = (eventsList) => {
     eventsList.find((event) => {
       if (!event?.event_date) return false;
       return new Date(`${event.event_date}T00:00:00`) >= today;
-    }) ||
-    eventsList[0] ||
-    null
+    }) || null
   );
 };
 
@@ -497,143 +495,170 @@ function ParentTeacherInterviews({ parentData, onBack }) {
           </div>
         </section>
 
-        <section className="interview-panel">
-          <div className="interview-event-heading">
-            <div className="interview-event-icon">📅</div>
-            <div>
-              <span className="interview-eyebrow">Upcoming interview</span>
-              <h2>{currentEvent?.name || "No upcoming interview event"}</h2>
-              <p>Student: {studentName} · {studentClass}</p>
-            </div>
-          </div>
-
-          <dl className="interview-details">
-            {eventDetails.map(([label, value]) => (
-              <div className="interview-detail" key={label}>
-                <dt>{label}</dt>
-                <dd>{value}</dd>
+        {currentEvent ? (
+          <section className="interview-panel">
+            <div className="interview-event-heading">
+              <div className="interview-event-icon">📅</div>
+              <div>
+                <span className="interview-eyebrow">Upcoming interview</span>
+                <h2>{currentEvent?.name || "No upcoming interview event"}</h2>
+                <p>
+                  Student: {studentName} · {studentClass}
+                </p>
               </div>
-            ))}
-          </dl>
+            </div>
 
-          {!booking || isChangingTime ? (
-            <div className="interview-slots">
-              <h3>Choose an available time</h3>
-              <div className="time-slot-list">
-                {timeSlots.map((slot) => {
-                  const isCurrentBooking = booking?.slotId === slot.id;
-                  const isBooked = bookedSlotIds.has(slot.id) && !isCurrentBooking;
-                  const isSelected = selectedSlot === slot.id;
+            <dl className="interview-details">
+              {eventDetails.map(([label, value]) => (
+                <div className="interview-detail" key={label}>
+                  <dt>{label}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
 
-                  return (
+            {!booking || isChangingTime ? (
+              <div className="interview-slots">
+                <h3>Choose an available time</h3>
+
+                <div className="time-slot-list">
+                  {timeSlots.map((slot) => {
+                    const isCurrentBooking = booking?.slotId === slot.id;
+                    const isBooked =
+                      bookedSlotIds.has(slot.id) && !isCurrentBooking;
+                    const isSelected = selectedSlot === slot.id;
+
+                    return (
+                      <button
+                        type="button"
+                        key={slot.id}
+                        className={`time-slot ${isBooked ? "booked" : ""} ${
+                          isSelected ? "selected" : ""
+                        }`}
+                        disabled={isBooked}
+                        onClick={() => {
+                          if (!isBooked) setSelectedSlot(slot.id);
+                        }}
+                      >
+                        <span>{slot.time}</span>
+
+                        <span className="slot-status">
+                          {isCurrentBooking
+                            ? "Current booking"
+                            : isBooked
+                            ? "Booked"
+                            : slot.status}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {isChangingTime && otherAvailableSlots.length === 0 && (
+                  <p className="no-other-slots">
+                    No other interview times are currently available. Your existing
+                    booking will remain unchanged.
+                  </p>
+                )}
+
+                {selectedSlotDetails && (
+                  <div className="interview-confirmation">
+                    <div>
+                      <span className="confirmation-label">
+                        Your selected time
+                      </span>
+
+                      <strong>{selectedSlotDetails.time}</strong>
+                    </div>
+
                     <button
                       type="button"
-                      key={slot.id}
-                      className={`time-slot ${isBooked ? "booked" : ""} ${
-                        isSelected ? "selected" : ""
-                      }`}
-                      disabled={isBooked}
-                      onClick={() => {
-                        if (!isBooked) setSelectedSlot(slot.id);
-                      }}
+                      className="confirm-interview-button"
+                      onClick={
+                        booking
+                          ? () => setShowChangeConfirmation(true)
+                          : confirmInterview
+                      }
                     >
-                      <span>{slot.time}</span>
-                      <span className="slot-status">
-                        {isCurrentBooking ? "Current booking" : isBooked ? "Booked" : slot.status}
-                      </span>
+                      Confirm Interview <span>→</span>
                     </button>
-                  );
-                })}
-              </div>
-
-              {isChangingTime && otherAvailableSlots.length === 0 && (
-                <p className="no-other-slots">
-                  No other interview times are currently available. Your existing booking will remain unchanged.
-                </p>
-              )}
-
-              {selectedSlotDetails && (
-                <div className="interview-confirmation">
-                  <div>
-                    <span className="confirmation-label">Your selected time</span>
-                    <strong>
-                      {selectedSlotDetails.time}
-                    </strong>
                   </div>
+                )}
+              </div>
+            ) : (
+              <div className="existing-booking-view">
+                <div className="interview-success" role="status">
+                  <strong>Interview booked successfully</strong>
+
+                  <div className="booking-confirmation-details">
+                    <span>Student: {studentName}</span>
+
+                    <span>
+                      Teacher: {booking?.teacherName || "Not available"}
+                    </span>
+
+                    <span>
+                      Date: {currentEvent?.event_date || "Not available"}
+                    </span>
+
+                    <span>
+                      Time: {booking?.time}
+                    </span>
+
+                    <span>
+                      Location: {currentEvent?.location || "Not available"}
+                    </span>
+                  </div>
+
+                  <p>A confirmation email has been sent to you.</p>
+                </div>
+
+                <div className="booked-interview-card">
+                  <h3>Your interview is booked</h3>
+
+                  <dl>
+                    <div>
+                      <dt>Student</dt>
+                      <dd>{studentName}</dd>
+                    </div>
+
+                    <div>
+                      <dt>Teacher</dt>
+                      <dd>{booking?.teacherName || "Not available"}</dd>
+                    </div>
+
+                    <div>
+                      <dt>Date</dt>
+                      <dd>{currentEvent?.event_date || "Not available"}</dd>
+                    </div>
+
+                    <div>
+                      <dt>Interview time</dt>
+                      <dd>{booking?.time}</dd>
+                    </div>
+
+                    <div>
+                      <dt>Location</dt>
+                      <dd>{currentEvent?.location || "Not available"}</dd>
+                    </div>
+                  </dl>
+
                   <button
                     type="button"
                     className="confirm-interview-button"
-                    onClick={booking ? () => setShowChangeConfirmation(true) : confirmInterview}
+                    onClick={changeInterviewTime}
                   >
-                    Confirm Interview <span>→</span>
+                    Change Interview Time
                   </button>
                 </div>
-              )}
-            </div>
-          ) : (
-            <div className="existing-booking-view">
-              <div className="interview-success" role="status">
-                <strong>Interview booked successfully</strong>
-                <div className="booking-confirmation-details">
-                  <span>Student: {studentName}</span>
-                  <span>
-                    Teacher: {booking?.teacherName || "Not available"}
-                  </span>
-                  <span>
-                    Date: {currentEvent?.event_date || "Not available"}
-                  </span>
-                  <span>
-                    Time: {booking?.time}
-                  </span>
-                  <span>
-                    Location: {currentEvent?.location || "Not available"}
-                  </span>
-                </div>
-                <p>A confirmation email has been sent to you.</p>
               </div>
-
-              <div className="booked-interview-card">
-                <h3>Your interview is booked</h3>
-                <dl>
-                  <div>
-                    <dt>Student</dt>
-                    <dd>{studentName}</dd>
-                  </div>
-
-                  <div>
-                    <dt>Teacher</dt>
-                    <dd>{booking?.teacherName || "Not available"}</dd>
-                  </div>
-
-                  <div>
-                    <dt>Date</dt>
-                    <dd>{currentEvent?.event_date || "Not available"}</dd>
-                  </div>
-
-                  <div>
-                    <dt>Interview time</dt>
-                    <dd>
-                      {booking?.time}
-                    </dd>
-                  </div>
-
-                  <div>
-                    <dt>Location</dt>
-                    <dd>{currentEvent?.location || "Not available"}</dd>
-                  </div>
-                </dl>
-
-                <button
-                  type="button"
-                  className="confirm-interview-button"
-                  onClick={changeInterviewTime}
-                >
-                  Change Interview Time
-                </button>
-              </div>
-            </div>
-          )}
-        </section>
+            )}
+          </section>
+        ) : (
+          <section className="interview-panel interview-empty-state">
+            <h2>There are no Active interview sessions currently</h2>
+          </section>
+        )}
 
         {showChangeConfirmation && (
           <div className="interview-change-modal-overlay">
