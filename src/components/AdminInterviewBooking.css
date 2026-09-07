@@ -1497,3 +1497,29 @@
   overflow-x: hidden;
   box-sizing: border-box;
 }
+.admin-interview-header-inner {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.admin-header-info {
+  flex: 1;
+}
+
+.admin-logout-button {
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: transparent;
+  color: #ffffff;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.admin-logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: #ffffff;
+}

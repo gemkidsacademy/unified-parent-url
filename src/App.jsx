@@ -53,7 +53,11 @@ function App() {
     setParentData(data);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/notifications`);
+      const centerCode = data?.student?.center_code;
+
+      const response = await fetch(
+        `${API_BASE_URL}/notifications?center_code=${encodeURIComponent(centerCode)}`
+      );
       const responseData = await response.json().catch(() => null);
 
       if (!response.ok || responseData?.status !== "success") {
@@ -91,6 +95,12 @@ function App() {
     setPendingParentNotifications([]);
   };
 
+  const handleAdminLogout = () => {
+    console.log("APP: admin logout");
+    localStorage.removeItem("interviewAdminData");
+    setInterviewAdminData(null);
+  };
+
   const handleNotificationAcknowledge = () => {
     setPendingParentNotifications((notifications) =>
       notifications.slice(1)
@@ -107,10 +117,10 @@ function App() {
     }
 
     if (isAdminNotifications) {
-      return <AdminNotificationManagement />;
+      return <AdminNotificationManagement interviewAdminData={interviewAdminData} />;
     }
 
-    return <AdminInterviewBooking />;
+    return <AdminInterviewBooking onLogout={handleAdminLogout} />;
   }
 
   if (isGamifiedQuiz) {

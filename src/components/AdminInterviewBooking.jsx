@@ -98,7 +98,7 @@ const formatBookingTime = (startTime, endTime) => {
   return `${formatAvailabilityTime(startTime)} – ${formatAvailabilityTime(endTime)}`;
 };
 
-function AdminInterviewBooking() {
+function AdminInterviewBooking({ onLogout }) {
   const interviewAdmin = (() => {
     try {
       return JSON.parse(localStorage.getItem("interviewAdminData") || "null") || {};
@@ -1056,21 +1056,30 @@ const eventTeacherAllocations = teacherAllocations.filter(
               alt="Gem Kids Academy"
             />
           </div>
-          <div>
+
+          <div className="admin-header-info">
             <span className="admin-eyebrow">Admin workspace</span>
-            
             <p className="admin-identity">
-              Center: {interviewAdmin.center_code || "—"} · Admin: {interviewAdmin.full_name || "—"}
+              Center: {interviewAdmin.center_code || "—"} · Admin:{" "}
+              {interviewAdmin.full_name || "—"}
             </p>
           </div>
+
+          <button
+            type="button"
+            className="admin-logout-button"
+            onClick={onLogout}
+          >
+            Logout
+          </button>
         </div>
       </header>
 
       <nav className="admin-tabs" aria-label="Admin interview sections">
         {[
-          ["unified", "Unified"],
+          ["unified", "Notifications"],
           ["parentTeacherInterview", "Parent Teacher Interview"],
-          ["homeworkPortal", "Homework Portal"],
+          ["homeworkPortal", "Homework Booking"],
         ].map(([tab, label]) => (
           <button
             type="button"

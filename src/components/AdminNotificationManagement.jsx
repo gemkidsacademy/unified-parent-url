@@ -40,7 +40,7 @@ const getNotificationStatus = (notification) => {
   return "Active";
 };
 
-function AdminNotificationManagement() {
+function AdminNotificationManagement({ interviewAdminData }) {
   const [notifications, setNotifications] = useState([]);
   const [isLoadingNotifications, setIsLoadingNotifications] = useState(true);
   const [notificationError, setNotificationError] = useState("");
@@ -60,7 +60,11 @@ function AdminNotificationManagement() {
       setNotificationError("");
 
       try {
-        const response = await fetch(`${API_BASE_URL}/notifications`);
+        const centerCode = interviewAdminData?.center_code;
+
+        const response = await fetch(
+          `${API_BASE_URL}/notifications?center_code=${encodeURIComponent(centerCode)}`
+        );
         const data = await response.json().catch(() => null);
 
         if (!response.ok || data?.status !== "success") {
@@ -165,6 +169,7 @@ function AdminNotificationManagement() {
     event.preventDefault();
 
     const notificationPayload = {
+      center_code: interviewAdminData?.center_code,
       title: editingNotification.title,
       text: editingNotification.text,
       image:
@@ -234,6 +239,12 @@ function AdminNotificationManagement() {
         `${API_BASE_URL}/notifications/${notificationId}/active`,
         {
           method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            center_code: interviewAdminData?.center_code,
+          }),
         }
       );
 
