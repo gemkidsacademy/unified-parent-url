@@ -8,6 +8,7 @@ import HomeworkConfiguration from "../pages/HomeworkConfiguration";
 import HomeworkAutomation from "../pages/HomeworkAutomation";
 import HomeworkWeeklyDashboard from "../pages/HomeworkWeeklyDashboard";
 import TestEmail from "../pages/TestEmail";
+import AdminGamifiedQuiz from "./AdminGamifiedQuiz";
 
 const parseTime = (time) => {
   const match = time.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
@@ -1080,6 +1081,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
           ["unified", "Notifications"],
           ["parentTeacherInterview", "Parent Teacher Interview"],
           ["homeworkPortal", "Homework Booking"],
+          ["gamifiedQuiz", "Gamified Quiz"],
         ].map(([tab, label]) => (
           <button
             type="button"
@@ -2172,6 +2174,9 @@ const eventTeacherAllocations = teacherAllocations.filter(
           </button>
           <EventHistory />
           </>
+        )}
+        {activeTab === "gamifiedQuiz" && (
+            <AdminGamifiedQuiz interviewAdmin={interviewAdmin} />
         )}
       </main>
     </div>

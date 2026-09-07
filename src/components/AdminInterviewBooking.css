@@ -1523,3 +1523,75 @@
   background-color: rgba(255, 255, 255, 0.12);
   border-color: #ffffff;
 }
+.gamified-dashboard-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    min-height: 190px;
+    padding: 32px 36px;
+    background: linear-gradient(135deg, #ffffff 0%, #f7f3ff 100%);
+    border: 1px solid #d8c9ff;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(76, 29, 149, 0.08);
+    cursor: pointer;
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.gamified-dashboard-card:hover {
+    transform: translateY(-4px);
+    border-color: #8b5cf6;
+    box-shadow: 0 14px 30px rgba(76, 29, 149, 0.14);
+}
+
+.gamified-dashboard-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 76px;
+    height: 76px;
+    flex-shrink: 0;
+    border-radius: 16px;
+    background: #ede9fe;
+    color: #5b21b6;
+}
+
+.gamified-dashboard-content {
+    flex: 1;
+}
+
+.gamified-dashboard-content h2 {
+    margin: 0 0 8px;
+    color: #24155f;
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.gamified-dashboard-content p {
+    margin: 0;
+    color: #6b6480;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.gamified-dashboard-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #5b21b6;
+    color: #ffffff;
+    font-size: 24px;
+    line-height: 1;
+    transition: transform 0.2s ease;
+}
+
+.gamified-dashboard-card:hover .gamified-dashboard-arrow {
+    transform: translateX(4px);
+}

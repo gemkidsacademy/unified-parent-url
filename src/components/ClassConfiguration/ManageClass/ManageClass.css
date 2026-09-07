@@ -1,0 +1,123 @@
+.manage-classes{
+
+    max-width:1000px;
+
+    margin:auto;
+
+    background:white;
+
+    padding:30px;
+
+    border:1px solid #ddd;
+
+    border-radius:10px;
+
+}
+
+.manage-classes h2{
+
+    margin-bottom:10px;
+
+}
+
+.description{
+
+    color:#666;
+
+    margin-bottom:25px;
+
+}
+
+.toolbar{
+
+    margin-bottom:25px;
+
+}
+
+.toolbar input{
+
+    width:350px;
+
+    padding:10px;
+
+    border:1px solid #ccc;
+
+    border-radius:4px;
+
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+thead{
+
+    background:#f4f4f4;
+
+}
+
+th{
+
+    padding:14px;
+
+    border:1px solid #ddd;
+
+}
+
+td{
+
+    padding:14px;
+
+    border:1px solid #ddd;
+
+}
+
+.edit-btn{
+
+    background:#4d8fe8;
+
+    color:white;
+
+    border:none;
+
+    padding:8px 18px;
+
+    border-radius:4px;
+
+    cursor:pointer;
+
+    margin-right:10px;
+
+}
+
+.edit-btn:hover{
+
+    background:#2d7ff9;
+
+}
+
+.delete-btn{
+
+    background:#dc3545;
+
+    color:white;
+
+    border:none;
+
+    padding:8px 18px;
+
+    border-radius:4px;
+
+    cursor:pointer;
+
+}
+
+.delete-btn:hover{
+
+    background:#bb2d3b;
+
+}

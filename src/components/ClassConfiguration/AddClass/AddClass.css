@@ -1,0 +1,115 @@
+.add-class{
+
+    max-width:700px;
+
+    margin:auto;
+
+    background:white;
+
+    border:1px solid #ddd;
+
+    border-radius:10px;
+
+    padding:35px;
+
+}
+
+.add-class h2{
+
+    margin-bottom:10px;
+
+}
+
+.description{
+
+    color:#666;
+
+    margin-bottom:35px;
+
+    line-height:1.7;
+
+}
+
+.form-group{
+
+    display:flex;
+
+    align-items:center;
+
+    margin-bottom:25px;
+
+}
+
+.form-group label{
+
+    width:170px;
+
+    font-weight:600;
+
+}
+
+.form-group select{
+
+    flex:1;
+
+    padding:10px;
+
+    border:1px solid #ccc;
+
+    border-radius:4px;
+
+    font-size:15px;
+
+}
+
+.button-row{
+
+    margin-top:35px;
+
+    display:flex;
+
+    gap:15px;
+
+}
+
+.save-btn{
+
+    background:#4d8fe8;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 35px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+}
+
+.save-btn:hover{
+
+    background:#2d7ff9;
+
+}
+
+.cancel-btn{
+
+    background:#eee;
+
+    border:none;
+
+    padding:12px 35px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+}
+
+.cancel-btn:hover{
+
+    background:#ddd;
+
+}
