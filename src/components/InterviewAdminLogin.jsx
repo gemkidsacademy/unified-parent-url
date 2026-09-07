@@ -61,7 +61,7 @@ function InterviewAdminLogin({ onLoginSuccess }) {
         </div>
 
         <p className="interview-admin-login-eyebrow">Admin workspace</p>
-        <h1>Parent–Teacher Interview Admin</h1>
+        
         <p className="interview-admin-login-description">
           Sign in to manage interview events and teacher availability.
         </p>

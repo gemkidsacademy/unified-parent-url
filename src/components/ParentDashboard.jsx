@@ -54,19 +54,16 @@ console.log("PARENT DASHBOARD student:", student);
               <span>{email}</span>
             </div>
 
-            <button className="account-chevron" type="button">
-             ⌄
-            </button>
-
             <div className="header-divider"></div>
 
             <button
               type="button"
               className="logout-button"
               onClick={onLogout}
+              aria-label="Logout"
             >
               <span className="logout-icon">↪</span>
-              Logout
+              <span className="logout-label">Logout</span>
             </button>
           </div>
 

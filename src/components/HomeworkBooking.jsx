@@ -305,11 +305,46 @@ function HomeworkBooking({ parentData, onBack }) {
           </div>
         )}
 
+        {!loadingDashboard && !error && bookingData?.bookings_closed && (
+          <div className="homework-response-confirmation">
+            <div className="confirmation-header">
+              <h2>Homework Support</h2>
+            </div>
+
+            <div className="confirmation-message">
+              <p className="thank-you">
+                Homework Support bookings are now closed for this week.
+              </p>
+
+              {bookingData.booking_status === "BOOKED" ? (
+                <p className="confirmation-text">
+                  Your booking: {bookingData.booking_start_time} -{" "}
+                  {bookingData.booking_end_time}
+                </p>
+              ) : (
+                <p className="confirmation-text">
+                  You have not made any booking this week.
+                </p>
+              )}
+            </div>
+
+            <div className="confirmation-actions">
+              <button
+                type="button"
+                className="homework-back-link"
+                onClick={onBack}
+              >
+                ← Back to dashboard
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Content - Only show when not loading and no error */}
         {!loadingDashboard && !error && bookingData && (
           <>
             {/* ===== EXISTING BOOKING ===== */}
-            {flowState === "existing_booking" && (
+            {!bookingData?.bookings_closed && flowState === "existing_booking" && (
               <div className="homework-response-confirmation">
                 <div className="confirmation-header">
                   <h2>Booking Confirmed</h2>
@@ -442,7 +477,7 @@ function HomeworkBooking({ parentData, onBack }) {
                 </button>
               </div>
             ) : (
-              flowState === "attendance" && (
+              !bookingData?.bookings_closed && flowState === "attendance" && (
                 <>
                 <div className="homework-title-section">
                   <h1>Homework Support</h1>
@@ -513,7 +548,7 @@ function HomeworkBooking({ parentData, onBack }) {
             )}
 
             {/* ===== TIME SLOT SELECTION SCREEN ===== */}
-            {flowState === "selecting_time_slot" && (
+            {!bookingData?.bookings_closed && flowState === "selecting_time_slot" && (
               <>
                 <div className="homework-title-section">
                   <h1>Homework Support</h1>
@@ -621,7 +656,9 @@ function HomeworkBooking({ parentData, onBack }) {
             )}
 
             {/* ===== ATTENDING CONFIRMATION ===== */}
-            {flowState === "confirmation" && bookingData?.response === "ATTENDING" && (
+            {!bookingData?.bookings_closed &&
+              flowState === "confirmation" &&
+              bookingData?.response === "ATTENDING" && (
               <div className="homework-response-confirmation">
                 <div className="confirmation-header">
                   <h2>Booking Confirmed</h2>

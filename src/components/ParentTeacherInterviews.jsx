@@ -222,18 +222,6 @@ function ParentTeacherInterviews({ parentData, onBack }) {
     console.log("PTI centerCode:", centerCode);
   }, [events, currentEvent, slots, existingBookings, booking, centerCode]);
 
-  const eventDetails = [
-    ["Date", currentEvent?.event_date || "Not available"],
-    ["Location", currentEvent?.location || "Not available"],
-    [
-      "Teacher",
-      slots.length > 0
-        ? slots[0].teacher_name || "Not available"
-        : "Not available",
-    ],
-    ["Booking status", booking ? "Booked" : "Not booked"],
-  ];
-
   const timeSlots = slots
   .filter((slot) => slot.is_available === true)
   .map((slot) => ({
@@ -244,6 +232,37 @@ function ParentTeacherInterviews({ parentData, onBack }) {
     time: `${formatSlotTime(slot.start_time)} – ${formatSlotTime(slot.end_time)}`,
     status: "Available",
   }));
+
+  console.log("[PTI DEBUG] slots from API:", slots);
+  console.log("[PTI DEBUG] timeSlots:", timeSlots);
+  console.log("[PTI DEBUG] timeSlots.length:", timeSlots.length);
+  console.log("[PTI DEBUG] booking:", booking);
+  console.log("[PTI DEBUG] booking status that should render:",
+    booking
+      ? "Booked"
+      : timeSlots.length > 0
+        ? "Not booked"
+        : "No bookings available"
+  );
+
+  const eventDetails = [
+    ["Date", currentEvent?.event_date || "Not available"],
+    ["Location", currentEvent?.location || "Not available"],
+    [
+      "Teacher",
+      slots.length > 0
+        ? slots[0].teacher_name || "Not available"
+        : "Not available",
+    ],
+    [
+      "Booking status",
+      booking
+        ? "Booked"
+        : timeSlots.length > 0
+          ? "Not booked"
+          : "No bookings available",
+    ],
+  ];
 
   const getSlot = (slotKey) =>
     timeSlots.find(
@@ -435,6 +454,18 @@ function ParentTeacherInterviews({ parentData, onBack }) {
       );
     }
   };
+
+  console.log("[PTI DEBUG] FINAL RENDER STATE:", {
+    currentEventId: currentEvent?.id,
+    booking,
+    slotsCount: slots.length,
+    timeSlotsCount: timeSlots.length,
+    calculatedBookingStatus: booking
+      ? "Booked"
+      : timeSlots.length > 0
+        ? "Not booked"
+        : "No bookings available",
+  });
 
   return (
     <div className="parent-dashboard">
