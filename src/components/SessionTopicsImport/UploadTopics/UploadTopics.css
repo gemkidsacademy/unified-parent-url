@@ -1,0 +1,85 @@
+.upload-topics{
+
+    max-width:750px;
+
+    margin:auto;
+
+    background:white;
+
+    padding:35px;
+
+    border:1px solid #ddd;
+
+    border-radius:10px;
+
+}
+
+.description{
+
+    color:#666;
+
+    line-height:1.8;
+
+    margin-bottom:30px;
+
+}
+
+.upload-box{
+
+    border:2px dashed #bbb;
+
+    border-radius:8px;
+
+    padding:30px;
+
+    text-align:center;
+
+    background:#fafafa;
+
+}
+
+.upload-box input{
+
+    margin-bottom:20px;
+
+}
+
+.button-row{
+
+    margin-top:30px;
+
+    display:flex;
+
+    gap:15px;
+
+}
+
+.upload-btn{
+
+    background:#4d8fe8;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 30px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+}
+
+.back-btn{
+
+    background:#eee;
+
+    border:none;
+
+    padding:12px 30px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+}

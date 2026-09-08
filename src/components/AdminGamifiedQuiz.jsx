@@ -2,6 +2,13 @@ import React, { useState } from "react";
 import Dashboard from "./Dashboard";
 import AcademicTerm from "./AcademicTerm/AcademicTerm";
 import ClassConfiguration from "./ClassConfiguration/ClassConfiguration";
+import SessionTopicsImport from "./SessionTopicsImport/SessionTopicsImport";
+import ActivityTypes from "./ActivityTypes/ActivityTypes";
+import QuizScheduler from "./QuizScheduler/QuizScheduler";
+import SchedulerRuns from "./SchedulerRuns/SchedulerRuns";
+import GenerateGamifiedQuizzes from "./GenerateGamifiedQuizzes/GenerateGamifiedQuizzes";
+import Leaderboard from "./Leaderboard/Leaderboard";
+import GuestCredentials from "./GuestCredentials/GuestCredentials";
 
 
 
@@ -10,6 +17,62 @@ export default function AdminGamifiedQuiz({ interviewAdmin }) {
     if (activeSection === "academicTerm") {
         return (
             <AcademicTerm
+                loggedInUser={interviewAdmin}
+                onBack={() => setActiveSection(null)}
+            />
+        );
+    }
+    if (activeSection === "sessionTopics") {
+    return (
+        <SessionTopicsImport
+        loggedInUser={interviewAdmin}
+        onBack={() => setActiveSection(null)}
+        />
+    );
+    }
+    if (activeSection === "activityTypes") {
+        return (
+            <ActivityTypes
+                loggedInUser={interviewAdmin}
+                onBack={() => setActiveSection(null)}
+            />
+        );
+    }
+    if (activeSection === "quizScheduler") {
+        return (
+            <QuizScheduler
+                loggedInUser={interviewAdmin}
+                onBack={() => setActiveSection(null)}
+            />
+        );
+    }
+    if (activeSection === "schedulerRuns") {
+        return (
+            <SchedulerRuns
+                loggedInUser={interviewAdmin}
+                onBack={() => setActiveSection(null)}
+            />
+        );
+    }
+    if (activeSection === "generateGamifiedQuizzes") {
+        return (
+            <GenerateGamifiedQuizzes
+                loggedInUser={interviewAdmin}
+                onBack={() => setActiveSection(null)}
+            />
+        );
+    }
+    if (activeSection === "leaderboard") {
+        return (
+            <Leaderboard
+                loggedInUser={interviewAdmin}
+                onBack={() => setActiveSection(null)}
+            />
+        );
+    }
+    if (activeSection === "guestCredentials") {
+        return (
+            <GuestCredentials
                 loggedInUser={interviewAdmin}
                 onBack={() => setActiveSection(null)}
             />
@@ -209,6 +272,314 @@ export default function AdminGamifiedQuiz({ interviewAdmin }) {
                     <h2>Class Configuration</h2>
                     <p>
                         Configure and manage classes for the Gamified Quiz system.
+                    </p>
+                </div>
+
+                <div className="gamified-dashboard-arrow">
+                    →
+                </div>
+            </article>
+            <article
+                className="gamified-dashboard-card"
+                onClick={() => setActiveSection("sessionTopics")}
+            >
+                <div className="gamified-dashboard-icon">
+                    <svg
+                        width="42"
+                        height="42"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M4 6H20"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                        <path
+                            d="M4 12H20"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                        <path
+                            d="M4 18H14"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                </div>
+
+                <div className="gamified-dashboard-content">
+                    <h2>Session Topics</h2>
+                    <p>
+                        Import and manage session topics for the Gamified Quiz system.
+                    </p>
+                </div>
+
+                <div className="gamified-dashboard-arrow">
+                    →
+                </div>
+            </article>
+            <article
+                className="gamified-dashboard-card"
+                onClick={() => setActiveSection("activityTypes")}
+            >
+                <div className="gamified-dashboard-icon">
+                    <svg
+                        width="42"
+                        height="42"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M4 6H20"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                        <path
+                            d="M4 12H20"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                        <path
+                            d="M4 18H14"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                </div>
+
+                <div className="gamified-dashboard-content">
+                    <h2>Activity Type</h2>
+                    <p>
+                        Manage activity types for the Gamified Quiz system.
+                    </p>
+                </div>
+
+                <div className="gamified-dashboard-arrow">
+                    →
+                </div>
+            </article>
+            <article
+                className="gamified-dashboard-card"
+                onClick={() => setActiveSection("quizScheduler")}
+            >
+                <div className="gamified-dashboard-icon">
+                    <svg
+                        width="42"
+                        height="42"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M4 6H20"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                        <path
+                            d="M4 12H20"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                        <path
+                            d="M4 18H14"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                </div>
+
+                <div className="gamified-dashboard-content">
+                    <h2>Scheduler</h2>
+                    <p>
+                        Configure and run the Gamified Quiz scheduler.
+                    </p>
+                </div>
+
+                <div className="gamified-dashboard-arrow">
+                    →
+                </div>
+            </article>
+            <article
+                className="gamified-dashboard-card"
+                onClick={() => setActiveSection("schedulerRuns")}
+            >
+                <div className="gamified-dashboard-icon">
+                    <svg
+                        width="42"
+                        height="42"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M4 6H20"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                        <path
+                            d="M4 12H20"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                        <path
+                            d="M4 18H14"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                </div>
+
+                <div className="gamified-dashboard-content">
+                    <h2>Scheduler Runs</h2>
+                    <p>
+                        View and manage Gamified Quiz scheduler runs.
+                    </p>
+                </div>
+
+                <div className="gamified-dashboard-arrow">
+                    →
+                </div>
+            </article>
+            <article
+                className="gamified-dashboard-card"
+                onClick={() => setActiveSection("generateGamifiedQuizzes")}
+            >
+                <div className="gamified-dashboard-icon">
+                    <svg
+                        width="42"
+                        height="42"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M4 6H20"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                        <path
+                            d="M4 12H20"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                        <path
+                            d="M4 18H14"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                </div>
+
+                <div className="gamified-dashboard-content">
+                    <h2>Generate Quizzes</h2>
+                    <p>
+                        Generate gamified quizzes for students using the configured session topics and activity types.
+                    </p>
+                </div>
+
+                <div className="gamified-dashboard-arrow">
+                    →
+                </div>
+            </article>
+            <article
+                className="gamified-dashboard-card"
+                onClick={() => setActiveSection("leaderboard")}
+            >
+                <div className="gamified-dashboard-icon">
+                    <svg
+                        width="42"
+                        height="42"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M4 6H20"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                        <path
+                            d="M4 12H20"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                        <path
+                            d="M4 18H14"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                </div>
+
+                <div className="gamified-dashboard-content">
+                    <h2>Leaderboard</h2>
+                    <p>
+                        View student quiz performance and leaderboard results.
+                    </p>
+                </div>
+
+                <div className="gamified-dashboard-arrow">
+                    →
+                </div>
+            </article>
+            <article
+                className="gamified-dashboard-card"
+                onClick={() => setActiveSection("guestCredentials")}
+            >
+                <div className="gamified-dashboard-icon">
+                    <svg
+                        width="42"
+                        height="42"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M4 6H20"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                        <path
+                            d="M4 12H20"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                        <path
+                            d="M4 18H14"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                </div>
+
+                <div className="gamified-dashboard-content">
+                    <h2>Guest Credentials</h2>
+                    <p>
+                        Manage guest login credentials for the Gamified Quiz system.
                     </p>
                 </div>
 

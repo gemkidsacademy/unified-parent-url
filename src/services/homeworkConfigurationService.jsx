@@ -99,6 +99,7 @@ export async function updateHomeworkConfiguration(loggedInUser, configuration) {
       selected_weeks: configuration.selected_weeks,
       time_slots: configuration.time_slots,
       booking_cutoff: configuration.booking_cutoff,
+      class_day: configuration.class_day,
     }),
   })
 

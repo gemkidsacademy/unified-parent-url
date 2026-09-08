@@ -1,0 +1,176 @@
+.session-topics{
+
+    max-width:1050px;
+
+    margin:auto;
+
+    padding:20px;
+
+}
+
+.session-topics-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 28px 0;
+    padding: 10px 16px;
+    border: 1px solid #d8c9ff;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #4c1d95;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(76, 29, 149, 0.06);
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.session-topics-back-btn:hover {
+    background: #f5f1ff;
+    border-color: #a78bfa;
+    box-shadow: 0 4px 10px rgba(76, 29, 149, 0.1);
+    transform: translateX(-2px);
+}
+
+.session-topics-back-btn:active {
+    transform: translateX(-1px);
+    box-shadow: 0 2px 5px rgba(76, 29, 149, 0.08);
+}
+
+.page-description{
+
+    color:#666;
+
+    line-height:1.7;
+
+    margin-bottom:35px;
+
+}
+
+.card-grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+
+    gap:30px;
+
+    margin-bottom:40px;
+
+}
+
+.action-card{
+
+    background:white;
+
+    border:1px solid #ddd;
+
+    border-radius:12px;
+
+    padding:35px;
+
+    text-align:center;
+
+    cursor:pointer;
+
+    transition:.25s;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.05);
+
+}
+
+.action-card:hover{
+
+    transform:translateY(-6px);
+
+    border-color:#4d8fe8;
+
+    box-shadow:0 12px 30px rgba(0,0,0,.12);
+
+}
+
+.card-icon{
+
+    font-size:60px;
+
+    margin-bottom:20px;
+
+}
+
+.action-card h3{
+
+    color:#2d7ff9;
+
+    margin-bottom:15px;
+
+}
+
+.action-card p{
+
+    color:#666;
+
+    line-height:1.7;
+
+    margin-bottom:25px;
+
+}
+
+.card-btn{
+
+    background:#4d8fe8;
+
+    color:white;
+
+    border:none;
+
+    border-radius:6px;
+
+    padding:12px 30px;
+
+    cursor:pointer;
+
+}
+
+.card-btn:hover{
+
+    background:#2d7ff9;
+
+}
+
+.assumption-box{
+
+    background:#fafafa;
+
+    border:1px solid #ddd;
+
+    border-radius:8px;
+
+    padding:22px;
+
+}
+
+.assumption-box h3{
+
+    margin-top:0;
+
+}
+
+.assumption-box ul{
+
+    padding-left:22px;
+
+}
+
+.assumption-box li{
+
+    margin-bottom:12px;
+
+    line-height:1.8;
+
+}

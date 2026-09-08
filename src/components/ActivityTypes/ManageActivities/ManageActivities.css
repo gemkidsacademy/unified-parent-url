@@ -1,0 +1,216 @@
+.manage-activities{
+
+    max-width:1000px;
+
+    margin:auto;
+
+    background:white;
+
+    border:1px solid #ddd;
+
+    border-radius:10px;
+
+    padding:35px;
+
+}
+
+.description{
+
+    color:#666;
+
+    margin-bottom:25px;
+
+    line-height:1.7;
+
+}
+
+.toolbar{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-bottom:25px;
+
+}
+
+.toolbar input{
+
+    width:320px;
+
+    padding:10px;
+
+    border:1px solid #ccc;
+
+    border-radius:4px;
+
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    margin-bottom:30px;
+
+}
+
+th{
+
+    background:#f4f4f4;
+
+    border:1px solid #ddd;
+
+    padding:14px;
+
+}
+
+td{
+
+    border:1px solid #ddd;
+
+    padding:14px;
+
+}
+
+td:nth-child(2){
+
+    text-align:center;
+
+}
+
+.edit-btn{
+
+    background:#4d8fe8;
+
+    color:white;
+
+    border:none;
+
+    padding:8px 18px;
+
+    border-radius:4px;
+
+    cursor:pointer;
+
+    margin-right:10px;
+
+}
+
+.edit-btn:hover{
+
+    background:#2d7ff9;
+
+}
+
+.delete-btn{
+
+    background:#dc3545;
+
+    color:white;
+
+    border:none;
+
+    padding:8px 18px;
+
+    border-radius:4px;
+
+    cursor:pointer;
+
+}
+
+.delete-btn:hover{
+
+    background:#bb2d3b;
+
+}
+
+.back-btn{
+
+    background:#eee;
+
+    border:none;
+
+    padding:10px 20px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+}
+
+.back-btn:hover{
+
+    background:#ddd;
+
+}
+
+.assumption-box{
+
+    margin-top:20px;
+
+    background:#fafafa;
+
+    border:1px solid #ddd;
+
+    border-radius:8px;
+
+    padding:20px;
+
+}
+
+.assumption-box h3{
+
+    margin-top:0;
+
+}
+
+.assumption-box ul{
+
+    padding-left:20px;
+
+}
+
+.assumption-box li{
+
+    margin-bottom:12px;
+
+    line-height:1.8;
+
+}
+.status-enabled {
+
+    display: inline-block;
+
+    padding: 4px 10px;
+
+    border-radius: 12px;
+
+    background: #d4edda;
+
+    color: #155724;
+
+    font-weight: 600;
+
+    font-size: 13px;
+
+}
+
+.status-disabled {
+
+    display: inline-block;
+
+    padding: 4px 10px;
+
+    border-radius: 12px;
+
+    background: #f8d7da;
+
+    color: #721c24;
+
+    font-weight: 600;
+
+    font-size: 13px;
+
+}

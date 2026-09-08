@@ -62,8 +62,18 @@ function TeacherAllocation() {
 
   const loadAllocations = async () => {
     try {
+      const teacherId =
+        interviewAdmin.role === "TEACHER"
+          ? interviewAdmin.teacher_id ?? interviewAdmin.id
+          : null;
+
+      const teacherQuery =
+        teacherId !== null && teacherId !== undefined
+          ? `&teacher_id=${encodeURIComponent(teacherId)}`
+          : "";
+
       const response = await fetch(
-        `${API_BASE_URL}/parent-teacher-interview/teacher-allocations?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}`
+        `${API_BASE_URL}/parent-teacher-interview/teacher-allocations?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}${teacherQuery}`
       );
 
       const data = await response.json();
@@ -374,11 +384,13 @@ function TeacherAllocation() {
 
         <h2>Teacher Allocation</h2>
 
-        <p>
-          Assign teachers to classes. Active students and
-          parents in the selected class will automatically
-          be linked to that teacher.
-        </p>
+        {interviewAdmin.role !== "TEACHER" && (
+          <p>
+            Assign teachers to classes. Active students and
+            parents in the selected class will automatically
+            be linked to that teacher.
+          </p>
+        )}
       </div>
 
       {/* Add allocation */}

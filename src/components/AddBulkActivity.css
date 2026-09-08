@@ -1,0 +1,63 @@
+.bulk-activity-container {
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 25px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.bulk-activity-container h3 {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.bulk-activity-container input[type="file"] {
+  display: block;
+  margin: 15px auto;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  background-color: #fff;
+}
+
+.bulk-activity-container input[type="file"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.bulk-activity-container button {
+  background-color: #4f46e5; /* Indigo-600 */
+  color: #fff;
+  border: none;
+  padding: 12px 25px;
+  margin-top: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.bulk-activity-container button:hover {
+  background-color: #4338ca; /* Darker Indigo */
+}
+
+.bulk-activity-container button:disabled {
+  background-color: #a5b4fc; /* Light Indigo */
+  cursor: not-allowed;
+}
+
+.bulk-activity-container p {
+  margin-top: 15px;
+  font-size: 1rem;
+  color: #16a34a; /* green for success message */
+}
+
+.bulk-activity-container p.error {
+  color: #dc2626; /* red for error message */
+}

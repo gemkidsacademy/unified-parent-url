@@ -1077,12 +1077,19 @@ const eventTeacherAllocations = teacherAllocations.filter(
       </header>
 
       <nav className="admin-tabs" aria-label="Admin interview sections">
-        {[
-          ["unified", "Notifications"],
-          ["parentTeacherInterview", "Parent Teacher Interview"],
-          ["homeworkPortal", "Homework Booking"],
-          ["gamifiedQuiz", "Gamified Quiz"],
-        ].map(([tab, label]) => (
+        {(interviewAdmin.role === "TEACHER"
+          ? [
+              ["parentTeacherInterview", "Parent Teacher Interview"],
+              ["homeworkPortal", "Homework Booking"],
+              ["gamifiedQuiz", "Gamified Quiz"],
+            ]
+          : [
+              ["unified", "Notifications"],
+              ["parentTeacherInterview", "Parent Teacher Interview"],
+              ["homeworkPortal", "Homework Booking"],
+              ["gamifiedQuiz", "Gamified Quiz"],
+            ]
+        ).map(([tab, label]) => (
           <button
             type="button"
             key={tab}
@@ -1130,56 +1137,175 @@ const eventTeacherAllocations = teacherAllocations.filter(
 
         {activeTab === "parentTeacherInterview" && (
           <div className="admin-overview-grid">
-            <article
-              role="button"
-              tabIndex="0"
-              className="admin-page-intro admin-overview-card admin-event-setup-card"
-              onClick={handleOpenEventSetup}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  handleOpenEventSetup();
-                }
-              }}
-            >
-              <div className="admin-overview-icon" aria-hidden="true">
-                📅
-              </div>
+            {interviewAdmin.role !== "TEACHER" && (
+              <>
+                <article
+                  role="button"
+                  tabIndex="0"
+                  className="admin-page-intro admin-overview-card admin-event-setup-card"
+                  onClick={handleOpenEventSetup}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      handleOpenEventSetup();
+                    }
+                  }}
+                >
+                  <div className="admin-overview-icon" aria-hidden="true">
+                    📅
+                  </div>
 
-              <div className="admin-event-setup-content">
-                <h2>Event Setup</h2>
-                <p>Create and manage interview events.</p>
+                  <div className="admin-event-setup-content">
+                    <h2>Event Setup</h2>
+                    <p>Create and manage interview events.</p>
 
-                <span className="admin-overview-action">
-                  Open Event Setup →
-                </span>
-              </div>
-            </article>
-            <article
-              role="button"
-              tabIndex="0"
-              className="admin-page-intro admin-overview-card"
-              onClick={handleOpenTeacherAvailability}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  handleOpenTeacherAvailability();
-                }
-              }}
-            >
-              <div className="admin-overview-icon" aria-hidden="true">
-                🕒
-              </div>
+                    <span className="admin-overview-action">
+                      Open Event Setup →
+                    </span>
+                  </div>
+                </article>
 
-              <div className="admin-event-setup-content">
-                <h2>Teacher Availability</h2>
-                <p>Set each teacher&apos;s available interview times and generate booking slots.</p>
+                <article
+                  role="button"
+                  tabIndex="0"
+                  className="admin-page-intro admin-overview-card"
+                  onClick={handleOpenTeacherAvailability}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      handleOpenTeacherAvailability();
+                    }
+                  }}
+                >
+                  <div className="admin-overview-icon" aria-hidden="true">
+                    🕒
+                  </div>
 
-                <span className="admin-overview-action">
-                  Open Teacher Availability →
-                </span>
-              </div>
-            </article>
+                  <div className="admin-event-setup-content">
+                    <h2>Teacher Availability</h2>
+                    <p>
+                      Set each teacher&apos;s available interview times and generate
+                      booking slots.
+                    </p>
+
+                    <span className="admin-overview-action">
+                      Open Teacher Availability →
+                    </span>
+                  </div>
+                </article>
+
+                <article
+                  role="button"
+                  tabIndex="0"
+                  className="admin-page-intro admin-overview-card"
+                  onClick={() => setActiveTab("bookings")}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      setActiveTab("bookings");
+                    }
+                  }}
+                >
+                  <div className="admin-overview-icon" aria-hidden="true">
+                    📋
+                  </div>
+
+                  <div className="admin-event-setup-content">
+                    <h2>Interview Bookings</h2>
+                    <p>View and manage parent–teacher interview bookings.</p>
+
+                    <span className="admin-overview-action">
+                      Open Interview Bookings →
+                    </span>
+                  </div>
+                </article>
+
+                <article
+                  role="button"
+                  tabIndex="0"
+                  className="admin-page-intro admin-overview-card"
+                  onClick={() => setActiveTab("invitations")}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      setActiveTab("invitations");
+                    }
+                  }}
+                >
+                  <div className="admin-overview-icon" aria-hidden="true">
+                    ✉️
+                  </div>
+
+                  <div className="admin-event-setup-content">
+                    <h2>Send Invitations</h2>
+                    <p>
+                      Send booking invitations to parents for their child&apos;s
+                      teacher.
+                    </p>
+
+                    <span className="admin-overview-action">
+                      Open Send Invitations →
+                    </span>
+                  </div>
+                </article>
+
+                <article
+                  role="button"
+                  tabIndex="0"
+                  className="admin-page-intro admin-overview-card"
+                  onClick={() => setActiveTab("reminders")}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      setActiveTab("reminders");
+                    }
+                  }}
+                >
+                  <div className="admin-overview-icon" aria-hidden="true">
+                    🔔
+                  </div>
+
+                  <div className="admin-event-setup-content">
+                    <h2>Reminders</h2>
+                    <p>Manage automatic interview reminder notifications.</p>
+
+                    <span className="admin-overview-action">
+                      Open Reminders →
+                    </span>
+                  </div>
+                </article>
+
+                <article
+                  role="button"
+                  tabIndex="0"
+                  className="admin-page-intro admin-overview-card"
+                  onClick={() => setActiveTab("history")}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      setActiveTab("history");
+                    }
+                  }}
+                >
+                  <div className="admin-overview-icon" aria-hidden="true">
+                    🗂️
+                  </div>
+
+                  <div className="admin-event-setup-content">
+                    <h2>Event History</h2>
+                    <p>
+                      View previous interview events and their historical booking
+                      records.
+                    </p>
+
+                    <span className="admin-overview-action">
+                      Open Event History →
+                    </span>
+                  </div>
+                </article>
+              </>
+            )}
+
             <article
               role="button"
               tabIndex="0"
@@ -1198,111 +1324,13 @@ const eventTeacherAllocations = teacherAllocations.filter(
 
               <div className="admin-event-setup-content">
                 <h2>Teacher Allocation</h2>
-                <p>Assign teachers to classes and automatically link them to students and parents.</p>
+                <p>
+                  Assign teachers to classes and automatically link them to students
+                  and parents.
+                </p>
 
                 <span className="admin-overview-action">
                   Open Teacher Allocation →
-                </span>
-              </div>
-            </article>
-            <article
-              role="button"
-              tabIndex="0"
-              className="admin-page-intro admin-overview-card"
-              onClick={() => setActiveTab("bookings")}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  setActiveTab("bookings");
-                }
-              }}
-            >
-              <div className="admin-overview-icon" aria-hidden="true">
-                📋
-              </div>
-
-              <div className="admin-event-setup-content">
-                <h2>Interview Bookings</h2>
-                <p>View and manage parent–teacher interview bookings.</p>
-
-                <span className="admin-overview-action">
-                  Open Interview Bookings →
-                </span>
-              </div>
-            </article>
-            <article
-              role="button"
-              tabIndex="0"
-              className="admin-page-intro admin-overview-card"
-              onClick={() => setActiveTab("invitations")}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  setActiveTab("invitations");
-                }
-              }}
-            >
-              <div className="admin-overview-icon" aria-hidden="true">
-                ✉️
-              </div>
-
-              <div className="admin-event-setup-content">
-                <h2>Send Invitations</h2>
-                <p>Send booking invitations to parents for their child&apos;s teacher.</p>
-
-                <span className="admin-overview-action">
-                  Open Send Invitations →
-                </span>
-              </div>
-      
-            </article>
-            <article
-              role="button"
-              tabIndex="0"
-              className="admin-page-intro admin-overview-card"
-              onClick={() => setActiveTab("reminders")}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  setActiveTab("reminders");
-                }
-              }}
-            >
-              <div className="admin-overview-icon" aria-hidden="true">
-                🔔
-              </div>
-
-              <div className="admin-event-setup-content">
-                <h2>Reminders</h2>
-                <p>Manage automatic interview reminder notifications.</p>
-
-                <span className="admin-overview-action">
-                  Open Reminders →
-                </span>
-              </div>
-            </article>
-            <article
-              role="button"
-              tabIndex="0"
-              className="admin-page-intro admin-overview-card"
-              onClick={() => setActiveTab("history")}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  setActiveTab("history");
-                }
-              }}
-            >
-              <div className="admin-overview-icon" aria-hidden="true">
-                🗂️
-              </div>
-
-              <div className="admin-event-setup-content">
-                <h2>Event History</h2>
-                <p>View previous interview events and their historical booking records.</p>
-
-                <span className="admin-overview-action">
-                  Open Event History →
                 </span>
               </div>
             </article>
@@ -1311,6 +1339,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
 
         {activeTab === "homeworkPortal" && (
           <div className="admin-overview-grid">
+            {interviewAdmin.role !== "TEACHER" && (
             <article
               role="button"
               tabIndex="0"
@@ -1336,6 +1365,8 @@ const eventTeacherAllocations = teacherAllocations.filter(
                 </span>
               </div>
             </article>
+            )}
+            {interviewAdmin.role !== "TEACHER" && (
             <article
               role="button"
               tabIndex="0"
@@ -1361,6 +1392,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
                 </span>
               </div>
             </article>
+            )}
             <article
               role="button"
               tabIndex="0"
@@ -1386,6 +1418,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
                 </span>
               </div>
             </article>
+            {interviewAdmin.role !== "TEACHER" && (
             <article
               role="button"
               tabIndex="0"
@@ -1411,6 +1444,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
                 </span>
               </div>
             </article>
+            )}
           </div>
         )}
 
@@ -2176,7 +2210,16 @@ const eventTeacherAllocations = teacherAllocations.filter(
           </>
         )}
         {activeTab === "gamifiedQuiz" && (
+          <>
+            {interviewAdmin.role === "TEACHER" && (
+              <style>{`
+                .admin-interview-main > .admin-overview-grid > .gamified-dashboard-card:not(:nth-of-type(9)) {
+                  display: none;
+                }
+              `}</style>
+            )}
             <AdminGamifiedQuiz interviewAdmin={interviewAdmin} />
+          </>
         )}
       </main>
     </div>

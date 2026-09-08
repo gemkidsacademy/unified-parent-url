@@ -1,0 +1,338 @@
+.leaderboard {
+
+    width: 100%;
+
+    padding: 30px;
+
+    box-sizing: border-box;
+
+    background: #ffffff;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+}
+
+.leaderboard-back-btn {
+    display: inline-flex;
+    width: fit-content;
+    max-width: max-content;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 28px 0;
+    padding: 10px 16px;
+    border: 1px solid #d8c9ff;
+    border-radius: 9px;
+    background: #ffffff;
+    color: #4c1d95;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(76, 29, 149, 0.06);
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease;
+}
+
+.leaderboard-back-btn:hover {
+    background: #f5f1ff;
+    border-color: #a78bfa;
+    box-shadow: 0 4px 10px rgba(76, 29, 149, 0.1);
+    transform: translateX(-2px);
+}
+
+.leaderboard-back-btn:active {
+    transform: translateX(-1px);
+    box-shadow: 0 2px 5px rgba(76, 29, 149, 0.08);
+}
+
+.leaderboard h2 {
+
+    margin: 0 0 8px;
+
+    font-size: 24px;
+
+    color: #222;
+
+}
+
+.leaderboard p {
+
+    margin: 0 0 30px;
+
+    color: #666;
+
+    font-size: 14px;
+
+}
+
+/* -------------------------------- */
+/* Filters */
+/* -------------------------------- */
+
+.filters {
+
+    display: flex;
+
+    gap: 20px;
+
+    align-items: flex-end;
+
+    flex-wrap: wrap;
+
+    margin-bottom: 30px;
+
+}
+
+.filters div {
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+.filters label {
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    margin-bottom: 8px;
+
+    color: #333;
+
+}
+
+.filters select {
+
+    width: 220px;
+
+    height: 42px;
+
+    padding: 0 12px;
+
+    border: 1px solid #d8d8d8;
+
+    border-radius: 4px;
+
+    font-size: 14px;
+
+    background: #fff;
+
+    outline: none;
+
+}
+
+.filters select:focus {
+
+    border-color: #4a90e2;
+
+}
+
+.filters button {
+
+    height: 42px;
+
+    padding: 0 28px;
+
+    border: none;
+
+    border-radius: 4px;
+
+    background: #4a90e2;
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+.filters button:hover {
+
+    background: #3578d4;
+
+}
+
+/* -------------------------------- */
+/* Table */
+/* -------------------------------- */
+
+.leaderboard table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    background: white;
+
+    border-radius: 8px;
+
+    overflow: hidden;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+
+}
+
+.leaderboard thead {
+    background: #f3f4f6;
+}
+
+.leaderboard th {
+    color: #1f2937;      /* Dark charcoal */
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.leaderboard td {
+
+    padding: 14px;
+
+    border-bottom: 1px solid #ececec;
+
+    font-size: 14px;
+
+    color: #444;
+
+}
+
+.leaderboard tbody tr:hover {
+
+    background: #f8fbff;
+
+}
+
+/* -------------------------------- */
+/* Rank */
+/* -------------------------------- */
+
+.leaderboard td:first-child {
+
+    font-weight: bold;
+
+    color: #4a90e2;
+
+}
+
+/* -------------------------------- */
+/* Score */
+/* -------------------------------- */
+
+.score {
+
+    font-weight: bold;
+
+    color: #27ae60;
+
+}
+
+/* -------------------------------- */
+/* Status */
+/* -------------------------------- */
+
+.status-completed {
+
+    display: inline-block;
+
+    padding: 6px 12px;
+
+    border-radius: 20px;
+
+    background: #d4edda;
+
+    color: #155724;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+}
+
+.status-progress {
+
+    display: inline-block;
+
+    padding: 6px 12px;
+
+    border-radius: 20px;
+
+    background: #fff3cd;
+
+    color: #856404;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+}
+
+/* -------------------------------- */
+/* Empty Table */
+/* -------------------------------- */
+
+.no-data {
+
+    text-align: center;
+
+    padding: 40px;
+
+    color: #888;
+
+    font-size: 15px;
+
+}
+
+/* -------------------------------- */
+/* Responsive */
+/* -------------------------------- */
+
+@media (max-width: 900px) {
+
+    .filters {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+    .filters div {
+
+        width: 100%;
+
+    }
+
+    .filters select {
+
+        width: 100%;
+
+    }
+
+    .filters button {
+
+        width: 100%;
+
+    }
+
+    .leaderboard {
+
+        overflow-x: auto;
+
+    }
+
+    .leaderboard table {
+
+        min-width: 900px;
+
+    }
+
+}

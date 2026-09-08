@@ -105,6 +105,7 @@ function HomeworkConfiguration({ loggedInUser }) {
   const [defaultTimingSaved, setDefaultTimingSaved] = useState(false)
   const [isSessionsExpanded, setIsSessionsExpanded] = useState(true)
   const [expandedWeeks, setExpandedWeeks] = useState({})
+  const [classDay, setClassDay] = useState('')
 
   function applyConfiguration(configuration) {
     const selectedSessions = configuration.selected_sessions
@@ -112,6 +113,7 @@ function HomeworkConfiguration({ loggedInUser }) {
     setAcademicTerms(configuration.academic_terms)
     setSelectedTermId(configuration.selected_term?.id?.toString() || '')
     setAvailableWeeks(configuration.available_weeks)
+    setClassDay(configuration.class_day || '')
     setSessions(selectedSessions)
     setSlots(ensureInitialTimeSlots(selectedSessions, configuration.time_slots, defaultSlotTimings))
     setBookingCutoff({
@@ -426,6 +428,7 @@ function HomeworkConfiguration({ loggedInUser }) {
           default_slot_index: slot.default_slot_index ?? null,
         })),
         booking_cutoff: bookingCutoff,
+        class_day: classDay,
       })
       if (configuration) applyConfiguration(configuration)
       setSaved(true)
@@ -458,6 +461,25 @@ function HomeworkConfiguration({ loggedInUser }) {
                 {term.term_name}
               </option>
             ))}
+          </select>
+        </label>
+        <label>
+          <span>Homework Support Class Day</span>
+          <select
+            value={classDay}
+            onChange={(event) => {
+              setClassDay(event.target.value)
+              setSaved(false)
+            }}
+          >
+            <option value="">Select a day</option>
+            <option value="Monday">Monday</option>
+            <option value="Tuesday">Tuesday</option>
+            <option value="Wednesday">Wednesday</option>
+            <option value="Thursday">Thursday</option>
+            <option value="Friday">Friday</option>
+            <option value="Saturday">Saturday</option>
+            <option value="Sunday">Sunday</option>
           </select>
         </label>
         <label>

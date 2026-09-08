@@ -1,0 +1,91 @@
+.download-template{
+
+    max-width:750px;
+
+    margin:auto;
+
+    background:white;
+
+    padding:35px;
+
+    border:1px solid #ddd;
+
+    border-radius:10px;
+
+}
+
+.description{
+
+    color:#666;
+
+    line-height:1.8;
+
+    margin-bottom:30px;
+
+}
+
+.preview-box{
+
+    background:#f8f8f8;
+
+    border:1px solid #ddd;
+
+    border-radius:8px;
+
+    padding:20px;
+
+}
+
+.preview-box ul{
+
+    margin:0;
+
+    padding-left:20px;
+
+}
+
+.preview-box li{
+
+    margin-bottom:8px;
+
+}
+
+.button-row{
+
+    margin-top:30px;
+
+    display:flex;
+
+    gap:15px;
+
+}
+
+.download-btn{
+
+    background:#4d8fe8;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 30px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+}
+
+.back-btn{
+
+    background:#eee;
+
+    border:none;
+
+    padding:12px 30px;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+}

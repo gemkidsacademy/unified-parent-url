@@ -36,8 +36,8 @@ function InterviewAdminLogin({ onLoginSuccess }) {
         return;
       }
 
-      if (interviewAdmin?.role !== "CENTER_ADMIN") {
-        setError("Only center administrators can access this page.");
+      if (!["CENTER_ADMIN", "TEACHER"].includes(interviewAdmin?.role)) {
+        setError("Only center administrators and teachers can access this page.");
         return;
       }
 

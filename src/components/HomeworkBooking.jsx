@@ -17,6 +17,7 @@ function HomeworkBooking({ parentData, onBack }) {
   const [loadingTimeSlots, setLoadingTimeSlots] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [notAttendingSaved, setNotAttendingSaved] = useState(false);
+  const [isChangingSelection, setIsChangingSelection] = useState(false);
 
   // Fetch dashboard data on mount
   useEffect(() => {
@@ -165,6 +166,7 @@ function HomeworkBooking({ parentData, onBack }) {
     try {
       setLoadingTimeSlots(true);
       setError(null);
+      setIsChangingSelection(false);
 
       const response = await fetch(
         `${API_BASE_URL}/homework-support/parent/time-slots`,
@@ -188,6 +190,46 @@ function HomeworkBooking({ parentData, onBack }) {
 
       const data = await response.json();
       setTimeSlots(data.time_slots || []);
+      setFlowState("selecting_time_slot");
+    } catch (err) {
+      console.error("Error fetching time slots:", err);
+      setError(
+        err.message || "Unable to load available time slots. Please try again."
+      );
+    } finally {
+      setLoadingTimeSlots(false);
+    }
+  };
+
+  const handleChangeSelection = async () => {
+    try {
+      setLoadingTimeSlots(true);
+      setError(null);
+
+      const response = await fetch(
+        `${API_BASE_URL}/homework-support/parent/time-slots`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            parent_email: parentData?.email,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData?.detail || "Unable to load available time slots. Please try again."
+        );
+      }
+
+      const data = await response.json();
+      setTimeSlots(data.time_slots || []);
+      setSelectedSlotId(null);
+      setIsChangingSelection(true);
       setFlowState("selecting_time_slot");
     } catch (err) {
       console.error("Error fetching time slots:", err);
@@ -239,7 +281,15 @@ function HomeworkBooking({ parentData, onBack }) {
         selected_time_slot_id: selectedSlotId,
       }));
 
-      setFlowState("confirmation");
+      if (isChangingSelection) {
+        setExistingBookingSlot(
+          timeSlots.find((slot) => slot.id === selectedSlotId) || null
+        );
+        setIsChangingSelection(false);
+        setFlowState("existing_booking");
+      } else {
+        setFlowState("confirmation");
+      }
     } catch (err) {
       console.error("Error confirming booking:", err);
       setError(
@@ -258,7 +308,7 @@ function HomeworkBooking({ parentData, onBack }) {
   const studentName = bookingData?.student_name || "Student";
   const homeworkTitle = bookingData?.title || "Homework Support";
   const weekNumber = bookingData?.week_number || 5;
-  const sessionDate = bookingData?.session_date || "Saturday, September 12, 2026";
+  const sessionDate = bookingData?.session_date || "Session date unavailable";
 
   return (
     <main
@@ -416,6 +466,14 @@ function HomeworkBooking({ parentData, onBack }) {
                   </div>
 
                   <div className="confirmation-actions">
+                    <button
+                      type="button"
+                      className="homework-back-link"
+                      onClick={handleChangeSelection}
+                      disabled={loadingTimeSlots}
+                    >
+                      {loadingTimeSlots ? "Loading..." : "Change Selection"}
+                    </button>
                     <button
                       type="button"
                       className="homework-back-link"
