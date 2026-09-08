@@ -344,77 +344,61 @@ function HomeworkBooking({ parentData, onBack }) {
         {!loadingDashboard && !error && bookingData && (
           <>
             {/* ===== EXISTING BOOKING ===== */}
-            {!bookingData?.bookings_closed && flowState === "existing_booking" && (
-              <div className="homework-response-confirmation">
-                <div className="confirmation-header">
-                  <h2>Booking Confirmed</h2>
-                </div>
-
-                <div className="confirmation-message">
-                  <p className="thank-you">
-                    Your Homework Support booking is already confirmed.
-                  </p>
-
-                  <p className="confirmation-text">
-                    {studentName} is booked for Homework Support this week.
-                  </p>
-                </div>
-
-                <div className="confirmation-details">
-                  <div className="homework-info-row">
-                    <span className="homework-info-label">
-                      Session
-                    </span>
-
-                    <strong>
-                      {homeworkTitle}
-                    </strong>
+              {!bookingData?.bookings_closed && flowState === "existing_booking" && (
+                <div className="homework-response-confirmation">
+                  <div className="confirmation-header">
+                    <h2>Homework Support</h2>
                   </div>
 
-                  <div className="homework-info-row">
-                    <span className="homework-info-label">
-                      Date
-                    </span>
+                  <div className="confirmation-message existing-booking-message">
+                    <p className="thank-you">
+                      Your Homework Support booking is already confirmed.
+                    </p>
 
-                    <strong>
-                      {sessionDate}
-                    </strong>
+                    <p className="confirmation-text">
+                      {studentName} is booked for Homework Support this week.
+                    </p>
+
+                    <div className="existing-booking-details">
+                      <div>
+                        <span className="homework-info-label">Session</span>
+                        <strong>{homeworkTitle}</strong>
+                      </div>
+
+                      <div>
+                        <span className="homework-info-label">Date</span>
+                        <strong>{sessionDate}</strong>
+                      </div>
+
+                      <div>
+                        <span className="homework-info-label">Time</span>
+                        <strong>
+                          {existingBookingSlot
+                            ? `${existingBookingSlot.start_time} - ${existingBookingSlot.end_time}`
+                            : "Booking time unavailable"}
+                        </strong>
+                      </div>
+
+                      <div>
+                        <span className="homework-info-label">Student</span>
+                        <strong className="student-name">
+                          {studentName}
+                        </strong>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="homework-info-row">
-                    <span className="homework-info-label">
-                      Time
-                    </span>
-
-                    <strong>
-                      {existingBookingSlot
-                        ? `${existingBookingSlot.start_time} - ${existingBookingSlot.end_time}`
-                        : "Booking time unavailable"}
-                    </strong>
-                  </div>
-
-                  <div className="homework-info-row">
-                    <span className="homework-info-label">
-                      Student
-                    </span>
-
-                    <strong className="student-name">
-                      {studentName}
-                    </strong>
+                  <div className="confirmation-actions">
+                    <button
+                      type="button"
+                      className="homework-back-link"
+                      onClick={onBack}
+                    >
+                      ← Back to dashboard
+                    </button>
                   </div>
                 </div>
-
-                <div className="confirmation-actions">
-                  <button
-                    type="button"
-                    className="homework-back-link"
-                    onClick={onBack}
-                  >
-                    ← Back to dashboard
-                  </button>
-                </div>
-              </div>
-            )}
+              )}
 
             {/* ===== ATTENDANCE SCREEN ===== */}
             {notAttendingSaved ? (
