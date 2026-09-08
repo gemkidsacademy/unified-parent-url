@@ -370,9 +370,7 @@ function TeacherAllocation() {
     <div className="teacher-allocation-page">
 
       <div className="teacher-allocation-intro">
-        <span className="allocation-eyebrow">
-          DEMO VIEW
-        </span>
+        
 
         <h2>Teacher Allocation</h2>
 

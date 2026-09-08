@@ -138,9 +138,7 @@ function EventHistory() {
     <div className="event-history-page">
 
       <div className="history-intro">
-        <span className="history-eyebrow">
-          DEMO VIEW
-        </span>
+        
 
         <h2>Event History</h2>
 

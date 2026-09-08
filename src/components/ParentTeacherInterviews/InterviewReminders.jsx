@@ -195,9 +195,7 @@ function InterviewReminders() {
     <div className="interview-reminders-page">
 
       <div className="reminders-intro">
-        <span className="reminders-eyebrow">
-          DEMO VIEW
-        </span>
+        
 
         <h2>Interview Reminders</h2>
 
