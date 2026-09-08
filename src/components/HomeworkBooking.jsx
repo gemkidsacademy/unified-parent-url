@@ -307,66 +307,53 @@ function HomeworkBooking({ parentData, onBack }) {
 
         {!loadingDashboard && !error && bookingData?.bookings_closed && (
           <div className="homework-response-confirmation">
-            {bookingData.booking_status === "BOOKED" ? (
-              <>
-                <div className="confirmation-header">
-                  <h2>Booking Confirmed</h2>
-                </div>
+            <div className="confirmation-header">
+              <h2>Homework Support</h2>
+            </div>
 
-                <div className="confirmation-message">
-                  <p className="thank-you">
-                    Your Homework Support booking is already confirmed.
-                  </p>
+            <div className="confirmation-message existing-booking-message">
+              <p className="thank-you">
+                Homework Support bookings are now closed for this week.
+              </p>
 
+              {flowState === "existing_booking" ? (
+                <>
                   <p className="confirmation-text">
                     {studentName} is booked for Homework Support this week.
                   </p>
-                </div>
 
-                <div className="confirmation-details">
-                  <div className="homework-info-row">
-                    <span className="homework-info-label">Session</span>
-                    <strong>{homeworkTitle}</strong>
+                  <div className="existing-booking-details">
+                    <div>
+                      <span className="homework-info-label">Session</span>
+                      <strong>{homeworkTitle}</strong>
+                    </div>
+
+                    <div>
+                      <span className="homework-info-label">Date</span>
+                      <strong>{sessionDate}</strong>
+                    </div>
+
+                    <div>
+                      <span className="homework-info-label">Time</span>
+                      <strong>
+                        {existingBookingSlot
+                          ? `${existingBookingSlot.start_time} - ${existingBookingSlot.end_time}`
+                          : "Booking time unavailable"}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span className="homework-info-label">Student</span>
+                      <strong className="student-name">{studentName}</strong>
+                    </div>
                   </div>
-
-                  <div className="homework-info-row">
-                    <span className="homework-info-label">Date</span>
-                    <strong>{sessionDate}</strong>
-                  </div>
-
-                  <div className="homework-info-row">
-                    <span className="homework-info-label">Time</span>
-                    <strong>
-                      {bookingData.booking_start_time} -{" "}
-                      {bookingData.booking_end_time}
-                    </strong>
-                  </div>
-
-                  <div className="homework-info-row">
-                    <span className="homework-info-label">Student</span>
-                    <strong className="student-name">
-                      {studentName}
-                    </strong>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="confirmation-header">
-                  <h2>Homework Support</h2>
-                </div>
-
-                <div className="confirmation-message">
-                  <p className="thank-you">
-                    Homework Support bookings are now closed for this week.
-                  </p>
-
-                  <p className="confirmation-text">
-                    You have not made any booking this week.
-                  </p>
-                </div>
-              </>
-            )}
+                </>
+              ) : (
+                <p className="confirmation-text">
+                  You have not made any booking this week.
+                </p>
+              )}
+            </div>
 
             <div className="confirmation-actions">
               <button
