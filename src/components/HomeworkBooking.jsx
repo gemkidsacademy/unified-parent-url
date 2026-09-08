@@ -308,7 +308,7 @@ function HomeworkBooking({ parentData, onBack }) {
         {!loadingDashboard && !error && bookingData?.bookings_closed && (
           <div className="homework-response-confirmation">
             <div className="confirmation-header">
-              <h2>Booking Confirmed</h2>
+              <h2>Homework Support</h2>
             </div>
 
             <div className="confirmation-message">
@@ -318,7 +318,8 @@ function HomeworkBooking({ parentData, onBack }) {
 
               {bookingData.booking_status === "BOOKED" ? (
                 <p className="confirmation-text">
-                  Your booking has been confirmed for Homework Support this week.
+                  Your booking: {bookingData.booking_start_time} -{" "}
+                  {bookingData.booking_end_time}
                 </p>
               ) : (
                 <p className="confirmation-text">
@@ -326,35 +327,6 @@ function HomeworkBooking({ parentData, onBack }) {
                 </p>
               )}
             </div>
-
-            {bookingData.booking_status === "BOOKED" && (
-              <div className="confirmation-details">
-                <div className="homework-info-row">
-                  <span className="homework-info-label">Session</span>
-                  <strong>{homeworkTitle}</strong>
-                </div>
-
-                <div className="homework-info-row">
-                  <span className="homework-info-label">Date</span>
-                  <strong>{sessionDate}</strong>
-                </div>
-
-                <div className="homework-info-row">
-                  <span className="homework-info-label">Time</span>
-                  <strong>
-                    {bookingData.booking_start_time} -{" "}
-                    {bookingData.booking_end_time}
-                  </strong>
-                </div>
-
-                <div className="homework-info-row">
-                  <span className="homework-info-label">Student</span>
-                  <strong className="student-name">
-                    {studentName}
-                  </strong>
-                </div>
-              </div>
-            )}
 
             <div className="confirmation-actions">
               <button
