@@ -768,3 +768,34 @@
 .existing-booking-details .student-name {
   color: #5425aa;
 }
+.existing-booking-message {
+  padding: 22px 20px;
+}
+
+.existing-booking-details {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #ebe6fa;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  text-align: left;
+}
+
+.existing-booking-details > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.existing-booking-details strong {
+  font-size: 15px;
+  font-weight: 600;
+  color: #302b49;
+}
+
+.existing-booking-details .student-name {
+  color: #5425aa;
+}
