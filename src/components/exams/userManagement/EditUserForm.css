@@ -1,0 +1,214 @@
+.edit-student-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 30px auto 50px;
+  padding: 32px 44px 44px;
+  box-sizing: border-box;
+
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* Back button */
+
+.edit-student-back-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+
+  width: fit-content !important;
+  height: auto !important;
+
+  padding: 9px 15px !important;
+  margin: 0 0 28px 0 !important;
+
+  border: 1px solid #d6d9e8 !important;
+  border-radius: 8px !important;
+
+  background: #ffffff !important;
+  color: #4f46e5 !important;
+
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  font-family: inherit !important;
+
+  cursor: pointer !important;
+
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.edit-student-back-button:hover {
+  background: #f5f3ff !important;
+  border-color: #4f46e5 !important;
+  transform: translateX(-2px);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+}
+
+/* Heading */
+
+.edit-student-container h2 {
+  margin: 0 0 32px;
+
+  text-align: center;
+
+  color: #172554;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+/* Form */
+
+.edit-student-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* Labels */
+
+.edit-student-container label {
+  display: block;
+
+  margin: 0 0 7px;
+
+  color: #172554;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* Inputs and selects */
+
+.edit-student-container input,
+.edit-student-container select {
+  width: 100%;
+  height: 48px;
+
+  margin: 0 0 20px;
+
+  padding: 0 14px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+
+  background: #ffffff;
+  color: #1e293b;
+
+  font-size: 15px;
+  font-family: inherit;
+
+  outline: none;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+/* Focus */
+
+.edit-student-container input:focus,
+.edit-student-container select:focus {
+  border-color: #4f46e5;
+
+  box-shadow:
+    0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+/* Read-only ID */
+
+.edit-student-container input[readonly] {
+  background: #f8fafc;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+/* Select */
+
+.edit-student-container select {
+  appearance: none;
+  cursor: pointer;
+
+  padding-right: 40px;
+
+  background-image:
+    linear-gradient(45deg, transparent 50%, #64748b 50%),
+    linear-gradient(135deg, #64748b 50%, transparent 50%);
+
+  background-position:
+    calc(100% - 18px) 20px,
+    calc(100% - 13px) 20px;
+
+  background-size:
+    5px 5px,
+    5px 5px;
+
+  background-repeat: no-repeat;
+}
+
+/* Update button */
+
+.edit-student-container form > button[type="submit"] {
+  width: 100%;
+  height: 50px;
+
+  margin-top: 8px;
+
+  border: none;
+  border-radius: 9px;
+
+  background: #4f46e5;
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+
+  cursor: pointer;
+
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.18);
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.edit-student-container form > button[type="submit"]:hover {
+  background: #4338ca;
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 7px 16px rgba(79, 70, 229, 0.24);
+}
+
+.edit-student-container form > button[type="submit"]:active {
+  transform: translateY(0);
+}
+
+/* Mobile */
+
+@media (max-width: 700px) {
+  .edit-student-container {
+    margin: 20px 16px 40px;
+    padding: 26px 22px 32px;
+  }
+
+  .edit-student-container h2 {
+    font-size: 26px;
+    margin-bottom: 26px;
+  }
+
+  .edit-student-back-button {
+    margin-bottom: 24px !important;
+  }
+}

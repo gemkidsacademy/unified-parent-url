@@ -9,7 +9,12 @@ import HomeworkAutomation from "../pages/HomeworkAutomation";
 import HomeworkWeeklyDashboard from "../pages/HomeworkWeeklyDashboard";
 import TestEmail from "../pages/TestEmail";
 import AdminGamifiedQuiz from "./AdminGamifiedQuiz";
-
+import ManageTerm from "./chatbot/ManageTerm";
+import ChatbotLoginSettings from "./chatbot/ChatbotLoginSettings";
+import ChatbotConversationsAdmin from "./chatbot/ChatbotConversationsAdmin";
+import UsageDashboard from "./chatbot/UsageDashboard";
+import ManageClasses from "./exams/ManageClasses";
+import ExamUserManagement from "./exams/userManagement/ExamUserManagement";
 const parseTime = (time) => {
   const match = time.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
 
@@ -1082,12 +1087,18 @@ const eventTeacherAllocations = teacherAllocations.filter(
               ["parentTeacherInterview", "Parent Teacher Interview"],
               ["homeworkPortal", "Homework Booking"],
               ["gamifiedQuiz", "Gamified Quiz"],
+              ["chatbot", "Chatbot"],
+              ["exams", "Exams"],
+              
             ]
           : [
               ["unified", "Notifications"],
               ["parentTeacherInterview", "Parent Teacher Interview"],
               ["homeworkPortal", "Homework Booking"],
               ["gamifiedQuiz", "Gamified Quiz"],
+              ["chatbot", "Chatbot"],
+              ["exams", "Exams"],
+              
             ]
         ).map(([tab, label]) => (
           <button
@@ -2221,6 +2232,238 @@ const eventTeacherAllocations = teacherAllocations.filter(
             <AdminGamifiedQuiz interviewAdmin={interviewAdmin} />
           </>
         )}
+        {activeTab === "chatbot" && (
+          <div className="admin-overview-grid">
+            {/* Manage Term */}
+            <article
+              role="button"
+              tabIndex="0"
+              className="admin-page-intro admin-overview-card"
+              onClick={() => setActiveTab("manageTerm")}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setActiveTab("manageTerm");
+                }
+              }}
+            >
+              <div className="admin-overview-icon" aria-hidden="true">
+                📝
+              </div>
+
+              <div className="admin-event-setup-content">
+                <h2>Manage Term</h2>
+                <p>Manage chatbot terms and related content.</p>
+                <span className="admin-overview-action">
+                  Open Manage Term →
+                </span>
+              </div>
+            </article>
+
+            {/* Chatbot Login Settings */}
+            <article
+              role="button"
+              tabIndex="0"
+              className="admin-page-intro admin-overview-card"
+              onClick={() => setActiveTab("chatbotLoginSettings")}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setActiveTab("chatbotLoginSettings");
+                }
+              }}
+            >
+              <div className="admin-overview-icon" aria-hidden="true">
+                🔐
+              </div>
+
+              <div className="admin-event-setup-content">
+                <h2>Chatbot Login Settings</h2>
+                <p>Manage login settings and access for the chatbot.</p>
+                <span className="admin-overview-action">
+                  Open Login Settings →
+                </span>
+              </div>
+            </article>
+            {/* Chatbot Conversations */}
+              <article
+                role="button"
+                tabIndex="0"
+                className="admin-page-intro admin-overview-card"
+                onClick={() => setActiveTab("chatbotConversations")}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    setActiveTab("chatbotConversations");
+                  }
+                }}
+              >
+                <div className="admin-overview-icon" aria-hidden="true">
+                  💬
+                </div>
+
+                <div className="admin-event-setup-content">
+                  <h2>Chatbot Conversations</h2>
+                  <p>View and manage chatbot conversations.</p>
+                  <span className="admin-overview-action">
+                    Open Conversations →
+                  </span>
+                </div>
+              </article>
+            {/* Open AI Usage */}
+              <article
+                role="button"
+                tabIndex="0"
+                className="admin-page-intro admin-overview-card"
+                onClick={() => setActiveTab("openAiUsage")}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    setActiveTab("openAiUsage");
+                  }
+                }}
+              >
+                <div className="admin-overview-icon" aria-hidden="true">
+                  📊
+                </div>
+
+                <div className="admin-event-setup-content">
+                  <h2>Open AI Usage</h2>
+                  <p>View and monitor OpenAI usage and costs.</p>
+                  <span className="admin-overview-action">
+                    Open AI Usage →
+                  </span>
+                </div>
+              </article>
+
+          </div>
+        )}
+        {activeTab === "manageTerm" && (
+          <ManageTerm
+            interviewAdminData={interviewAdmin}
+            onBack={() => setActiveTab("chatbot")}
+            />
+        )}
+        {activeTab === "chatbotLoginSettings" && (
+          <ChatbotLoginSettings
+            centerCode={interviewAdmin.center_code}
+            onBack={() => setActiveTab("chatbot")}
+          />
+        )}
+        {activeTab === "chatbotConversations" && (
+          <ChatbotConversationsAdmin
+            centerCode={interviewAdmin.center_code}
+            onBack={() => setActiveTab("chatbot")}
+          />
+        )}
+        {activeTab === "openAiUsage" && (
+          <UsageDashboard
+            centerCode={interviewAdmin.center_code}
+            onBack={() => setActiveTab("chatbot")}
+          />
+        )}
+        {activeTab === "exams" && (
+          <div className="admin-overview-grid">
+
+            {/* Exam Module User Management */}
+            <article
+              role="button"
+              tabIndex="0"
+              className="admin-page-intro admin-overview-card"
+              onClick={() => setActiveTab("examUserManagement")}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setActiveTab("examUserManagement");
+                }
+              }}
+            >
+              <div className="admin-overview-icon" aria-hidden="true">
+                👥
+              </div>
+
+              <div className="admin-event-setup-content">
+                <h2>Exam Module User Management</h2>
+                <p>Manage users and exam accounts.</p>
+                <span className="admin-overview-action">
+                  Open User Management →
+                </span>
+              </div>
+            </article>
+
+            {/* Manage Classes */}
+            <article
+              role="button"
+              tabIndex="0"
+              className="admin-page-intro admin-overview-card"
+              onClick={() => setActiveTab("examManageClasses")}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setActiveTab("examManageClasses");
+                }
+              }}
+            >
+              <div className="admin-overview-icon" aria-hidden="true">
+                🏫
+              </div>
+
+              <div className="admin-event-setup-content">
+                <h2>Manage Classes</h2>
+                <p>Manage classes for your centre.</p>
+                <span className="admin-overview-action">
+                  Open Manage Classes →
+                </span>
+              </div>
+            </article>
+
+            {/* Manage Class Years */}
+            <article className="admin-page-intro admin-overview-card">
+              <div className="admin-overview-icon" aria-hidden="true">
+                📚
+              </div>
+
+              <div className="admin-event-setup-content">
+                <h2>Manage Class Years</h2>
+                <p>Manage class years for your centre.</p>
+                <span className="admin-overview-action">
+                  Open Class Years →
+                </span>
+              </div>
+            </article>
+
+            {/* Upload Questions */}
+            <article className="admin-page-intro admin-overview-card">
+              <div className="admin-overview-icon" aria-hidden="true">
+                📄
+              </div>
+
+              <div className="admin-event-setup-content">
+                <h2>Upload Questions</h2>
+                <p>Upload exam questions from Word documents.</p>
+                <span className="admin-overview-action">
+                  Open Upload Questions →
+                </span>
+              </div>
+            </article>
+
+          </div>
+        )}
+        {activeTab === "examManageClasses" && (
+          <ManageClasses
+            centerCode={interviewAdmin.center_code}
+            onBack={() => setActiveTab("exams")}
+          />
+        )}
+        {activeTab === "examUserManagement" && (
+          <ExamUserManagement
+            centerCode={interviewAdmin.center_code}
+            onBack={() => setActiveTab("exams")}
+          />
+        )}
+
+        
+
       </main>
     </div>
   );

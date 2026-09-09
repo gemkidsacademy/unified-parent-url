@@ -1,0 +1,110 @@
+.manage-terms-page{
+    padding:30px;
+}
+
+.back-btn{
+    background:#4f8ee8;
+    color:white;
+    border:none;
+    padding:10px 20px;
+    border-radius:6px;
+    cursor:pointer;
+    margin-bottom:20px;
+    font-weight:600;
+}
+
+.back-btn:hover{
+    background:#3c7ddd;
+}
+
+.manage-terms-page h2{
+    margin-bottom:10px;
+    color:#1f2937;
+}
+
+.page-description{
+    color:#666;
+    margin-bottom:25px;
+}
+
+.table-container{
+    overflow-x:auto;
+}
+
+.terms-table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 6px 18px rgba(0,0,0,.08);
+}
+
+.terms-table th{
+    background:#f8fafc;
+    text-align:left;
+    padding:16px;
+    border-bottom:1px solid #ddd;
+}
+
+.terms-table td{
+    padding:16px;
+    border-bottom:1px solid #eee;
+}
+
+.terms-table tr:last-child td{
+    border-bottom:none;
+}
+
+.status{
+    padding:6px 14px;
+    border-radius:30px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.current{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.inactive{
+    background:#f3f4f6;
+    color:#6b7280;
+}
+
+.action-btn{
+    border:none;
+    border-radius:6px;
+    padding:10px 16px;
+    margin-right:8px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.edit-btn{
+    background:#4f8ee8;
+    color:white;
+}
+
+.current-btn{
+    background:#10b981;
+    color:white;
+}
+
+.delete-btn{
+    background:#ef4444;
+    color:white;
+}
+
+.edit-btn:hover{
+    background:#3c7ddd;
+}
+
+.current-btn:hover{
+    background:#059669;
+}
+
+.delete-btn:hover{
+    background:#dc2626;
+}
