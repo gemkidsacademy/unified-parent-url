@@ -197,7 +197,55 @@ console.log("PARENT DASHBOARD student:", student);
           {/* Homework */}
           <article className="tool-card homework-card">
             <div className="tool-image homework-image">
-              📅
+              <svg
+                viewBox="0 0 64 64"
+                width="78"
+                height="78"
+                aria-hidden="true"
+              >
+                <rect
+                  x="10"
+                  y="14"
+                  width="44"
+                  height="42"
+                  rx="6"
+                  fill="#ffffff"
+                  stroke="#176fd4"
+                  strokeWidth="3"
+                />
+                <rect
+                  x="10"
+                  y="14"
+                  width="44"
+                  height="12"
+                  rx="6"
+                  fill="#176fd4"
+                />
+                <line
+                  x1="21"
+                  y1="9"
+                  x2="21"
+                  y2="19"
+                  stroke="#176fd4"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+                <line
+                  x1="43"
+                  y1="9"
+                  x2="43"
+                  y2="19"
+                  stroke="#176fd4"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+                <circle cx="22" cy="35" r="3" fill="#176fd4" />
+                <circle cx="32" cy="35" r="3" fill="#176fd4" />
+                <circle cx="42" cy="35" r="3" fill="#176fd4" />
+                <circle cx="22" cy="45" r="3" fill="#176fd4" />
+                <circle cx="32" cy="45" r="3" fill="#176fd4" />
+                <circle cx="42" cy="45" r="3" fill="#176fd4" />
+              </svg>
             </div>
 
             <h2>Homework Booking</h2>
