@@ -14,7 +14,20 @@ import ChatbotLoginSettings from "./chatbot/ChatbotLoginSettings";
 import ChatbotConversationsAdmin from "./chatbot/ChatbotConversationsAdmin";
 import UsageDashboard from "./chatbot/UsageDashboard";
 import ManageClasses from "./exams/ManageClasses";
+import ManageClassYears from "./exams/ManageClassYears";
 import ExamUserManagement from "./exams/userManagement/ExamUserManagement";
+import QuizSetup from "./exams/QuizSetup";
+import QuizSetup_MathematicalReasoning from "./exams/QuizSetup_MathematicalReasoning";
+import QuizSetup_reading from "./exams/QuizSetup_reading";
+import QuizSetup_writing from "./exams/QuizSetup_writing";
+import QuizSetupOCThinkingSkills from "./exams/QuizSetupOCThinkingSkills";
+import QuizSetup_OC_MathematicalReasoning from "./exams/QuizSetup_OC_MathematicalReasoning";
+import QuizSetup_oc_reading from "./exams/QuizSetup_oc_reading";
+import QuizSetup_oc_writing from "./exams/QuizSetup_oc_writing";
+import QuizSetup_naplan from "./exams/QuizSetup_naplan";
+import QuizSetup_naplan_language_conventions from "./exams/QuizSetup_naplan_language_conventions";
+import QuizSetup_naplan_reading from "./exams/QuizSetup_naplan_reading";
+import QuizSetup_naplan_writing from "./exams/QuizSetup_naplan_writing";
 const parseTime = (time) => {
   const match = time.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
 
@@ -134,6 +147,8 @@ function AdminInterviewBooking({ onLogout }) {
   });
   
   const [activeTab, setActiveTab] = useState("parentTeacherInterview");
+  const [createExamCategory, setCreateExamCategory] = useState(null);
+  const [createExamType, setCreateExamType] = useState(null);
   const [bookingFilters, setBookingFilters] = useState({
     event: "All",
     teacher: "All",
@@ -2420,7 +2435,18 @@ const eventTeacherAllocations = teacherAllocations.filter(
             </article>
 
             {/* Manage Class Years */}
-            <article className="admin-page-intro admin-overview-card">
+            <article
+              className="admin-page-intro admin-overview-card"
+              role="button"
+              tabIndex="0"
+              onClick={() => setActiveTab("examManageClassYears")}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setActiveTab("examManageClassYears");
+                }
+              }}
+            >
               <div className="admin-overview-icon" aria-hidden="true">
                 📚
               </div>
@@ -2434,17 +2460,28 @@ const eventTeacherAllocations = teacherAllocations.filter(
               </div>
             </article>
 
-            {/* Upload Questions */}
-            <article className="admin-page-intro admin-overview-card">
+            {/* Create Exam */}
+            <article
+              className="admin-page-intro admin-overview-card"
+              role="button"
+              tabIndex="0"
+              onClick={() => setActiveTab("examCreate")}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  setActiveTab("examCreate");
+                }
+              }}
+            >
               <div className="admin-overview-icon" aria-hidden="true">
-                📄
+                📝
               </div>
 
               <div className="admin-event-setup-content">
-                <h2>Upload Questions</h2>
-                <p>Upload exam questions from Word documents.</p>
+                <h2>Create Exam</h2>
+                <p>Create and configure a new exam.</p>
                 <span className="admin-overview-action">
-                  Open Upload Questions →
+                  Open Create Exam →
                 </span>
               </div>
             </article>
@@ -2457,10 +2494,268 @@ const eventTeacherAllocations = teacherAllocations.filter(
             onBack={() => setActiveTab("exams")}
           />
         )}
+        {activeTab === "examManageClassYears" && (
+          <ManageClassYears
+            centerCode={interviewAdmin.center_code}
+            onBack={() => setActiveTab("exams")}
+          />
+        )}
         {activeTab === "examUserManagement" && (
           <ExamUserManagement
             centerCode={interviewAdmin.center_code}
             onBack={() => setActiveTab("exams")}
+          />
+        )}
+        {activeTab === "examCreate" && (
+          <div
+            className="exam-create-page"
+            style={{
+              textAlign: "center",
+              padding: "30px",
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setActiveTab("exams")}
+            >
+              ← Back to Exams
+            </button>
+
+            <h2>Create Exam</h2>
+
+            {!createExamCategory && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "15px",
+                  alignItems: "center",
+                  marginTop: "25px",
+                }}
+              >
+                <button
+                  className="dashboard-button"
+                  onClick={() => setCreateExamCategory("selective")}
+                >
+                  Selective Exam
+                </button>
+
+                <button
+                  className="dashboard-button"
+                  onClick={() => setCreateExamCategory("oc")}
+                >
+                  OC Exam
+                </button>
+
+                <button
+                  className="dashboard-button"
+                  onClick={() => setCreateExamCategory("foundational")}
+                >
+                  Foundational Exam
+                </button>
+
+                <button
+                  className="dashboard-button"
+                  onClick={() => setCreateExamCategory("naplan")}
+                >
+                  NAPLAN
+                </button>
+              </div>
+            )}
+
+            {createExamCategory === "selective" && !createExamType && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "15px",
+                  alignItems: "center",
+                  marginTop: "25px",
+                }}
+              >
+                <button
+                  className="dashboard-button"
+                  onClick={() => setActiveTab("examQuizSetupThinkingSkills")}
+                >
+                  Thinking Skills
+                </button>
+
+                <button
+                  className="dashboard-button"
+                  onClick={() => setActiveTab("examQuizSetupMathematicalReasoning")}
+                >
+                  Mathematical Reasoning
+                </button>
+
+                <button
+                  className="dashboard-button"
+                  onClick={() => setActiveTab("examQuizSetupReading")}
+                >
+                  Reading
+                </button>
+
+                <button
+                  className="dashboard-button"
+                  onClick={() => setActiveTab("examQuizSetupWriting")}
+                >
+                  Writing
+                </button>
+              </div>
+            )}
+
+            {createExamCategory === "oc" && !createExamType && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "15px",
+                  alignItems: "center",
+                  marginTop: "25px",
+                }}
+              >
+                <button
+                  className="dashboard-button"
+                  onClick={() => setActiveTab("examQuizSetupOCThinkingSkills")}
+                >
+                  Thinking Skills
+                </button>
+
+                <button
+                  className="dashboard-button"
+                  onClick={() => setActiveTab("examQuizSetupOCMathematicalReasoning")}
+                >
+                  Mathematical Reasoning
+                </button>
+
+                <button
+                  className="dashboard-button"
+                  onClick={() => setActiveTab("examQuizSetupOCReading")}
+                >
+                  Reading
+                </button>
+
+                <button
+                  className="dashboard-button"
+                  onClick={() => setActiveTab("examQuizSetupOCWriting")}
+                >
+                  Writing
+                </button>
+              </div>
+            )}
+
+            {createExamCategory === "naplan" && !createExamType && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "15px",
+                  alignItems: "center",
+                  marginTop: "25px",
+                }}
+              >
+                <button
+                  className="dashboard-button"
+                  onClick={() => setActiveTab("examQuizSetupNAPLANNumeracy")}
+                >
+                  Numeracy
+                </button>
+
+                <button
+                  className="dashboard-button"
+                  onClick={() => setActiveTab("examQuizSetupNAPLANLanguageConventions")}
+                >
+                  Language Conventions
+                </button>
+
+                <button
+                  className="dashboard-button"
+                  onClick={() => setActiveTab("examQuizSetupNAPLANReading")}
+                >
+                  Reading
+                </button>
+
+                <button
+                  className="dashboard-button"
+                  onClick={() => setActiveTab("examQuizSetupNAPLANWriting")}
+                >
+                  Writing
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+        {activeTab === "examQuizSetupThinkingSkills" && (
+          <QuizSetup
+            userType={interviewAdmin.role}
+            centerCode={interviewAdmin.center_code}
+          />
+        )}
+        {activeTab === "examQuizSetupMathematicalReasoning" && (
+          <QuizSetup_MathematicalReasoning
+            userType={interviewAdmin.role}
+            centerCode={interviewAdmin.center_code}
+          />
+        )}
+        {activeTab === "examQuizSetupReading" && (
+          <QuizSetup_reading
+            userType={interviewAdmin.role}
+            centerCode={interviewAdmin.center_code}
+          />
+        )}
+        {activeTab === "examQuizSetupWriting" && (
+          <QuizSetup_writing
+            userType={interviewAdmin.role}
+            centerCode={interviewAdmin.center_code}
+          />
+        )}
+        {activeTab === "examQuizSetupOCThinkingSkills" && (
+          <QuizSetupOCThinkingSkills
+            userType={interviewAdmin.role}
+            centerCode={interviewAdmin.center_code}
+          />
+        )}
+        {activeTab === "examQuizSetupOCMathematicalReasoning" && (
+          <QuizSetup_OC_MathematicalReasoning
+            userType={interviewAdmin.role}
+            centerCode={interviewAdmin.center_code}
+          />
+        )}
+        {activeTab === "examQuizSetupOCReading" && (
+          <QuizSetup_oc_reading
+            userType={interviewAdmin.role}
+            centerCode={interviewAdmin.center_code}
+          />
+        )}
+        {activeTab === "examQuizSetupOCWriting" && (
+          <QuizSetup_oc_writing
+            userType={interviewAdmin.role}
+            centerCode={interviewAdmin.center_code}
+          />
+        )}
+        {activeTab === "examQuizSetupNAPLANNumeracy" && (
+          <QuizSetup_naplan
+            examType="naplan_numeracy"
+            userType={interviewAdmin.role}
+            centerCode={interviewAdmin.center_code}
+          />
+        )}
+        {activeTab === "examQuizSetupNAPLANLanguageConventions" && (
+          <QuizSetup_naplan_language_conventions
+            userType={interviewAdmin.role}
+            centerCode={interviewAdmin.center_code}
+          />
+        )}
+        {activeTab === "examQuizSetupNAPLANReading" && (
+          <QuizSetup_naplan_reading
+            examType="naplan_reading"
+            userType={interviewAdmin.role}
+            centerCode={interviewAdmin.center_code}
+          />
+        )}
+        {activeTab === "examQuizSetupNAPLANWriting" && (
+          <QuizSetup_naplan_writing
+            userType={interviewAdmin.role}
+            centerCode={interviewAdmin.center_code}
           />
         )}
 

@@ -1,0 +1,73 @@
+.quiz-setup-container {
+  max-width: 450px;
+  margin: 30px auto;
+  padding: 25px 30px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  font-family: "Inter", sans-serif;
+}
+
+.quiz-setup-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* Labels */
+.quiz-setup-container label {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: -5px;
+  color: #333;
+}
+
+/* Input + Select Fields */
+.quiz-setup-container input,
+.quiz-setup-container select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fafafa;
+  transition: 0.2s;
+}
+
+.quiz-setup-container input:focus,
+.quiz-setup-container select:focus {
+  border-color: #2563eb;
+  background: #fff;
+  box-shadow: 0 0 4px rgba(37,99,235,0.3);
+  outline: none;
+}
+
+/* Readonly subject field */
+.quiz-setup-container input[readonly] {
+  background: #eee;
+  cursor: not-allowed;
+  color: #555;
+}
+
+/* Submit Button */
+.quiz-setup-container button[type="submit"] {
+  margin-top: 10px;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.quiz-setup-container button[type="submit"]:hover {
+  background: #1e4fcc;
+}
+
+.quiz-setup-container button[type="submit"]:disabled {
+  background: #9cb7f3;
+  cursor: not-allowed;
+}

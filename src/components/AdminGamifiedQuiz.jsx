@@ -543,50 +543,6 @@ export default function AdminGamifiedQuiz({ interviewAdmin }) {
                     →
                 </div>
             </article>
-            <article
-                className="gamified-dashboard-card"
-                onClick={() => setActiveSection("guestCredentials")}
-            >
-                <div className="gamified-dashboard-icon">
-                    <svg
-                        width="42"
-                        height="42"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M4 6H20"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                        />
-                        <path
-                            d="M4 12H20"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                        />
-                        <path
-                            d="M4 18H14"
-                            stroke="currentColor"
-                            strokeWidth="1.8"
-                            strokeLinecap="round"
-                        />
-                    </svg>
-                </div>
-
-                <div className="gamified-dashboard-content">
-                    <h2>Guest Credentials</h2>
-                    <p>
-                        Manage guest login credentials for the Gamified Quiz system.
-                    </p>
-                </div>
-
-                <div className="gamified-dashboard-arrow">
-                    →
-                </div>
-            </article>
         </section>
     );
 }
