@@ -2,7 +2,7 @@ import { useState } from "react";
 import { API_BASE_URL } from "../config/api";
 import "./InterviewAdminLogin.css";
 
-function InterviewAdminLogin({ onLoginSuccess }) {
+function InterviewAdminLogin({ onLoginSuccess, expectedRole }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -38,6 +38,11 @@ function InterviewAdminLogin({ onLoginSuccess }) {
 
       if (!["CENTER_ADMIN", "TEACHER"].includes(interviewAdmin?.role)) {
         setError("Only center administrators and teachers can access this page.");
+        return;
+      }
+
+      if (interviewAdmin?.role !== expectedRole) {
+        setError("This account type cannot log in from this page.");
         return;
       }
 

@@ -1064,9 +1064,13 @@ const eventTeacherAllocations = teacherAllocations.filter(
           </div>
 
           <div className="admin-header-info">
-            <span className="admin-eyebrow">Admin workspace</span>
+            <span className="admin-eyebrow">
+              {interviewAdmin.role === "TEACHER" ? "Teacher" : "Admin workspace"}
+            </span>
+
             <p className="admin-identity">
-              Center: {interviewAdmin.center_code || "—"} · Admin:{" "}
+              Center: {interviewAdmin.center_code || "—"} ·{" "}
+              {interviewAdmin.role === "TEACHER" ? "Teacher" : "Admin"}:{" "}
               {interviewAdmin.full_name || "—"}
             </p>
           </div>
@@ -1087,8 +1091,6 @@ const eventTeacherAllocations = teacherAllocations.filter(
               ["parentTeacherInterview", "Parent Teacher Interview"],
               ["homeworkPortal", "Homework Booking"],
               ["gamifiedQuiz", "Gamified Quiz"],
-              ["chatbot", "Chatbot"],
-              ["exams", "Exams"],
               
             ]
           : [
@@ -1522,7 +1524,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
         <section className="admin-existing-events-section">
           <div className="admin-section-heading">
             <div>
-              <p className="admin-section-kicker">Demo data</p>
+              
               <h2>Existing Events</h2>
             </div>
             <button

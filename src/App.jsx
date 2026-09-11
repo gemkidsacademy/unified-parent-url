@@ -33,6 +33,8 @@ function App() {
   });
   const isAdminInterviewBooking =
     window.location.pathname === "/admin";
+  const isTeacherInterviewBooking =
+    window.location.pathname === "/teachers";
   const isAdminNotifications =
     window.location.pathname === "/admin/notifications";
   const isGamifiedQuiz =
@@ -107,11 +109,14 @@ function App() {
     );
   };
 
-  if (isAdminInterviewBooking || isAdminNotifications) {
-    if (!interviewAdminData) {
+  if (isAdminInterviewBooking || isTeacherInterviewBooking || isAdminNotifications) {
+    const expectedRole = isTeacherInterviewBooking ? "TEACHER" : "CENTER_ADMIN";
+
+    if (!interviewAdminData || interviewAdminData.role !== expectedRole) {
       return (
         <InterviewAdminLogin
           onLoginSuccess={setInterviewAdminData}
+          expectedRole={expectedRole}
         />
       );
     }

@@ -468,12 +468,13 @@ function HomeworkBooking({ parentData, onBack }) {
                   <div className="confirmation-actions">
                     <button
                       type="button"
-                      className="homework-back-link"
+                      className="homework-primary-button"
                       onClick={handleChangeSelection}
                       disabled={loadingTimeSlots}
                     >
                       {loadingTimeSlots ? "Loading..." : "Change Selection"}
                     </button>
+
                     <button
                       type="button"
                       className="homework-back-link"

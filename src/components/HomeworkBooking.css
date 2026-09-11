@@ -799,3 +799,21 @@
 .existing-booking-details .student-name {
   color: #5425aa;
 }
+.homework-primary-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.homework-primary-button:hover {
+  background: #1d4ed8;
+}
+
+.homework-primary-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
