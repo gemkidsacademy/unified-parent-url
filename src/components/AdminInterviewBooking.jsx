@@ -1913,7 +1913,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
           <section className="admin-bookings-section">
             <div className="admin-section-heading">
               <div>
-                <p className="admin-section-kicker">Demo view</p>
+                
                 <h2>Interview Bookings</h2>
               </div>
               <button
@@ -2059,7 +2059,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
           <section className="admin-invitations-section">
             <div className="admin-section-heading">
               <div>
-                <p className="admin-section-kicker">Demo view</p>
+                
                 <h2>Send Invitations</h2>
               </div>
             </div>

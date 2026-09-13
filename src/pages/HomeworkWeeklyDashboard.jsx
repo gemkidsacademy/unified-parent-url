@@ -78,13 +78,6 @@ function HomeworkWeeklyDashboard({ loggedInUser }) {
         const params = new URLSearchParams({
           center_code: centerCode,
           week_number: String(selectedWeek),
-          ...(loggedInUser?.role === 'TEACHER'
-            ? {
-                teacher_id: String(
-                  loggedInUser.teacher_id ?? loggedInUser.id
-                ),
-              }
-            : {}),
         })
 
         const response = await fetch(
@@ -231,33 +224,31 @@ function HomeworkWeeklyDashboard({ loggedInUser }) {
         ))}
       </div>
 
-      {loggedInUser?.role !== 'TEACHER' && (
-        <section className="weekly-panel" aria-labelledby="capacity-title">
-          <div className="weekly-panel-heading">
-            <div>
-              <h3 id="capacity-title">Slot Capacity Status</h3>
-              <p>{dashboardData.session_date}</p>
-            </div>
+      <section className="weekly-panel" aria-labelledby="capacity-title">
+        <div className="weekly-panel-heading">
+          <div>
+            <h3 id="capacity-title">Slot Capacity Status</h3>
+            <p>{dashboardData.session_date}</p>
           </div>
-          <div className="capacity-list">
-            {slots.map((slot) => {
-              const progress = slot.capacity
-                ? Math.min((slot.booked / slot.capacity) * 100, 100)
-                : 0
+        </div>
+        <div className="capacity-list">
+          {slots.map((slot) => {
+            const progress = slot.capacity
+              ? Math.min((slot.booked / slot.capacity) * 100, 100)
+              : 0
 
-              return (
-                <div className="capacity-row" key={slot.id}>
-                  <strong>{slot.start_time} - {slot.end_time}</strong>
-                  <span>{slot.booked} / {slot.capacity} booked</span>
-                  <div className={`capacity-track${slot.is_full ? ' full' : ''}`}>
-                    <i style={{ width: `${progress}%` }} />
-                  </div>
+            return (
+              <div className="capacity-row" key={slot.id}>
+                <strong>{slot.start_time} - {slot.end_time}</strong>
+                <span>{slot.booked} / {slot.capacity} booked</span>
+                <div className={`capacity-track${slot.is_full ? ' full' : ''}`}>
+                  <i style={{ width: `${progress}%` }} />
                 </div>
-              )
-            })}
-          </div>
-        </section>
-      )}
+              </div>
+            )
+          })}
+        </div>
+      </section>
 
       <section className="weekly-panel" aria-labelledby="responses-title">
         <div className="weekly-panel-heading">

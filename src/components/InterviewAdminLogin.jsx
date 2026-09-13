@@ -65,11 +65,9 @@ function InterviewAdminLogin({ onLoginSuccess, expectedRole }) {
           />
         </div>
 
-        <p className="interview-admin-login-eyebrow">Admin workspace</p>
         
-        <p className="interview-admin-login-description">
-          Sign in to manage interview events and teacher availability.
-        </p>
+        
+        
 
         <form onSubmit={handleSubmit}>
           <label>
