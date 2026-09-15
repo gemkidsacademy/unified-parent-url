@@ -1719,7 +1719,38 @@
 .exam-create-page .dashboard-button:nth-child(4) {
   border-top: 4px solid #f59e0b;
 }
+.exam-management-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 
+  margin-top: 10px;
+  padding: 8px 14px;
+
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid #4fc3f7;
+  border-radius: 6px;
+
+  color: #4fc3f7;
+  font-size: 15px;
+  font-weight: 700;
+
+  text-decoration: none;
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.exam-management-link:hover {
+  background: #4fc3f7;
+  color: #24105c;
+  border-color: #4fc3f7;
+  transform: translateY(-1px);
+}
+
+.exam-management-link:active {
+  transform: translateY(0);
+}
 /* Mobile */
 @media (max-width: 700px) {
   .exam-create-page {

@@ -1088,6 +1088,16 @@ const eventTeacherAllocations = teacherAllocations.filter(
               {interviewAdmin.role === "TEACHER" ? "Teacher" : "Admin"}:{" "}
               {interviewAdmin.full_name || "—"}
             </p>
+
+            <button
+              type="button"
+              className="exam-management-link"
+              onClick={() =>
+                window.open("https://exam.gemkidsacademy.com.au", "_blank")
+              }
+            >
+              Visit Exam Management
+            </button>
           </div>
 
           <button
@@ -1114,7 +1124,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
               ["homeworkPortal", "Homework Booking"],
               ["gamifiedQuiz", "Gamified Quiz"],
               ["chatbot", "Chatbot"],
-              ["exams", "Exams"],
+              
               
             ]
         ).map(([tab, label]) => (
