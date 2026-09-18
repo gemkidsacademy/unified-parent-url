@@ -160,7 +160,8 @@ function AdminInterviewBooking({ onLogout }) {
   const [teacherAllocations, setTeacherAllocations] = useState([]);
   const [bookingClassOptions, setBookingClassOptions] = useState([]);
   const [invitations, setInvitations] = useState([]);
-  const [selectedInvitationIds, setSelectedInvitationIds] = useState([]);
+  const [eligibleStudents, setEligibleStudents] = useState([]);
+  const [selectedStudentIds, setSelectedStudentIds] = useState([]);
   const [invitationFilters, setInvitationFilters] = useState({
     event: "All",
     className: "All",
@@ -246,6 +247,30 @@ function AdminInterviewBooking({ onLogout }) {
       setTeacherAllocations([]);
     }
   };
+    const loadEligibleStudents = async (eventId) => {
+    if (!eventId || eventId === "All") {
+      setEligibleStudents([]);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/parent-teacher-interview/eligible-students?center_code=${encodeURIComponent(
+          interviewAdmin.center_code || ""
+        )}&event_id=${encodeURIComponent(eventId)}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`Unable to load eligible students (${response.status})`);
+      }
+
+      const data = await response.json();
+      setEligibleStudents(data.students || []);
+    } catch (error) {
+      console.error("Failed to load eligible students:", error);
+      setEligibleStudents([]);
+    }
+  };
   const loadInvitations = async (eventId) => {
   if (!eventId || eventId === "All") {
     setInvitations([]);
@@ -284,7 +309,7 @@ function AdminInterviewBooking({ onLogout }) {
       }))
     );
 
-    setSelectedInvitationIds([]);
+    setSelectedStudentIds([]);
     setInvitationMessage("");
   } catch (error) {
     console.error("Failed to load invitations:", error);
@@ -915,31 +940,48 @@ console.log("[FILTERED BOOKINGS RESULT]", filteredBookings);
     URL.revokeObjectURL(downloadUrl);
   };
 
-  const filteredInvitations = invitations.filter((invitation) =>
-    (invitationFilters.className === "All" || invitation.className === invitationFilters.className) &&
-    (invitationFilters.classYear === "All" || invitation.classYear === invitationFilters.classYear) &&
-    (invitationFilters.status === "All" || invitation.status === invitationFilters.status)
-  );
+  const filteredInvitations = eligibleStudents.filter((student) => {
+    const invitation = invitations.find(
+      (existingInvitation) =>
+        existingInvitation.studentId === student.student_id
+    );
 
-  const toggleInvitation = (invitationId) => {
-    setSelectedInvitationIds((currentIds) =>
-      currentIds.includes(invitationId)
-        ? currentIds.filter((id) => id !== invitationId)
-        : [...currentIds, invitationId]
+    const invitationStatus = invitation?.status || "Not Sent";
+
+    return (
+      (invitationFilters.className === "All" ||
+        student.class_name === invitationFilters.className) &&
+      (invitationFilters.classYear === "All" ||
+        student.class_year === invitationFilters.classYear) &&
+      (invitationFilters.status === "All" ||
+        invitationStatus === invitationFilters.status)
+    );
+  });
+
+  const toggleInvitation = (studentId) => {
+    setSelectedStudentIds((currentIds) =>
+      currentIds.includes(studentId)
+        ? currentIds.filter((id) => id !== studentId)
+        : [...currentIds, studentId]
     );
     setInvitationMessage("");
   };
 
   const toggleAllInvitations = () => {
-    const visibleIds = filteredInvitations.map((invitation) => invitation.id);
-    const allVisibleSelected = visibleIds.length > 0 &&
-      visibleIds.every((id) => selectedInvitationIds.includes(id));
+    const visibleIds = filteredInvitations.map(
+      (student) => student.student_id
+    );
 
-    setSelectedInvitationIds((currentIds) =>
+    const allVisibleSelected =
+      visibleIds.length > 0 &&
+      visibleIds.every((id) => selectedStudentIds.includes(id));
+
+    setSelectedStudentIds((currentIds) =>
       allVisibleSelected
         ? currentIds.filter((id) => !visibleIds.includes(id))
         : [...new Set([...currentIds, ...visibleIds])]
     );
+
     setInvitationMessage("");
   };
   const eventTeacherIds = new Set(
@@ -953,7 +995,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
 
 
   const sendInvitations = async () => {
-  if (selectedInvitationIds.length === 0) {
+  if (selectedStudentIds.length === 0) {
     return;
   }
 
@@ -964,13 +1006,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
     return;
   }
 
-  const selectedInvitations = invitations.filter((invitation) =>
-    selectedInvitationIds.includes(invitation.id)
-  );
-
-  const studentIds = selectedInvitations
-    .map((invitation) => invitation.studentId)
-    .filter(Boolean);
+  const studentIds = selectedStudentIds.filter(Boolean);
 
   if (studentIds.length === 0) {
     setInvitationMessage("No valid students selected.");
@@ -1012,7 +1048,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
       )
     );
 
-    setSelectedInvitationIds([]);
+    setSelectedStudentIds([]);
 
     setInvitationMessage(
       `${data.sent_count} invitation${
@@ -2097,8 +2133,8 @@ const eventTeacherAllocations = teacherAllocations.filter(
                   [
                     "All",
                     ...new Set(
-                      eventTeacherAllocations
-                        .map((allocation) => allocation.class_name)
+                      eligibleStudents
+                        .map((student) => student.class_name)
                         .filter(Boolean)
                     ),
                   ],
@@ -2109,8 +2145,8 @@ const eventTeacherAllocations = teacherAllocations.filter(
                   [
                     "All",
                     ...new Set(
-                      eventTeacherAllocations
-                        .map((allocation) => allocation.class_year)
+                      eligibleStudents
+                        .map((student) => student.class_year)
                         .filter(Boolean)
                     ),
                   ],
@@ -2133,7 +2169,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
 
                       if (field === "event") {
                         loadInvitations(value);
-                        loadEventSlots(value);
+                        loadEligibleStudents(value);
                       }
                     }}
                   >
@@ -2158,19 +2194,24 @@ const eventTeacherAllocations = teacherAllocations.filter(
               <label className="select-all-control">
                 <input
                   type="checkbox"
-                  checked={filteredInvitations.length > 0 && filteredInvitations.every((invitation) => selectedInvitationIds.includes(invitation.id))}
+                  checked={
+                    filteredInvitations.length > 0 &&
+                    filteredInvitations.every((student) =>
+                      selectedStudentIds.includes(student.student_id)
+                    )
+                  }
                   onChange={toggleAllInvitations}
                 />
                 <span>Select All</span>
               </label>
               <span className="selected-count">
-                {selectedInvitationIds.length} {selectedInvitationIds.length === 1 ? "parent" : "parents"} selected
+                {selectedStudentIds.length} {selectedStudentIds.length === 1 ? "parent" : "parents"} selected
               </span>
               <button
                 type="button"
                 className="admin-save-button"
                 onClick={sendInvitations}
-                disabled={selectedInvitationIds.length === 0}
+                disabled={selectedStudentIds.length === 0}
               >
                 Send Invitations
               </button>
@@ -2189,29 +2230,47 @@ const eventTeacherAllocations = teacherAllocations.filter(
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredInvitations.map((invitation) => (
-                    <tr key={invitation.id}>
-                      <td>
-                        <input
-                          type="checkbox"
-                          checked={selectedInvitationIds.includes(invitation.id)}
-                          onChange={() => toggleInvitation(invitation.id)}
-                          aria-label={`Select ${invitation.parent}`}
-                        />
-                      </td>
-                      <td>{invitation.student}</td>
-                      <td>{invitation.parent}</td>
-                      <td>{invitation.className}</td>
-                      <td>{invitation.classYear}</td>
-                      <td>
-                        <span className={`invitation-status ${invitation.status === "Sent" ? "sent" : "not-sent"}`}>
-                          {invitation.status}
-                        </span>
+                  {filteredInvitations.map((student) => {
+                    const invitation = invitations.find(
+                      (existingInvitation) =>
+                        existingInvitation.studentId === student.student_id
+                    );
+
+                    const invitationStatus = invitation?.status || "Not Sent";
+
+                    return (
+                      <tr key={student.student_id}>
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={selectedStudentIds.includes(student.student_id)}
+                            onChange={() => toggleInvitation(student.student_id)}
+                            aria-label={`Select ${student.parent_email || student.student_name}`}
+                          />
+                        </td>
+                        <td>{student.student_name}</td>
+                        <td>{student.parent_email}</td>
+                        <td>{student.class_name}</td>
+                        <td>{student.class_year}</td>
+                        <td>
+                          <span
+                            className={`invitation-status ${
+                              invitationStatus === "Sent" ? "sent" : "not-sent"
+                            }`}
+                          >
+                            {invitationStatus}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+
+                  {filteredInvitations.length === 0 && (
+                    <tr>
+                      <td colSpan="6" className="no-bookings">
+                        No matching parents
                       </td>
                     </tr>
-                  ))}
-                  {filteredInvitations.length === 0 && (
-                    <tr><td colSpan="6" className="no-bookings">No matching parents</td></tr>
                   )}
                 </tbody>
               </table>
