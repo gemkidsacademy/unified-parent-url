@@ -1037,16 +1037,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
       );
     }
 
-    setInvitations((currentInvitations) =>
-      currentInvitations.map((invitation) =>
-        studentIds.includes(invitation.studentId)
-          ? {
-              ...invitation,
-              status: "Sent",
-            }
-          : invitation
-      )
-    );
+      await loadInvitations(eventId);
 
     setSelectedStudentIds([]);
 
