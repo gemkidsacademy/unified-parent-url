@@ -29,7 +29,7 @@ function App() {
   // Captured once per page load from the invitation URL (e.g.
   // ?event_id=15&student_id=...). Kept in memory only (not localStorage) so
   // it can't leak between different parents sharing a browser/device.
-  const [invitationEventId] = useState(
+  const [invitationEventId, setInvitationEventId] = useState(
     () => new URLSearchParams(window.location.search).get("event_id")
   );
 
@@ -108,9 +108,18 @@ function App() {
 
   const handleLogout = () => {
     console.log("APP: logout");
+
     localStorage.removeItem("parentData");
     setParentData(null);
     setPendingParentNotifications([]);
+
+    setInvitationEventId(null);
+
+    window.history.replaceState(
+      {},
+      document.title,
+      window.location.pathname
+    );
   };
 
   const handleAdminLogout = () => {
