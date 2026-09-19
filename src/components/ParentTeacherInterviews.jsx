@@ -56,6 +56,7 @@ function ParentTeacherInterviews({ parentData, onBack, invitationEventId }) {
   const [showChangeConfirmation, setShowChangeConfirmation] = useState(false);
 
   const [events, setEvents] = useState([]);
+  const [resolvedEventId, setResolvedEventId] = useState(null);
   // Not yet read in JSX — wired up for the teacher-allocation/time-slot step.
   // eslint-disable-next-line no-unused-vars
   const [slots, setSlots] = useState([]);
@@ -101,10 +102,13 @@ function ParentTeacherInterviews({ parentData, onBack, invitationEventId }) {
       invitationEventIdNum
     );
 
-  const currentEvent = invitationEventIdNum
-    ? events.find((event) => Number(event.id) === invitationEventIdNum) ||
+  const currentEvent = resolvedEventId
+    ? events.find((event) => Number(event.id) === Number(resolvedEventId)) ||
       null
-    : findCurrentEvent(events);
+    : invitationEventIdNum
+      ? events.find((event) => Number(event.id) === invitationEventIdNum) ||
+        null
+      : findCurrentEvent(events);
   console.log(
     "PTI EVENT DEBUG - currentEvent:",
     currentEvent
@@ -155,11 +159,45 @@ function ParentTeacherInterviews({ parentData, onBack, invitationEventId }) {
         if (isCancelled) return;
         setEvents(loadedEvents);
 
-        const selectedEvent = invitationEventIdNum
-          ? loadedEvents.find(
+        let selectedEvent = null;
+
+        if (invitationEventIdNum) {
+          // Invitation link: preserve the existing event-specific behavior.
+          selectedEvent =
+            loadedEvents.find(
               (event) => Number(event.id) === invitationEventIdNum
-            ) || null
-          : findCurrentEvent(loadedEvents);
+            ) || null;
+        } else {
+          // Normal OTP/dashboard flow: resolve the student's PTI event.
+          const myEventUrl = `${API_BASE_URL}/parent-teacher-interview/my-event?center_code=${encodeURIComponent(
+            centerCode
+          )}&student_id=${encodeURIComponent(student.student_id)}`;
+
+          console.log("PTI my-event URL:", myEventUrl);
+
+          const myEventResponse = await fetch(myEventUrl);
+
+          if (myEventResponse.ok) {
+            const myEventData = await myEventResponse.json();
+
+            console.log("PTI my-event response:", myEventData);
+
+            const resolvedEventId = myEventData.event_id;
+
+            selectedEvent =
+              loadedEvents.find(
+                (event) => Number(event.id) === Number(resolvedEventId)
+              ) || null;
+          } else if (myEventResponse.status === 404) {
+            // No invitation found: preserve the existing fallback behavior.
+            selectedEvent = findCurrentEvent(loadedEvents);
+          } else {
+            throw new Error(
+              `Unable to resolve student's interview event (${myEventResponse.status})`
+            );
+          }
+        }
+
         console.log("PTI selected event:", selectedEvent);
 
         const bookingsUrl = `${API_BASE_URL}/parent-teacher-interview/bookings?center_code=${encodeURIComponent(centerCode)}`;
