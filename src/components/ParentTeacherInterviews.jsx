@@ -200,6 +200,12 @@ function ParentTeacherInterviews({ parentData, onBack, invitationEventId }) {
 
         console.log("PTI selected event:", selectedEvent);
 
+        if (selectedEvent) {
+          setResolvedEventId(selectedEvent.id);
+        } else {
+          setResolvedEventId(null);
+        }
+
         const bookingsUrl = `${API_BASE_URL}/parent-teacher-interview/bookings?center_code=${encodeURIComponent(centerCode)}`;
         console.log("PTI bookings URL:", bookingsUrl);
 
