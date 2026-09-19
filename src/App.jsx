@@ -26,6 +26,22 @@ function App() {
       return null;
     }
   });
+  // Captured once per page load from the invitation URL (e.g.
+  // ?event_id=15&student_id=...). Kept in memory only (not localStorage) so
+  // it can't leak between different parents sharing a browser/device.
+  const [invitationEventId] = useState(
+    () => new URLSearchParams(window.location.search).get("event_id")
+  );
+
+  console.log(
+    "APP EVENT DEBUG - URL:",
+    window.location.href
+  );
+
+  console.log(
+    "APP EVENT DEBUG - invitationEventId:",
+    invitationEventId
+  );
   const [pendingParentNotifications, setPendingParentNotifications] = useState([]);
   const [interviewAdminData, setInterviewAdminData] = useState(() => {
     const storedData = localStorage.getItem("interviewAdminData");
@@ -172,6 +188,7 @@ function App() {
         <ParentDashboard
           parentData={parentData}
           onLogout={handleLogout}
+          invitationEventId={invitationEventId}
         />
         {pendingParentNotifications.length > 0 && (
           <ParentNotificationModal

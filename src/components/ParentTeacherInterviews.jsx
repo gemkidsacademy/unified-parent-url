@@ -30,7 +30,7 @@ const formatSlotTime = (timeValue) => {
   return `${hours % 12 || 12}:${String(minutes).padStart(2, "0")} ${period}`;
 };
 
-function ParentTeacherInterviews({ parentData, onBack }) {
+function ParentTeacherInterviews({ parentData, onBack, invitationEventId }) {
   const student = parentData?.student || null;
 
   const studentName = student?.name || "Not available";
@@ -82,7 +82,33 @@ function ParentTeacherInterviews({ parentData, onBack }) {
       parentData?.student?.parent_email
     );
   }, [parentData]);
-  const currentEvent = findCurrentEvent(events);
+  // Priority: invitation event_id preserved from login -> event_id still on
+  // the current URL -> date-based fallback when there's genuinely no invitation.
+  const urlEventId = new URLSearchParams(window.location.search).get(
+    "event_id"
+  );
+  const resolvedInvitationEventId = invitationEventId || urlEventId;
+  const invitationEventIdNum = resolvedInvitationEventId
+    ? Number(resolvedInvitationEventId)
+    : null;
+    console.log("PTI EVENT DEBUG - URL event_id:", urlEventId);
+    console.log(
+      "PTI EVENT DEBUG - invitationEventId prop:",
+      invitationEventId
+    );
+    console.log(
+      "PTI EVENT DEBUG - invitationEventIdNum:",
+      invitationEventIdNum
+    );
+
+  const currentEvent = invitationEventIdNum
+    ? events.find((event) => Number(event.id) === invitationEventIdNum) ||
+      null
+    : findCurrentEvent(events);
+  console.log(
+    "PTI EVENT DEBUG - currentEvent:",
+    currentEvent
+  );
 
   const bookedSlotIds = new Set(
     existingBookings
@@ -129,7 +155,11 @@ function ParentTeacherInterviews({ parentData, onBack }) {
         if (isCancelled) return;
         setEvents(loadedEvents);
 
-        const selectedEvent = findCurrentEvent(loadedEvents);
+        const selectedEvent = invitationEventIdNum
+          ? loadedEvents.find(
+              (event) => Number(event.id) === invitationEventIdNum
+            ) || null
+          : findCurrentEvent(loadedEvents);
         console.log("PTI selected event:", selectedEvent);
 
         const bookingsUrl = `${API_BASE_URL}/parent-teacher-interview/bookings?center_code=${encodeURIComponent(centerCode)}`;

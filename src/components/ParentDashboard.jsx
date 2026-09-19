@@ -3,7 +3,7 @@ import HomeworkBooking from "./HomeworkBooking";
 import ParentTeacherInterviews from "./ParentTeacherInterviews";
 import "./ParentDashboard.css";
 
-function ParentDashboard({ parentData, onLogout }) {
+function ParentDashboard({ parentData, onLogout, invitationEventId }) {
   const [showHomeworkBooking, setShowHomeworkBooking] = useState(false);
   const [showParentTeacherInterviews, setShowParentTeacherInterviews] =
     useState(false);
@@ -30,6 +30,7 @@ console.log("PARENT DASHBOARD student:", student);
       <ParentTeacherInterviews
         parentData={parentData}
         onBack={() => setShowParentTeacherInterviews(false)}
+        invitationEventId={invitationEventId}
       />
     );
   }
