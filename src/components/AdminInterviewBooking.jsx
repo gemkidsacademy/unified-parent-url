@@ -29,13 +29,30 @@ import QuizSetup_naplan_language_conventions from "./exams/QuizSetup_naplan_lang
 import QuizSetup_naplan_reading from "./exams/QuizSetup_naplan_reading";
 import QuizSetup_naplan_writing from "./exams/QuizSetup_naplan_writing";
 const parseTime = (time) => {
-  const match = time.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (!time || typeof time !== "string") return null;
 
-  if (!match) return null;
+  const value = time.trim();
 
-  let hours = Number(match[1]);
-  const minutes = Number(match[2]);
-  const period = match[3].toUpperCase();
+  // Native <input type="time"> format: HH:MM
+  const twentyFourHourMatch = value.match(/^(\d{2}):(\d{2})$/);
+
+  if (twentyFourHourMatch) {
+    const hours = Number(twentyFourHourMatch[1]);
+    const minutes = Number(twentyFourHourMatch[2]);
+
+    if (hours > 23 || minutes > 59) return null;
+
+    return hours * 60 + minutes;
+  }
+
+  // Existing 12-hour format: h:mm AM/PM
+  const twelveHourMatch = value.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+
+  if (!twelveHourMatch) return null;
+
+  let hours = Number(twelveHourMatch[1]);
+  const minutes = Number(twelveHourMatch[2]);
+  const period = twelveHourMatch[3].toUpperCase();
 
   if (hours < 1 || hours > 12 || minutes > 59) return null;
 
@@ -919,24 +936,26 @@ console.log("[FILTERED BOOKINGS RESULT]", filteredBookings);
         : stringValue;
     };
     const headers = [
+      "Event Name",
+      "Event Date",
       "Teacher",
       "Class",
       "Student",
       "Parent",
       "Booking Status",
-      "Interview Date",
       "Interview Time",
     ];
     const rows = filteredBookings.map((booking) => {
       const displayStatus = getBookingDisplayStatus(booking.booking_status);
 
       return [
+        booking.event_name || "—",
+        booking.event_date || "—",
         booking.teacher_name,
         booking.class_name || "—",
         displayStatus === "Booked" ? booking.student_name : "—",
         displayStatus === "Booked" ? booking.parent_email : "—",
         displayStatus,
-        booking.event_date,
         formatBookingTime(booking.start_time, booking.end_time),
       ];
     });
@@ -1257,6 +1276,35 @@ const eventTeacherAllocations = teacherAllocations.filter(
                   role="button"
                   tabIndex="0"
                   className="admin-page-intro admin-overview-card"
+                  onClick={() => setActiveTab("allocation")}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      setActiveTab("allocation");
+                    }
+                  }}
+                >
+                  <div className="admin-overview-icon" aria-hidden="true">
+                    👥
+                  </div>
+
+                  <div className="admin-event-setup-content">
+                    <h2>Teacher Allocation</h2>
+                    <p>
+                      Assign teachers to classes and automatically link them to students
+                      and parents.
+                    </p>
+
+                    <span className="admin-overview-action">
+                      Open Teacher Allocation →
+                    </span>
+                  </div>
+                </article>
+
+                <article
+                  role="button"
+                  tabIndex="0"
+                  className="admin-page-intro admin-overview-card"
                   onClick={handleOpenTeacherAvailability}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
@@ -1393,37 +1441,6 @@ const eventTeacherAllocations = teacherAllocations.filter(
                 </span>
               </div>
             </article>
-
-            {interviewAdmin.role !== "TEACHER" && (
-              <article
-                role="button"
-                tabIndex="0"
-                className="admin-page-intro admin-overview-card"
-                onClick={() => setActiveTab("allocation")}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    setActiveTab("allocation");
-                  }
-                }}
-              >
-                <div className="admin-overview-icon" aria-hidden="true">
-                  👥
-                </div>
-
-                <div className="admin-event-setup-content">
-                  <h2>Teacher Allocation</h2>
-                  <p>
-                    Assign teachers to classes and automatically link them to students
-                    and parents.
-                  </p>
-
-                  <span className="admin-overview-action">
-                    Open Teacher Allocation →
-                  </span>
-                </div>
-              </article>
-            )}
           </div>
         )}
 
@@ -1888,8 +1905,8 @@ const eventTeacherAllocations = teacherAllocations.filter(
                 {teacher.isAvailable && (
                   <div className="availability-settings">
                   {[
-                    ["Start time", "startTime", "text"],
-                    ["End time", "endTime", "text"],
+                    ["Start time", "startTime", "time"],
+                    ["End time", "endTime", "time"],
                     ["Slot Duration", "slotDuration", "number"],
                     ["Gap", "gap", "number"],
                   ].map(([label, field, type]) => (
@@ -2052,6 +2069,8 @@ const eventTeacherAllocations = teacherAllocations.filter(
               <table className="booking-table">
                 <thead>
                   <tr>
+                    <th>Event Name</th>
+                    <th>Event Date</th>
                     <th>Teacher</th>
                     <th>Class</th>
                     <th>Student</th>
@@ -2068,6 +2087,10 @@ const eventTeacherAllocations = teacherAllocations.filter(
 
                     return (
                     <tr key={booking.id}>
+                      <td>{booking.event_name || "—"}</td>
+
+                      <td>{booking.event_date || "—"}</td>
+
                       <td>{booking.teacher_name}</td>
 
                       <td>{booking.class_name || "—"}</td>
@@ -2106,7 +2129,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
                     );
                   })}
                   {filteredBookings.length === 0 && (
-                    <tr><td colSpan="6" className="no-bookings">No matching bookings</td></tr>
+                    <tr><td colSpan="8" className="no-bookings">No matching bookings</td></tr>
                   )}
                 </tbody>
               </table>

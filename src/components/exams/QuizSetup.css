@@ -18,7 +18,7 @@ body {
 /* ===============================
    MAIN CARD
 ================================= */
-.quiz-card {
+.quiz-setup-container .quiz-card {
   max-width: 900px;
   margin: 0 auto;
   background: #ffffff;
