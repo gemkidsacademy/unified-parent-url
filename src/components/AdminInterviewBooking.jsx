@@ -449,6 +449,22 @@ function AdminInterviewBooking({ onLogout }) {
   }, []);
 
   useEffect(() => {
+    if (interviewAdmin.role !== "TEACHER" || !interviewAdmin.teacher_id) return;
+
+    const loggedInTeacherAllocation = teacherAllocations.find(
+      (allocation) =>
+        String(allocation.teacher_id) === String(interviewAdmin.teacher_id)
+    );
+
+    if (!loggedInTeacherAllocation) return;
+
+    setBookingFilters((currentFilters) => ({
+      ...currentFilters,
+      teacher: loggedInTeacherAllocation.teacher_name,
+    }));
+  }, [interviewAdmin.role, interviewAdmin.teacher_id, teacherAllocations]);
+
+  useEffect(() => {
     loadTeacherAvailability();
     loadTeacherAssignedStudents();
   }, [availabilityEventId]);
@@ -1094,6 +1110,13 @@ const eventTeacherAllocations = teacherAllocations.filter(
     ),
   ];
 
+  const loggedInTeacherAllocation = teacherAllocations.find(
+    (allocation) =>
+      String(allocation.teacher_id) === String(interviewAdmin.teacher_id)
+  );
+  const teacherHasInterviewAllocation =
+    interviewAdmin.role !== "TEACHER" || Boolean(loggedInTeacherAllocation);
+
   return (
     <div className="admin-interview-page">
       <header className="admin-interview-header">
@@ -1263,32 +1286,6 @@ const eventTeacherAllocations = teacherAllocations.filter(
                   role="button"
                   tabIndex="0"
                   className="admin-page-intro admin-overview-card"
-                  onClick={() => setActiveTab("bookings")}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === " ") {
-                      event.preventDefault();
-                      setActiveTab("bookings");
-                    }
-                  }}
-                >
-                  <div className="admin-overview-icon" aria-hidden="true">
-                    📋
-                  </div>
-
-                  <div className="admin-event-setup-content">
-                    <h2>Interview Bookings</h2>
-                    <p>View and manage parent–teacher interview bookings.</p>
-
-                    <span className="admin-overview-action">
-                      Open Interview Bookings →
-                    </span>
-                  </div>
-                </article>
-
-                <article
-                  role="button"
-                  tabIndex="0"
-                  className="admin-page-intro admin-overview-card"
                   onClick={() => setActiveTab("invitations")}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
@@ -1375,30 +1372,58 @@ const eventTeacherAllocations = teacherAllocations.filter(
               role="button"
               tabIndex="0"
               className="admin-page-intro admin-overview-card"
-              onClick={() => setActiveTab("allocation")}
+              onClick={() => setActiveTab("bookings")}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault();
-                  setActiveTab("allocation");
+                  setActiveTab("bookings");
                 }
               }}
             >
               <div className="admin-overview-icon" aria-hidden="true">
-                👥
+                📋
               </div>
 
               <div className="admin-event-setup-content">
-                <h2>Teacher Allocation</h2>
-                <p>
-                  Assign teachers to classes and automatically link them to students
-                  and parents.
-                </p>
+                <h2>Interview Bookings</h2>
+                <p>View and manage parent–teacher interview bookings.</p>
 
                 <span className="admin-overview-action">
-                  Open Teacher Allocation →
+                  Open Interview Bookings →
                 </span>
               </div>
             </article>
+
+            {interviewAdmin.role !== "TEACHER" && (
+              <article
+                role="button"
+                tabIndex="0"
+                className="admin-page-intro admin-overview-card"
+                onClick={() => setActiveTab("allocation")}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    setActiveTab("allocation");
+                  }
+                }}
+              >
+                <div className="admin-overview-icon" aria-hidden="true">
+                  👥
+                </div>
+
+                <div className="admin-event-setup-content">
+                  <h2>Teacher Allocation</h2>
+                  <p>
+                    Assign teachers to classes and automatically link them to students
+                    and parents.
+                  </p>
+
+                  <span className="admin-overview-action">
+                    Open Teacher Allocation →
+                  </span>
+                </div>
+              </article>
+            )}
           </div>
         )}
 
@@ -2009,7 +2034,13 @@ const eventTeacherAllocations = teacherAllocations.filter(
               ))}
             </div>
 
-            {bookingFilters.status !== "Not Booked" && (
+            {!teacherHasInterviewAllocation && (
+              <p className="no-bookings">
+                No interview bookings have been assigned to you.
+              </p>
+            )}
+
+            {teacherHasInterviewAllocation && bookingFilters.status !== "Not Booked" && (
               <div className="booking-summary"> 
                 <span><strong>{filteredBookings.length}</strong> Students</span> 
                 <span><strong>{bookedBookingCount}</strong> Booked</span> 
@@ -2017,7 +2048,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
               </div>
             )}
 
-            <div className="booking-table-wrap">
+            {teacherHasInterviewAllocation && <div className="booking-table-wrap">
               <table className="booking-table">
                 <thead>
                   <tr>
@@ -2079,7 +2110,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
                   )}
                 </tbody>
               </table>
-            </div>
+            </div>}
           </section>
           </>
         )}

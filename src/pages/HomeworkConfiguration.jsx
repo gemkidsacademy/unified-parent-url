@@ -416,7 +416,7 @@ function HomeworkConfiguration({ loggedInUser }) {
     }
 
     try {
-      const configuration = await updateHomeworkConfiguration(loggedInUser, {
+      await updateHomeworkConfiguration(loggedInUser, {
         term_id: Number(selectedTermId),
         selected_weeks: sessions.map((session) => ({ week_number: session.week_number })),
         time_slots: slots.map((slot) => ({
@@ -430,7 +430,6 @@ function HomeworkConfiguration({ loggedInUser }) {
         booking_cutoff: bookingCutoff,
         class_day: classDay,
       })
-      if (configuration) applyConfiguration(configuration)
       setSaved(true)
     } catch (saveError) {
       setError(saveError.message)
