@@ -509,8 +509,17 @@ const modalHeaderStyle = {
 const closeButtonStyle = {
   border: "none",
   background: "transparent",
-  fontSize: "22px",
+  color: "#29234f",
+  fontSize: "24px",
+  fontWeight: "700",
   cursor: "pointer",
+  width: "40px",
+  height: "40px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  borderRadius: "50%",
+  lineHeight: 1,
 };
 
 const conversationMetaStyle = {
