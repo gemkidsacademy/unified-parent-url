@@ -9,11 +9,130 @@ import SchedulerRuns from "./SchedulerRuns/SchedulerRuns";
 import GenerateGamifiedQuizzes from "./GenerateGamifiedQuizzes/GenerateGamifiedQuizzes";
 import Leaderboard from "./Leaderboard/Leaderboard";
 import GuestCredentials from "./GuestCredentials/GuestCredentials";
+import { API_BASE_URL } from "../config/api";
 
 
 
 export default function AdminGamifiedQuiz({ interviewAdmin }) {
     const [activeSection, setActiveSection] = useState(null);
+    const [latestQuiz, setLatestQuiz] = useState(null);
+    const [latestQuizLoading, setLatestQuizLoading] = useState(false);
+    const [latestQuizError, setLatestQuizError] = useState("");
+    const [isEditingQuiz, setIsEditingQuiz] = useState(false);
+    const [editableQuiz, setEditableQuiz] = useState(null);
+
+    const handleShowQuiz = async () => {
+        setActiveSection("showQuiz");
+        setIsEditingQuiz(false);
+        setLatestQuizLoading(true);
+        setLatestQuizError("");
+
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/gamified-quiz/latest?center_code=${encodeURIComponent(interviewAdmin.center_code)}`
+            );
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    throw new Error("No generated quiz found.");
+                }
+                throw new Error("Failed to load the latest quiz.");
+            }
+
+            const data = await response.json();
+            setLatestQuiz(data);
+            setEditableQuiz(data.quiz_json);
+        } catch (error) {
+            setLatestQuizError(error.message || "Failed to load the latest quiz.");
+            setLatestQuiz(null);
+        } finally {
+            setLatestQuizLoading(false);
+        }
+    };
+
+    const handleSaveQuiz = async () => {
+        setLatestQuizError("");
+
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/gamified-quiz/${latestQuiz.id}?center_code=${encodeURIComponent(latestQuiz.center_code)}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(editableQuiz),
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data?.detail || "Failed to save quiz changes."
+                );
+            }
+
+            setLatestQuiz((previousQuiz) => ({
+                ...previousQuiz,
+                quiz_json: data.quiz_json,
+            }));
+
+            setEditableQuiz(data.quiz_json);
+            setIsEditingQuiz(false);
+        } catch (error) {
+            setLatestQuizError(
+                error.message || "Failed to save quiz changes."
+            );
+        }
+    };
+
+    const updateEditableQuizField = (field, value) => {
+        setEditableQuiz((currentQuiz) => ({
+            ...currentQuiz,
+            [field]: value,
+        }));
+    };
+
+    const updateEditableQuestionField = (questionIndex, field, value) => {
+        setEditableQuiz((currentQuiz) => ({
+            ...currentQuiz,
+            questions: currentQuiz.questions.map((question, index) =>
+                index === questionIndex
+                    ? { ...question, [field]: value }
+                    : question
+            ),
+        }));
+    };
+
+    const updateEditableQuestionOption = (
+        questionIndex,
+        optionIndex,
+        value
+    ) => {
+        setEditableQuiz((previousQuiz) => {
+            const questions = [...previousQuiz.questions];
+            const question = { ...questions[questionIndex] };
+            const options = [...question.options];
+
+            const previousOption = options[optionIndex];
+
+            options[optionIndex] = value;
+            question.options = options;
+
+            if (question.answer === previousOption) {
+                question.answer = value;
+            }
+
+            questions[questionIndex] = question;
+
+            return {
+                ...previousQuiz,
+                questions,
+            };
+        });
+    };
+
     if (activeSection === "academicTerm") {
         return (
             <AcademicTerm
@@ -84,6 +203,250 @@ export default function AdminGamifiedQuiz({ interviewAdmin }) {
                 loggedInUser={interviewAdmin}
                 onBack={() => setActiveSection(null)}
             />
+        );
+    }
+
+    if (activeSection === "showQuiz") {
+        return (
+            <section>
+                <button type="button" onClick={() => setActiveSection(null)}>
+                    ← Back to Gamified Quiz
+                </button>
+
+                {latestQuizLoading && <p>Loading...</p>}
+                {!latestQuizLoading && latestQuizError && <p>{latestQuizError}</p>}
+                {!latestQuizLoading && !latestQuizError && latestQuiz && (
+                    <>
+                        {!isEditingQuiz && (
+                            <button type="button" onClick={() => setIsEditingQuiz(true)}>
+                                Edit Quiz
+                            </button>
+                        )}
+
+                        {isEditingQuiz && editableQuiz ? (
+                            <>
+                                <article className="gamified-dashboard-card">
+                                    <div className="gamified-dashboard-content">
+                                        <div className="quiz-edit-form">
+                                            <div className="quiz-edit-field">
+                                                <label className="quiz-edit-label" htmlFor="quiz-title">
+                                                    Quiz Title
+                                                </label>
+                                                <input
+                                                    id="quiz-title"
+                                                    className="quiz-edit-input"
+                                                    type="text"
+                                                    value={editableQuiz.quiz_title}
+                                                    onChange={(event) =>
+                                                        updateEditableQuizField("quiz_title", event.target.value)
+                                                    }
+                                                />
+                                            </div>
+
+                                            <div className="quiz-edit-field">
+                                                <label className="quiz-edit-label" htmlFor="quiz-instructions">
+                                                    Instructions
+                                                </label>
+                                                <textarea
+                                                    id="quiz-instructions"
+                                                    className="quiz-edit-textarea quiz-edit-instructions"
+                                                    value={editableQuiz.instructions}
+                                                    onChange={(event) =>
+                                                        updateEditableQuizField("instructions", event.target.value)
+                                                    }
+                                                />
+                                            </div>
+                                        </div>
+                                        <p><strong>Term:</strong> {latestQuiz.term_name}</p>
+                                        <p><strong>Category:</strong> {latestQuiz.category}</p>
+                                        <p><strong>Class Year:</strong> {latestQuiz.class_year}</p>
+                                        <p><strong>Class Day:</strong> {latestQuiz.class_day}</p>
+                                        <p><strong>Session:</strong> {latestQuiz.session}</p>
+                                        <p><strong>Activity Type:</strong> {latestQuiz.activity_type}</p>
+                                        <p><strong>Topic:</strong> {latestQuiz.topic}</p>
+                                        <p><strong>Generated At:</strong> {latestQuiz.generated_at}</p>
+                                    </div>
+                                </article>
+
+                                <div className="admin-overview-grid">
+                                    {editableQuiz.questions.map((question, questionIndex) => (
+                                        <article
+                                            className="gamified-dashboard-card"
+                                            key={`editable-question-${questionIndex}`}
+                                        >
+                                            <div className="gamified-dashboard-content">
+                                                <h2>Question {questionIndex + 1}</h2>
+
+                                                <div className="quiz-edit-form">
+                                                    <div className="quiz-edit-field">
+                                                        <label
+                                                            className="quiz-edit-label"
+                                                            htmlFor={`question-category-${questionIndex}`}
+                                                        >
+                                                            Category
+                                                        </label>
+                                                        <input
+                                                            id={`question-category-${questionIndex}`}
+                                                            className="quiz-edit-input"
+                                                            type="text"
+                                                            value={question.category}
+                                                            onChange={(event) =>
+                                                                updateEditableQuestionField(
+                                                                    questionIndex,
+                                                                    "category",
+                                                                    event.target.value
+                                                                )
+                                                            }
+                                                        />
+                                                    </div>
+
+                                                    <div className="quiz-edit-field">
+                                                        <label
+                                                            className="quiz-edit-label"
+                                                            htmlFor={`question-prompt-${questionIndex}`}
+                                                        >
+                                                            Prompt
+                                                        </label>
+                                                        <textarea
+                                                            id={`question-prompt-${questionIndex}`}
+                                                            className="quiz-edit-textarea quiz-edit-prompt"
+                                                            value={question.prompt}
+                                                            onChange={(event) =>
+                                                                updateEditableQuestionField(
+                                                                    questionIndex,
+                                                                    "prompt",
+                                                                    event.target.value
+                                                                )
+                                                            }
+                                                        />
+                                                    </div>
+
+                                                    {question.options.map((option, optionIndex) => (
+                                                        <div
+                                                            className="quiz-edit-field"
+                                                            key={`editable-option-${optionIndex}`}
+                                                        >
+                                                            <label
+                                                                className="quiz-edit-label"
+                                                                htmlFor={`question-option-${questionIndex}-${optionIndex}`}
+                                                            >
+                                                                Option {String.fromCharCode(65 + optionIndex)}
+                                                            </label>
+                                                            <input
+                                                                id={`question-option-${questionIndex}-${optionIndex}`}
+                                                                className="quiz-edit-input"
+                                                                type="text"
+                                                                value={option}
+                                                                onChange={(event) =>
+                                                                    updateEditableQuestionOption(
+                                                                        questionIndex,
+                                                                        optionIndex,
+                                                                        event.target.value
+                                                                    )
+                                                                }
+                                                            />
+                                                        </div>
+                                                    ))}
+
+                                                    <div className="quiz-edit-field">
+                                                        <label
+                                                            className="quiz-edit-label"
+                                                            htmlFor={`question-answer-${questionIndex}`}
+                                                        >
+                                                            Correct Answer
+                                                        </label>
+                                                        <select
+                                                            id={`question-answer-${questionIndex}`}
+                                                            className="quiz-edit-select"
+                                                        value={question.answer}
+                                                            onChange={(event) =>
+                                                                updateEditableQuestionField(
+                                                                    questionIndex,
+                                                                    "answer",
+                                                                    event.target.value
+                                                                )
+                                                            }
+                                                        >
+                                                            {question.options.map((option, optionIndex) => (
+                                                                <option
+                                                                    key={`answer-option-${questionIndex}-${optionIndex}`}
+                                                                    value={option}
+                                                                >
+                                                                    {option}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </article>
+                                    ))}
+                                </div>
+
+                                <div className="quiz-edit-actions">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setEditableQuiz(latestQuiz.quiz_json);
+                                            setIsEditingQuiz(false);
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button type="button" onClick={handleSaveQuiz}>
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <article className="gamified-dashboard-card">
+                                    <div className="gamified-dashboard-content">
+                                        <h2>{latestQuiz.quiz_json.quiz_title}</h2>
+                                        <p>
+                                            <strong>Instructions:</strong>{" "}
+                                            {latestQuiz.quiz_json.instructions}
+                                        </p>
+                                        <p><strong>Term:</strong> {latestQuiz.term_name}</p>
+                                        <p><strong>Category:</strong> {latestQuiz.category}</p>
+                                        <p><strong>Class Year:</strong> {latestQuiz.class_year}</p>
+                                        <p><strong>Class Day:</strong> {latestQuiz.class_day}</p>
+                                        <p><strong>Session:</strong> {latestQuiz.session}</p>
+                                        <p><strong>Activity Type:</strong> {latestQuiz.activity_type}</p>
+                                        <p><strong>Topic:</strong> {latestQuiz.topic}</p>
+                                        <p><strong>Generated At:</strong> {latestQuiz.generated_at}</p>
+                                    </div>
+                                </article>
+
+                                <div className="admin-overview-grid">
+                                    {latestQuiz.quiz_json.questions.map((question, questionIndex) => (
+                                        <article
+                                            className="gamified-dashboard-card"
+                                            key={`${question.prompt}-${questionIndex}`}
+                                        >
+                                            <div className="gamified-dashboard-content">
+                                                <h2>Question {questionIndex + 1}</h2>
+                                                <p><strong>{question.category}</strong></p>
+                                                <p>{question.prompt}</p>
+
+                                                {question.options.map((option, optionIndex) => (
+                                                    <p key={`${option}-${optionIndex}`}>
+                                                        {option}
+                                                    </p>
+                                                ))}
+
+                                                <p>
+                                                    <strong>Correct Answer:</strong> {question.answer}
+                                                </p>
+                                            </div>
+                                        </article>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+                    </>
+                )}
+            </section>
         );
     }
 
@@ -536,6 +899,60 @@ export default function AdminGamifiedQuiz({ interviewAdmin }) {
                     <h2>Leaderboard</h2>
                     <p>
                         View student quiz performance and leaderboard results.
+                    </p>
+                </div>
+
+                <div className="gamified-dashboard-arrow">
+                    →
+                </div>
+            </article>
+
+            <article
+                className="gamified-dashboard-card"
+                onClick={handleShowQuiz}
+            >
+                <div className="gamified-dashboard-icon">
+                    <svg
+                        width="42"
+                        height="42"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <rect
+                            x="4"
+                            y="4"
+                            width="16"
+                            height="16"
+                            rx="2"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                        />
+                        <path
+                            d="M8 9H16"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                        <path
+                            d="M8 13H16"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                        <path
+                            d="M8 17H13"
+                            stroke="currentColor"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                </div>
+
+                <div className="gamified-dashboard-content">
+                    <h2>Manage Quiz</h2>
+                    <p>
+                        Manage generated quizzes and quiz content.
                     </p>
                 </div>
 

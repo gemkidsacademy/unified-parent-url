@@ -1596,6 +1596,89 @@
     transform: translateX(4px);
 }
 
+.quiz-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.quiz-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 100%;
+}
+
+.quiz-edit-label {
+  display: block;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.quiz-edit-input,
+.quiz-edit-textarea,
+.quiz-edit-select {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 13px;
+  border: 1px solid #d4d4dc;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #222;
+  font-size: 15px;
+  font-family: inherit;
+}
+
+.quiz-edit-input,
+.quiz-edit-select {
+  min-height: 44px;
+}
+
+.quiz-edit-textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.quiz-edit-instructions {
+  min-height: 110px;
+}
+
+.quiz-edit-prompt {
+  min-height: 120px;
+}
+
+.quiz-edit-input:focus,
+.quiz-edit-textarea:focus,
+.quiz-edit-select:focus {
+  outline: none;
+  border-color: #7c5cff;
+  box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.12);
+}
+
+.quiz-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px 0 30px;
+  margin-top: 10px;
+}
+
+.quiz-edit-actions button {
+  min-height: 44px;
+  padding: 10px 22px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 /* =================================
    Create Exam
 ================================= */
