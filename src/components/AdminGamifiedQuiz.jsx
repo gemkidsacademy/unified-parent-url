@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Dashboard from "./Dashboard";
 import AcademicTerm from "./AcademicTerm/AcademicTerm";
 import ClassConfiguration from "./ClassConfiguration/ClassConfiguration";
@@ -20,33 +20,131 @@ export default function AdminGamifiedQuiz({ interviewAdmin }) {
     const [latestQuizError, setLatestQuizError] = useState("");
     const [isEditingQuiz, setIsEditingQuiz] = useState(false);
     const [editableQuiz, setEditableQuiz] = useState(null);
+    const [manageQuizCategory, setManageQuizCategory] = useState("");
+    const [manageQuizClassYear, setManageQuizClassYear] = useState("");
+    const [manageQuizClassDay, setManageQuizClassDay] = useState("");
+    const [manageQuizLoading, setManageQuizLoading] = useState(false);
+    const [manageQuizError, setManageQuizError] = useState("");
+    const [manageQuizCategories, setManageQuizCategories] = useState([]);
+    const [manageQuizClassYears, setManageQuizClassYears] = useState([]);
+    const [manageQuizClassDays, setManageQuizClassDays] = useState([]);
 
-    const handleShowQuiz = async () => {
-        setActiveSection("showQuiz");
-        setIsEditingQuiz(false);
-        setLatestQuizLoading(true);
-        setLatestQuizError("");
+    useEffect(() => {
+        if (activeSection !== "manageQuiz") {
+            return;
+        }
+
+        const loadManageQuizCategories = async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/gamified/categories`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data?.detail || "Failed to load categories.");
+                }
+
+                setManageQuizCategories(data.categories);
+            } catch (error) {
+                setManageQuizError(error.message || "Failed to load categories.");
+            }
+        };
+
+        loadManageQuizCategories();
+    }, [activeSection]);
+
+    const loadManageQuizClassYears = async (category) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/admin/gamified/class-years`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ category }),
+            });
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data?.detail || "Failed to load class years.");
+            }
+
+            setManageQuizClassYears(data.class_years);
+        } catch (error) {
+            setManageQuizError(error.message || "Failed to load class years.");
+        }
+    };
+
+    const loadManageQuizClassDays = async (category, classYear) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/admin/gamified/class-days`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    category,
+                    class_year: classYear,
+                }),
+            });
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data?.detail || "Failed to load class days.");
+            }
+
+            setManageQuizClassDays(data.class_days);
+        } catch (error) {
+            setManageQuizError(error.message || "Failed to load class days.");
+        }
+    };
+
+    const handleLoadManageQuiz = async () => {
+        if (
+            !manageQuizCategory ||
+            !manageQuizClassYear ||
+            !manageQuizClassDay
+        ) {
+            setManageQuizError(
+                "Please select Category, Class Year, and Class Day."
+            );
+            return;
+        }
+
+        setManageQuizLoading(true);
+        setManageQuizError("");
+        setLatestQuiz(null);
 
         try {
             const response = await fetch(
-                `${API_BASE_URL}/gamified-quiz/latest?center_code=${encodeURIComponent(interviewAdmin.center_code)}`
+                `${API_BASE_URL}/gamified-quiz/manage?center_code=${encodeURIComponent(
+                    interviewAdmin.center_code
+                )}&category=${encodeURIComponent(
+                    manageQuizCategory
+                )}&class_year=${encodeURIComponent(
+                    manageQuizClassYear
+                )}&class_day=${encodeURIComponent(
+                    manageQuizClassDay
+                )}`
             );
 
+            const data = await response.json();
+
             if (!response.ok) {
-                if (response.status === 404) {
-                    throw new Error("No generated quiz found.");
-                }
-                throw new Error("Failed to load the latest quiz.");
+                throw new Error(
+                    data?.detail || "No generated quiz found for the selected filters."
+                );
             }
 
-            const data = await response.json();
             setLatestQuiz(data);
             setEditableQuiz(data.quiz_json);
+            setIsEditingQuiz(false);
         } catch (error) {
-            setLatestQuizError(error.message || "Failed to load the latest quiz.");
             setLatestQuiz(null);
+            setEditableQuiz(null);
+            setManageQuizError(
+                error.message || "Failed to load the generated quiz."
+            );
         } finally {
-            setLatestQuizLoading(false);
+            setManageQuizLoading(false);
         }
     };
 
@@ -206,16 +304,104 @@ export default function AdminGamifiedQuiz({ interviewAdmin }) {
         );
     }
 
-    if (activeSection === "showQuiz") {
+    if (activeSection === "manageQuiz") {
         return (
             <section>
                 <button type="button" onClick={() => setActiveSection(null)}>
                     ← Back to Gamified Quiz
                 </button>
 
-                {latestQuizLoading && <p>Loading...</p>}
+                <article className="gamified-dashboard-card">
+                    <div className="gamified-dashboard-content">
+                        <h2>Manage Quiz</h2>
+                        <div className="quiz-edit-form">
+                            <div className="quiz-edit-field">
+                                <label className="quiz-edit-label" htmlFor="manage-quiz-category">
+                                    Category
+                                </label>
+                                <select
+                                    id="manage-quiz-category"
+                                    className="quiz-edit-select"
+                                    value={manageQuizCategory}
+                                    onChange={(event) => {
+                                        const value = event.target.value;
+                                        setManageQuizCategory(value);
+                                        setManageQuizClassYear("");
+                                        setManageQuizClassDay("");
+                                        setManageQuizClassYears([]);
+                                        setManageQuizClassDays([]);
+                                        setManageQuizError("");
+                                        loadManageQuizClassYears(value);
+                                    }}
+                                >
+                                    <option value="">Select Category</option>
+                                    {manageQuizCategories.map((category) => (
+                                        <option key={category} value={category}>
+                                            {category}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="quiz-edit-field">
+                                <label className="quiz-edit-label" htmlFor="manage-quiz-class-year">
+                                    Class Year
+                                </label>
+                                <select
+                                    id="manage-quiz-class-year"
+                                    className="quiz-edit-select"
+                                    value={manageQuizClassYear}
+                                    onChange={(event) => {
+                                        const value = event.target.value;
+                                        setManageQuizClassYear(value);
+                                        setManageQuizClassDay("");
+                                        setManageQuizClassDays([]);
+                                        setManageQuizError("");
+                                        loadManageQuizClassDays(manageQuizCategory, value);
+                                    }}
+                                >
+                                    <option value="">Select Class Year</option>
+                                    {manageQuizClassYears.map((classYear) => (
+                                        <option key={classYear} value={classYear}>
+                                            {classYear}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <div className="quiz-edit-field">
+                                <label className="quiz-edit-label" htmlFor="manage-quiz-class-day">
+                                    Class Day
+                                </label>
+                                <select
+                                    id="manage-quiz-class-day"
+                                    className="quiz-edit-select"
+                                    value={manageQuizClassDay}
+                                    onChange={(event) => {
+                                        setManageQuizClassDay(event.target.value);
+                                        setManageQuizError("");
+                                    }}
+                                >
+                                    <option value="">Select Class Day</option>
+                                    {manageQuizClassDays.map((classDay) => (
+                                        <option key={classDay} value={classDay}>
+                                            {classDay}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            <button type="button" onClick={handleLoadManageQuiz}>
+                                Load Quiz
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                {manageQuizLoading && <p>Loading...</p>}
+                {!manageQuizLoading && manageQuizError && <p>{manageQuizError}</p>}
                 {!latestQuizLoading && latestQuizError && <p>{latestQuizError}</p>}
-                {!latestQuizLoading && !latestQuizError && latestQuiz && (
+                {!manageQuizLoading && !manageQuizError && !latestQuizError && latestQuiz && (
                     <>
                         {!isEditingQuiz && (
                             <button type="button" onClick={() => setIsEditingQuiz(true)}>
@@ -909,7 +1095,14 @@ export default function AdminGamifiedQuiz({ interviewAdmin }) {
 
             <article
                 className="gamified-dashboard-card"
-                onClick={handleShowQuiz}
+                onClick={() => {
+                    setActiveSection("manageQuiz");
+                    setLatestQuiz(null);
+                    setEditableQuiz(null);
+                    setManageQuizError("");
+                    setLatestQuizError("");
+                    setIsEditingQuiz(false);
+                }}
             >
                 <div className="gamified-dashboard-icon">
                     <svg
