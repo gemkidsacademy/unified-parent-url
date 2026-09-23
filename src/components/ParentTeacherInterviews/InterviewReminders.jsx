@@ -379,57 +379,76 @@ function InterviewReminders() {
             </div>
 
             <div className="preview-email">
-
-              <p>Hi Emma,</p>
+              <p>
+                <strong>Parent teacher 1 day reminder</strong>
+              </p>
 
               <p>
-                This is a reminder that Oliver Brown's
-                Parent–Teacher Interview is tomorrow.
+                <strong>Sub - Reminder: Parent–Teacher Interview – {"{{student_name}}"}</strong>
+              </p>
+
+              <p>Dear Parent,</p>
+
+              <p>
+                This is a reminder about your upcoming Parent–Teacher Interview
+                with Gem Kids Academy.
               </p>
 
               <div className="preview-details">
+                <div>
+                  <span>Event</span>
+                  <strong>{"{{event_name}}"}</strong>
+                </div>
 
                 <div>
                   <span>Student</span>
-                  <strong>Oliver Brown</strong>
+                  <strong>{"{{student_name}}"}</strong>
                 </div>
 
                 <div>
                   <span>Teacher</span>
-                  <strong>Mrs Sarah Johnson</strong>
+                  <strong>{"{{teacher_name}}"}</strong>
                 </div>
 
                 <div>
                   <span>Date</span>
-                  <strong>
-                    Friday, 18 September 2026
-                  </strong>
+                  <strong>{"{{event_date}}"}</strong>
                 </div>
 
                 <div>
                   <span>Time</span>
-                  <strong>
-                    6:45 PM – 6:55 PM
-                  </strong>
+                  <strong>{"{{time_slot}}"}</strong>
+                </div>
+
+                <div>
+                  <span>Duration</span>
+                  <strong>{"{{slot_duration}}"}</strong>
                 </div>
 
                 <div>
                   <span>Location</span>
-                  <strong>
-                    Marsden Park Centre
-                  </strong>
+                  <strong>{"{{location}}"}</strong>
                 </div>
-
               </div>
 
               <p>
-                We look forward to seeing you.
+                <strong>Important:</strong> Please arrive on time and kindly ensure
+                the discussion is completed within the allocated
+                <strong>{"{{slot_duration}}"}</strong>. This will help us keep
+                appointments running on schedule and ensure every parent receives
+                their allocated time with the teacher.
               </p>
 
-              <strong>
-                Gem Kids Academy
-              </strong>
+              <p>
+                We look forward to meeting you and discussing
+                {"{{student_name}}"}'s learning and progress.
+              </p>
 
+              <p>
+                Kind regards,
+              </p>
+
+              <strong>Gem Kids Academy</strong>
             </div>
 
           </div>
