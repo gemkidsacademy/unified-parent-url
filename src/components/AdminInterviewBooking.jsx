@@ -2355,7 +2355,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
           <>
             {interviewAdmin.role === "TEACHER" && (
               <style>{`
-                .admin-interview-main > .admin-overview-grid > .gamified-dashboard-card:not(:nth-of-type(9)) {
+                .admin-interview-main > .admin-overview-grid > .gamified-dashboard-card:not(:nth-of-type(9)):not(:nth-of-type(10)) {
                   display: none;
                 }
               `}</style>
