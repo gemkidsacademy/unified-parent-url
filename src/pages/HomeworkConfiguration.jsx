@@ -430,6 +430,13 @@ function HomeworkConfiguration({ loggedInUser }) {
         booking_cutoff: bookingCutoff,
         class_day: classDay,
       })
+
+      const refreshedConfiguration = await getHomeworkConfiguration(loggedInUser)
+
+      if (refreshedConfiguration) {
+        applyConfiguration(refreshedConfiguration)
+      }
+
       setSaved(true)
     } catch (saveError) {
       setError(saveError.message)

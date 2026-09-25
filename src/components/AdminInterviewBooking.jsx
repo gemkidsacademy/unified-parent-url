@@ -170,6 +170,7 @@ function AdminInterviewBooking({ onLogout }) {
     event: "All",
     teacher: "All",
     className: "All",
+    classYear: "All",
     status: "All",
     time: "All",
   });
@@ -895,6 +896,10 @@ const filteredBookings = visibleBookingRows.filter((booking) => {
     bookingFilters.className === "All" ||
     booking.class_name === bookingFilters.className;
 
+  const classYearMatches =
+    bookingFilters.classYear === "All" ||
+    booking.class_year === bookingFilters.classYear;
+
   const statusMatches =
     bookingFilters.status === "All" ||
     displayStatus === bookingFilters.status;
@@ -906,10 +911,24 @@ const filteredBookings = visibleBookingRows.filter((booking) => {
     eventMatches &&
     teacherMatches &&
     classMatches &&
+    classYearMatches &&
     statusMatches &&
     timeMatches
   );
 });
+console.log(
+  "[INTERVIEW DEBUG] filteredBookings:",
+  filteredBookings.map((booking) => ({
+    id: booking.id,
+    event_id: booking.event_id,
+    event_name: booking.event_name,
+    teacher_id: booking.teacher_id,
+    teacher_name: booking.teacher_name,
+    class_name: booking.class_name,
+    class_year: booking.class_year,
+    booking_status: booking.booking_status,
+  }))
+);
 console.log("[FILTERED BOOKINGS RESULT]", filteredBookings);
 
   const bookedBookingCount = filteredBookings.filter(
@@ -940,6 +959,7 @@ console.log("[FILTERED BOOKINGS RESULT]", filteredBookings);
       "Event Date",
       "Teacher",
       "Class",
+      "Class Year",
       "Student",
       "Parent",
       "Booking Status",
@@ -953,6 +973,7 @@ console.log("[FILTERED BOOKINGS RESULT]", filteredBookings);
         booking.event_date || "—",
         booking.teacher_name,
         booking.class_name || "—",
+        booking.class_year || "—",
         displayStatus === "Booked" ? booking.student_name : "—",
         displayStatus === "Booked" ? booking.parent_email : "—",
         displayStatus,
@@ -1125,6 +1146,56 @@ const eventTeacherAllocations = teacherAllocations.filter(
           )
           .map((allocation) => allocation.class_name)
           .filter(Boolean)
+      )
+    ),
+  ];
+
+  console.log(
+    "[CLASS YEAR DEBUG]",
+    {
+      selectedEvent: bookingFilters.event,
+      selectedTeacher: bookingFilters.teacher,
+      selectedClass: bookingFilters.className,
+      matchingBookings: bookings
+        .filter(
+          (booking) =>
+            (bookingFilters.event === "All" ||
+              String(booking.event_id) === String(bookingFilters.event)) &&
+            (bookingFilters.teacher === "All" ||
+              booking.teacher_name === bookingFilters.teacher) &&
+            (bookingFilters.className === "All" ||
+              booking.class_name === bookingFilters.className)
+        )
+        .map((booking) => ({
+          id: booking.id,
+          event_id: booking.event_id,
+          event_name: booking.event_name,
+          teacher_id: booking.teacher_id,
+          teacher_name: booking.teacher_name,
+          class_name: booking.class_name,
+          class_year: booking.class_year,
+          booking_status: booking.booking_status,
+        })),
+    }
+  );
+
+  const bookingClassYearFilterOptions = [
+    "All",
+    ...Array.from(
+      new Set(
+        bookings
+          .filter(
+            (booking) =>
+              (bookingFilters.event === "All" ||
+                String(booking.event_id) === String(bookingFilters.event)) &&
+              (bookingFilters.teacher === "All" ||
+                booking.teacher_name === bookingFilters.teacher) &&
+              (bookingFilters.className === "All" ||
+                booking.class_name === bookingFilters.className)
+          )
+          .map((booking) => booking.class_year)
+          .filter(Boolean)
+          .map(String)
       )
     ),
   ];
@@ -2019,12 +2090,16 @@ const eventTeacherAllocations = teacherAllocations.filter(
                 ],
                 ["teacher", "Teacher", bookingTeacherOptions],
                 ["className", "Class", bookingClassFilterOptions],
+                ["classYear", "Class Year", bookingClassYearFilterOptions],
                 ["status", "Booking Status", ["All", "Booked", "Not Booked"]],
               ].map(([field, label, options]) => (
                 <label key={field}>
                   <span>{label}</span>
                   <select
                     value={bookingFilters[field]}
+                    disabled={
+                      interviewAdmin.role === "TEACHER" && field === "teacher"
+                    }
                     onChange={(event) => {
                       const value = event.target.value;
                       updateBookingFilter(field, value);
@@ -2073,6 +2148,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
                     <th>Event Date</th>
                     <th>Teacher</th>
                     <th>Class</th>
+                    <th>Class Year</th>
                     <th>Student</th>
                     <th>Parent</th>
                     <th>Booking Status</th>
@@ -2094,6 +2170,8 @@ const eventTeacherAllocations = teacherAllocations.filter(
                       <td>{booking.teacher_name}</td>
 
                       <td>{booking.class_name || "—"}</td>
+
+                      <td>{booking.class_year || "—"}</td>
 
                       <td>
                         {displayStatus === "Booked"
@@ -2129,7 +2207,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
                     );
                   })}
                   {filteredBookings.length === 0 && (
-                    <tr><td colSpan="8" className="no-bookings">No matching bookings</td></tr>
+                    <tr><td colSpan="9" className="no-bookings">No matching bookings</td></tr>
                   )}
                 </tbody>
               </table>
