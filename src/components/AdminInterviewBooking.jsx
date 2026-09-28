@@ -211,8 +211,15 @@ function AdminInterviewBooking({ onLogout }) {
   };
 
   const loadTeacherOptions = async () => {
+    if (!availabilityEventId) {
+      setTeacherOptions([]);
+      return;
+    }
+
     const response = await fetch(
-      `${API_BASE_URL}/parent-teacher-interview/teachers?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}`
+      `${API_BASE_URL}/parent-teacher-interview/teachers?center_code=${encodeURIComponent(
+        interviewAdmin.center_code || ""
+      )}`
     );
 
     if (!response.ok) return;
@@ -463,7 +470,6 @@ function AdminInterviewBooking({ onLogout }) {
 
   useEffect(() => {
     loadEvents();
-    loadTeacherOptions();
   }, []);
 
   useEffect(() => {
@@ -483,7 +489,27 @@ function AdminInterviewBooking({ onLogout }) {
   }, [interviewAdmin.role, interviewAdmin.teacher_id, teacherAllocations]);
 
   useEffect(() => {
-    loadTeacherAvailability();
+    const loadEventTeachers = async () => {
+      if (!availabilityEventId) {
+        setTeachers([]);
+        return;
+      }
+
+      const response = await fetch(
+        `${API_BASE_URL}/parent-teacher-interview/event-teachers?center_code=${encodeURIComponent(
+          interviewAdmin.center_code || ""
+        )}&event_id=${encodeURIComponent(availabilityEventId)}`
+      );
+
+      if (!response.ok) return;
+
+      const data = await response.json();
+      setTeachers(data.teachers || []);
+      loadTeacherAvailability();
+    };
+
+    loadTeacherOptions();
+    loadEventTeachers();
     loadTeacherAssignedStudents();
   }, [availabilityEventId]);
 
@@ -520,6 +546,7 @@ function AdminInterviewBooking({ onLogout }) {
       ...currentTeachers,
       {
         id: teacher.id,
+        full_name: teacher.full_name,
         name: teacher.full_name,
         className: "—",
         isAvailable: true,
@@ -1903,35 +1930,6 @@ const eventTeacherAllocations = teacherAllocations.filter(
               </select>
             </div>
 
-            <div className="teacher-selection-row">
-              <span>Add Teacher</span>
-              <select
-                value={selectedTeacher}
-                onChange={(event) => {
-                  setSelectedTeacher(event.target.value);
-                  selectTeacher(event.target.value);
-                }}
-                aria-label="Select a teacher"
-              >
-                <option value="">Select a teacher</option>
-                {teacherOptions.map((teacher) => {
-                  const isAlreadyAdded = teachers.some(
-                    (currentTeacher) => currentTeacher.id === teacher.id
-                  );
-
-                  return (
-                    <option
-                      value={teacher.id}
-                      key={teacher.id}
-                      disabled={isAlreadyAdded}
-                    >
-                      {teacher.full_name}
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-
             {teacherCapacity.map((teacher) => {
               const isExpanded = expandedTeacherIds.has(teacher.id);
 
@@ -1944,10 +1942,10 @@ const eventTeacherAllocations = teacherAllocations.filter(
                   onClick={() => toggleTeacher(teacher.id)}
                 >
                   <span className="teacher-person-icon" aria-hidden="true">👤</span>
-                  <strong>{teacher.name}</strong>
+                  <strong>{teacher.full_name}</strong>
                   <span>
                     {teacher.isAvailable
-                      ? `${teacher.startTime} – ${teacher.endTime}`
+                      ? `${formatAvailabilityTime(toApiTime(teacher.startTime))} – ${formatAvailabilityTime(toApiTime(teacher.endTime))}`
                       : "Unavailable"}
                   </span>
                   <span className="teacher-accordion-indicator" aria-hidden="true">
