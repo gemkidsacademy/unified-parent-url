@@ -1180,6 +1180,11 @@
   font-size: 13px;
 }
 
+.booking-filters-submit {
+  grid-column: 1 / -1;
+  justify-self: end;
+}
+
 .booking-summary {
   display: flex;
   flex-wrap: wrap;
@@ -1293,6 +1298,10 @@
 
   .booking-filters {
     grid-template-columns: 1fr;
+  }
+
+  .booking-filters-submit {
+    width: 100%;
   }
 
   .selected-event-heading {

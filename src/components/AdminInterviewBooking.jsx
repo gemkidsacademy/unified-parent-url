@@ -174,6 +174,14 @@ function AdminInterviewBooking({ onLogout }) {
     status: "All",
     time: "All",
   });
+  const [appliedBookingFilters, setAppliedBookingFilters] = useState({
+    event: "All",
+    teacher: "All",
+    className: "All",
+    classYear: "All",
+    status: "All",
+    time: "All",
+  });
   const [bookings, setBookings] = useState([]);
   const [teacherAllocations, setTeacherAllocations] = useState([]);
   const [bookingClassOptions, setBookingClassOptions] = useState([]);
@@ -488,6 +496,10 @@ function AdminInterviewBooking({ onLogout }) {
     if (!loggedInTeacherAllocation) return;
 
     setBookingFilters((currentFilters) => ({
+      ...currentFilters,
+      teacher: loggedInTeacherAllocation.teacher_name,
+    }));
+    setAppliedBookingFilters((currentFilters) => ({
       ...currentFilters,
       teacher: loggedInTeacherAllocation.teacher_name,
     }));
@@ -916,28 +928,28 @@ const filteredBookings = visibleBookingRows.filter((booking) => {
   const displayStatus = getBookingDisplayStatus(booking.booking_status);
 
   const eventMatches =
-    bookingFilters.event === "All" ||
-    bookingFilters.event === "any" ||
-    String(booking.event_id) === String(bookingFilters.event);
+    appliedBookingFilters.event === "All" ||
+    appliedBookingFilters.event === "any" ||
+    String(booking.event_id) === String(appliedBookingFilters.event);
 
   const teacherMatches =
-    bookingFilters.teacher === "All" ||
-    booking.teacher_name === bookingFilters.teacher;
+    appliedBookingFilters.teacher === "All" ||
+    booking.teacher_name === appliedBookingFilters.teacher;
 
   const classMatches =
-    bookingFilters.className === "All" ||
-    booking.class_name === bookingFilters.className;
+    appliedBookingFilters.className === "All" ||
+    booking.class_name === appliedBookingFilters.className;
 
   const classYearMatches =
-    bookingFilters.classYear === "All" ||
-    booking.class_year === bookingFilters.classYear;
+    appliedBookingFilters.classYear === "All" ||
+    booking.class_year === appliedBookingFilters.classYear;
 
   const statusMatches =
-    bookingFilters.status === "All" ||
-    displayStatus === bookingFilters.status;
+    appliedBookingFilters.status === "All" ||
+    displayStatus === appliedBookingFilters.status;
 
   const timeMatches =
-    bookingFilters.time === "All";
+    appliedBookingFilters.time === "All";
 
   return (
     eventMatches &&
@@ -976,6 +988,12 @@ console.log("[FILTERED BOOKINGS RESULT]", filteredBookings);
       ...currentFilters,
       [field]: value,
     }));
+  };
+
+  const submitBookingFilters = async (event) => {
+    event.preventDefault();
+    setAppliedBookingFilters({ ...bookingFilters });
+    await loadBookings();
   };
 
   const downloadBookingsCsv = () => {
@@ -1159,9 +1177,14 @@ const eventTeacherAllocations = teacherAllocations.filter(
     "All",
     ...Array.from(
       new Set(
-        teacherAllocations
-          .map((allocation) => allocation.teacher_name)
-          .filter(Boolean)
+        [
+          ...teacherAllocations.map(
+            (allocation) => allocation.teacher_name
+          ),
+          ...bookings.map(
+            (booking) => booking.teacher_name
+          ),
+        ].filter(Boolean)
       )
     ),
   ];
@@ -1170,14 +1193,14 @@ const eventTeacherAllocations = teacherAllocations.filter(
     "All",
     ...Array.from(
       new Set(
-        teacherAllocations
-          .filter(
-            (allocation) =>
-              bookingFilters.teacher === "All" ||
-              allocation.teacher_name === bookingFilters.teacher
-          )
-          .map((allocation) => allocation.class_name)
-          .filter(Boolean)
+        [
+          ...teacherAllocations.map(
+            (allocation) => allocation.class_name
+          ),
+          ...bookings.map(
+            (booking) => booking.class_name
+          ),
+        ].filter(Boolean)
       )
     ),
   ];
@@ -1215,19 +1238,43 @@ const eventTeacherAllocations = teacherAllocations.filter(
     "All",
     ...Array.from(
       new Set(
-        bookings
-          .filter(
-            (booking) =>
-              (bookingFilters.event === "All" ||
-                String(booking.event_id) === String(bookingFilters.event)) &&
-              (bookingFilters.teacher === "All" ||
-                booking.teacher_name === bookingFilters.teacher) &&
-              (bookingFilters.className === "All" ||
-                booking.class_name === bookingFilters.className)
-          )
-          .map((booking) => booking.class_year)
-          .filter(Boolean)
-          .map(String)
+        [
+          ...teacherAllocations
+            .filter((allocation) => {
+              const eventMatches =
+                bookingFilters.event === "All" ||
+                String(allocation.event_id) === String(bookingFilters.event);
+
+              const teacherMatches =
+                bookingFilters.teacher === "All" ||
+                allocation.teacher_name === bookingFilters.teacher;
+
+              const classMatches =
+                bookingFilters.className === "All" ||
+                allocation.class_name === bookingFilters.className;
+
+              return eventMatches && teacherMatches && classMatches;
+            })
+            .map((allocation) => allocation.class_year),
+
+          ...bookings
+            .filter((booking) => {
+              const eventMatches =
+                bookingFilters.event === "All" ||
+                String(booking.event_id) === String(bookingFilters.event);
+
+              const teacherMatches =
+                bookingFilters.teacher === "All" ||
+                booking.teacher_name === bookingFilters.teacher;
+
+              const classMatches =
+                bookingFilters.className === "All" ||
+                booking.class_name === bookingFilters.className;
+
+              return eventMatches && teacherMatches && classMatches;
+            })
+            .map((booking) => booking.class_year),
+        ].filter(Boolean)
       )
     ),
   ];
@@ -2078,7 +2125,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
               </button>
             </div>
 
-            <div className="booking-filters">
+            <form className="booking-filters" onSubmit={submitBookingFilters}>
               {[
                 [
                   "event",
@@ -2127,7 +2174,13 @@ const eventTeacherAllocations = teacherAllocations.filter(
                   </select>
                 </label>
               ))}
-            </div>
+              <button
+                type="submit"
+                className="admin-save-button booking-filters-submit"
+              >
+                Submit
+              </button>
+            </form>
 
             {!teacherHasInterviewAllocation && (
               <p className="no-bookings">
@@ -2135,7 +2188,7 @@ const eventTeacherAllocations = teacherAllocations.filter(
               </p>
             )}
 
-            {teacherHasInterviewAllocation && bookingFilters.status !== "Not Booked" && (
+            {teacherHasInterviewAllocation && appliedBookingFilters.status !== "Not Booked" && (
               <div className="booking-summary"> 
                 <span><strong>{filteredBookings.length}</strong> Students</span> 
                 <span><strong>{bookedBookingCount}</strong> Booked</span> 
@@ -2158,8 +2211,16 @@ const eventTeacherAllocations = teacherAllocations.filter(
                     <th>Interview Time</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody key={filteredBookings.map((booking) => booking.id).join("-")}>
                   {filteredBookings.map((booking) => {
+                    console.log(
+                      "[TABLE RENDER]",
+                      booking.id,
+                      booking.teacher_name,
+                      booking.class_name,
+                      booking.class_year
+                    );
+
                     const displayStatus = getBookingDisplayStatus(
                       booking.booking_status
                     );

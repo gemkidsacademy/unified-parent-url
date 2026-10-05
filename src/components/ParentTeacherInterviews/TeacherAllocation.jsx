@@ -133,7 +133,8 @@ function TeacherAllocation() {
       const initiallySelectedIds = (data.students || [])
         .filter(
           (student) =>
-            student.assigned === true &&
+            student.assigned_allocation_id !== null &&
+            student.assigned_allocation_id !== undefined &&
             Number(student.assigned_allocation_id) === Number(allocationId)
         )
         .map((student) => student.student_id);
