@@ -25,6 +25,9 @@ function TeacherAllocation() {
   const [selectedClassDay, setSelectedClassDay] = useState("");
   const [editingAllocation, setEditingAllocation] = useState(null);
   const [allocationMessage, setAllocationMessage] = useState("");
+  const [expandedAllocationId, setExpandedAllocationId] = useState(null);
+  const [allocationStudents, setAllocationStudents] = useState({});
+  const [selectedStudentIds, setSelectedStudentIds] = useState([]);
 
   useEffect(() => {
     const loadClasses = async () => {
@@ -101,6 +104,85 @@ function TeacherAllocation() {
     } catch (error) {
       console.error("Failed to load teacher allocations:", error);
       setAllocations([]);
+    }
+  };
+
+  const loadAllocationStudents = async (allocationId) => {
+    try {
+      setSelectedStudentIds([]);
+
+      const response = await fetch(
+        `${API_BASE_URL}/parent-teacher-interview/teacher-allocations/${allocationId}/students?center_code=${encodeURIComponent(
+          interviewAdmin.center_code || ""
+        )}`
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail || "Failed to load allocation students."
+        );
+      }
+
+      setAllocationStudents((current) => ({
+        ...current,
+        [allocationId]: data.students || [],
+      }));
+
+      const initiallySelectedIds = (data.students || [])
+        .filter(
+          (student) =>
+            student.assigned === true &&
+            Number(student.assigned_allocation_id) === Number(allocationId)
+        )
+        .map((student) => student.student_id);
+
+      setSelectedStudentIds(initiallySelectedIds);
+    } catch (error) {
+      console.error("Failed to load allocation students:", error);
+      window.alert(
+        error.message || "Failed to load allocation students."
+      );
+    }
+  };
+
+  const saveAllocationStudents = async (allocationId) => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/parent-teacher-interview/teacher-allocations/${allocationId}/students?center_code=${encodeURIComponent(
+          interviewAdmin.center_code || ""
+        )}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            student_ids: selectedStudentIds,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data?.detail?.message ||
+          data?.detail ||
+          "Failed to save student allocations."
+        );
+      }
+
+      setAllocationMessage("Student allocations updated successfully.");
+
+      await loadAllocationStudents(allocationId);
+      await loadAllocations();
+    } catch (error) {
+      console.error("Failed to save student allocations:", error);
+      window.alert(
+        error.message || "Failed to save student allocations."
+      );
     }
   };
 
@@ -592,7 +674,7 @@ function TeacherAllocation() {
                   <button
                     type="button"
                     className="allocation-edit-button"
-                    onClick={() => {
+                    onClick={async () => {
                       setEditingAllocation(allocation);
                       setSelectedEventId(String(allocation.eventId));
                       setSelectedTeacher(allocation.teacher);
@@ -600,6 +682,8 @@ function TeacherAllocation() {
                       setSelectedClassYear("");
                       setSelectedClassDay("");
                       setClassDayOptions([]);
+                      setExpandedAllocationId(allocation.id);
+                      await loadAllocationStudents(allocation.id);
                     }}
                   >
                     Edit
@@ -615,6 +699,124 @@ function TeacherAllocation() {
                 </div>
 
               </div>
+
+              {expandedAllocationId === allocation.id && (
+                <div className="student-list">
+                  <button
+                    type="button"
+                    className="allocation-student-save-button"
+                    onClick={() => saveAllocationStudents(allocation.id)}
+                  >
+                    Save Changes
+                  </button>
+
+                  <div className="student-list-summary">
+                    Assigned Students ({selectedStudentIds.length} selected)
+                  </div>
+
+                  <div className="student-list-header">
+                    {(() => {
+                      const availableStudentIds = (
+                        allocationStudents[allocation.id] || []
+                      )
+                        .filter(
+                          (student) =>
+                            student.assigned_allocation_id === null ||
+                            student.assigned_allocation_id === undefined
+                        )
+                        .map((student) => student.student_id);
+                      const allAvailableSelected =
+                        availableStudentIds.length > 0 &&
+                        availableStudentIds.every((studentId) =>
+                          selectedStudentIds.includes(studentId)
+                        );
+
+                      return (
+                        <input
+                          type="checkbox"
+                          aria-label="Select all available students"
+                          checked={allAvailableSelected}
+                          disabled={availableStudentIds.length === 0}
+                          onChange={(event) => {
+                            setSelectedStudentIds((current) =>
+                              event.target.checked
+                                ? [
+                                    ...new Set([
+                                      ...current,
+                                      ...availableStudentIds,
+                                    ]),
+                                  ]
+                                : current.filter(
+                                    (studentId) =>
+                                      !availableStudentIds.includes(studentId)
+                                  )
+                            );
+                          }}
+                        />
+                      );
+                    })()}
+                    <span>Student ID</span>
+                    <span>Student Name</span>
+                    <span>Status</span>
+                  </div>
+
+                  {(allocationStudents[allocation.id] || []).map(
+                    (student, index) => {
+                      const hasAssignedAllocation =
+                        student.assigned_allocation_id !== null &&
+                        student.assigned_allocation_id !== undefined;
+
+                      const isAssignedToCurrentAllocation =
+                        hasAssignedAllocation &&
+                        Number(student.assigned_allocation_id) ===
+                          Number(allocation.id);
+
+                      const isAssignedToOtherAllocation =
+                        hasAssignedAllocation &&
+                        Number(student.assigned_allocation_id) !==
+                          Number(allocation.id);
+
+                      return (
+                        <div
+                          className="student-list-row"
+                          key={student.student_id ?? index}
+                        >
+                          <div className="student-list-identity">
+                            <input
+                              type="checkbox"
+                              aria-label={`Assign ${student.student_id}`}
+                              checked={
+                                !isAssignedToOtherAllocation &&
+                                selectedStudentIds.includes(student.student_id)
+                              }
+                              disabled={isAssignedToOtherAllocation}
+                              onChange={(event) => {
+                                setSelectedStudentIds((current) =>
+                                  event.target.checked
+                                    ? [...current, student.student_id]
+                                    : current.filter(
+                                        (studentId) =>
+                                          studentId !== student.student_id
+                                      )
+                                );
+                              }}
+                            />
+                            <span>{student.student_id}</span>
+                          </div>
+                          <span className="student-list-name">
+                            {student.student_name || "—"}
+                          </span>
+                          <span className="student-list-status student-assignment-status">
+                            {student.assigned_teacher_name
+                              ? `Assigned to ${student.assigned_teacher_name}`
+                              : "Available"}
+                          </span>
+                        </div>
+                      );
+                    }
+                  )}
+                </div>
+              )}
 
             </div>
           ))}

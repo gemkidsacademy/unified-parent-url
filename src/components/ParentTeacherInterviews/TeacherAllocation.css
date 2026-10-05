@@ -186,34 +186,97 @@
 }
 
 .student-list {
-  margin: 0 14px 10px;
-  padding: 14px;
-  background: #faf8ff;
-  border: 1px solid #e7def8;
-  border-top: none;
-  border-radius: 0 0 10px 10px;
+  width: 100%;
 }
 
-.student-list-header,
-.student-list-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+.student-list-summary {
+  padding: 0 16px 10px;
+  font-weight: 800;
 }
 
 .student-list-header {
-  padding-bottom: 8px;
-  color: #77728a;
-  font-size: 11px;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) minmax(0, 1fr) minmax(220px, 1fr);
+  align-items: center;
+  column-gap: 10px;
+  padding: 0 16px 10px;
   font-weight: 800;
-  text-transform: uppercase;
+}
+
+.student-list-header > input[type="checkbox"] {
+  grid-column: 1;
+  justify-self: center;
+  margin: 0;
+}
+
+.student-list-header > span {
+  min-width: 0;
+  text-align: left;
 }
 
 .student-list-row {
-  padding: 9px 0;
-  border-top: 1px solid #eee9f7;
-  color: #33276f;
-  font-size: 13px;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) minmax(0, 1fr) minmax(220px, 1fr);
+  align-items: center;
+  column-gap: 10px;
+  min-height: 48px;
+  padding: 8px 16px;
+  box-sizing: border-box;
+  border-top: 1px solid #e8e5f0;
+}
+
+.student-list-identity {
+  display: contents;
+}
+
+.student-list-identity > input[type="checkbox"] {
+  grid-column: 1;
+  justify-self: center;
+  align-self: center;
+  margin: 0;
+}
+
+.student-list-identity > span {
+  grid-column: 2;
+  display: block;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  color: #1f1f1f;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.student-list-name,
+.student-list-status {
+  display: block;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.student-list-name {
+  grid-column: 3;
+}
+
+.student-list-status {
+  grid-column: 4;
+}
+
+.student-assignment-status {
+  display: inline-block;
+  justify-self: start;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #e7f6ec;
+  color: #236b3b;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .allocation-flow {

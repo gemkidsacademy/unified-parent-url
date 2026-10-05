@@ -344,8 +344,13 @@ function AdminInterviewBooking({ onLogout }) {
 
   const loadBookings = async () => {
     try {
+      const teacherQuery =
+        interviewAdmin.role === "TEACHER" && interviewAdmin.teacher_id
+          ? `&teacher_id=${encodeURIComponent(interviewAdmin.teacher_id)}`
+          : "";
+
       const response = await fetch(
-        `${API_BASE_URL}/parent-teacher-interview/bookings?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}`
+        `${API_BASE_URL}/parent-teacher-interview/bookings?center_code=${encodeURIComponent(interviewAdmin.center_code || "")}${teacherQuery}`
       );
 
       if (!response.ok) {
