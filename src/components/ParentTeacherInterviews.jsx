@@ -569,7 +569,7 @@ function ParentTeacherInterviews({ parentData, onBack, invitationEventId }) {
           </div>
         </section>
 
-        {currentEvent ? (
+        {currentEvent && timeSlots.length > 0 ? (
           <section className="interview-panel">
             <div className="interview-event-heading">
               <div className="interview-event-icon">📅</div>
