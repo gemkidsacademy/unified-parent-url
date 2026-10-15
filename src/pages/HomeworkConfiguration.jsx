@@ -697,7 +697,15 @@ function HomeworkConfiguration({ loggedInUser }) {
         <p className="homework-helper">This cut-off applies to all selected Homework Support weeks.</p>
       </div>
       <div className="configuration-footer">
-        <button className="homework-primary-button" type="submit" disabled={isSaving || !selectedTermId}>{isSaving ? 'Saving configuration...' : 'Save Configuration'}</button>
+       
+        <button
+          className="homework-primary-button"
+          type="submit"
+          disabled={isSaving || !selectedTermId || !classDay}
+        >
+          {isSaving ? 'Saving configuration...' : 'Save Configuration'}
+        </button>
+        
         {saved && <span role="status">Configuration saved successfully.</span>}
         {defaultTimingSaved && <span role="status">Default slot timing saved successfully.</span>}
         {error && <span className="login-error" role="alert">Unable to save configuration. {error}</span>}
