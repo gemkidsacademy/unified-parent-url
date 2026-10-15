@@ -24,6 +24,15 @@ export default function ManageClasses({
     const [classYears, setClassYears] = useState([]);
     const [classDays, setClassDays] = useState([]);
 
+
+
+    const [sourceTerms, setSourceTerms] = useState([]);
+    const [sourceTermId, setSourceTermId] = useState("");
+    const [loadingSourceTerms, setLoadingSourceTerms] = useState(false);
+    const [copyingClasses, setCopyingClasses] = useState(false);
+    const [copyMessage, setCopyMessage] = useState("");
+    const [copyError, setCopyError] = useState(false);
+
     // ---------------------------------------
     // Load configured classes for selected term
     // ---------------------------------------
@@ -164,6 +173,48 @@ export default function ManageClasses({
             setClassDays([]);
         }
     };
+    
+
+useEffect(() => {
+    if (!selectedTerm?.id) {
+        setSourceTerms([]);
+        setSourceTermId("");
+        setLoadingSourceTerms(false);
+        return;
+    }
+
+    const loadSourceTerms = async () => {
+        setLoadingSourceTerms(true);
+        setCopyMessage("");
+        setCopyError(false);
+
+        try {
+            const response = await fetch(
+                `${server}/admin/academic-terms/${selectedTerm.id}/copy-source-options`
+            );
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.detail || "Failed to load academic terms."
+                );
+            }
+
+            setSourceTerms(data);
+            setSourceTermId("");
+        } catch (error) {
+            setSourceTerms([]);
+            setCopyMessage(error.message);
+            setCopyError(true);
+        } finally {
+            setLoadingSourceTerms(false);
+        }
+    };
+
+    loadSourceTerms();
+}, [selectedTerm?.id, server]);
+
 
     useEffect(() => {
         if (loggedInUser && selectedTerm) {
@@ -183,6 +234,77 @@ export default function ManageClasses({
             .toLowerCase()
             .includes(search.toLowerCase())
     );
+    
+const handleCopyClasses = async () => {
+    if (!selectedTerm?.id) {
+        setCopyMessage("Please select a destination academic term.");
+        setCopyError(true);
+        return;
+    }
+
+    if (!sourceTermId) {
+        setCopyMessage("Please select a source academic term.");
+        setCopyError(true);
+        return;
+    }
+
+    const sourceTerm = sourceTerms.find(
+        (term) => String(term.id) === String(sourceTermId)
+    );
+
+    if (!sourceTerm) {
+        setCopyMessage("The selected source term could not be found.");
+        setCopyError(true);
+        return;
+    }
+
+    const confirmed = window.confirm(
+        `Copy classes from ${sourceTerm.term_name} into ${selectedTerm.term_name}? ` +
+        "Existing classes will not be overwritten."
+    );
+
+    if (!confirmed) return;
+
+    setCopyingClasses(true);
+    setCopyMessage("");
+    setCopyError(false);
+
+    try {
+        const response = await fetch(
+            `${server}/admin/academic-terms/${selectedTerm.id}/copy-classes`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    source_term_id: Number(sourceTermId),
+                }),
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail || "Failed to copy classes."
+            );
+        }
+
+        setCopyMessage(data.message || "Classes copied successfully.");
+        setCopyError(false);
+
+        // Use the existing function to refresh the class table.
+        await loadClasses();
+
+    } catch (error) {
+        setCopyMessage(error.message);
+        setCopyError(true);
+    } finally {
+        setCopyingClasses(false);
+    }
+};
+
 
     // ---------------------------------------
     // Start inline edit
@@ -326,6 +448,58 @@ export default function ManageClasses({
                 <p>Loading class configurations...</p>
             ) : (
                 <>
+                    <div className="copy-classes-panel">
+                        <h3>Copy Classes from Previous Term</h3>
+
+                        <p>
+                            Copy class configurations from a previous academic
+                            term into the currently selected term.
+                        </p>
+
+                        <div className="copy-classes-controls">
+                            <select
+                                value={sourceTermId}
+                                onChange={(e) => setSourceTermId(e.target.value)}
+                                disabled={loadingSourceTerms || copyingClasses}
+                            >
+                                <option value="">
+                                    {loadingSourceTerms
+                                        ? "Loading academic terms..."
+                                        : "Select a previous term"}
+                                </option>
+
+                                {sourceTerms.map((term) => (
+                                    <option key={term.id} value={term.id}>
+                                        {term.term_name}
+                                    </option>
+                                ))}
+                            </select>
+
+                            <button
+                                type="button"
+                                onClick={handleCopyClasses}
+                                disabled={
+                                    !sourceTermId ||
+                                    copyingClasses ||
+                                    loadingSourceTerms
+                                }
+                            >
+                                {copyingClasses
+                                    ? "Copying Classes..."
+                                    : "Copy Classes to Current Term"}
+                            </button>
+                        </div>
+
+                        {copyMessage && (
+                            <p
+                                role="status"
+                                className={copyError ? "copy-error" : "copy-success"}
+                            >
+                                {copyMessage}
+                            </p>
+                        )}
+                    </div>
+
                     <div className="toolbar">
                         <input
                             type="text"
