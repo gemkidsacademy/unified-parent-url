@@ -115,6 +115,10 @@ function HomeworkConfiguration({ loggedInUser }) {
     setAvailableWeeks(configuration.available_weeks)
     setClassDay(configuration.class_day || '')
     setSessions(selectedSessions)
+    console.log(
+      "CONFIGURATION TIME SLOTS:",
+      configuration.time_slots
+    )
     setSlots(ensureInitialTimeSlots(selectedSessions, configuration.time_slots, defaultSlotTimings))
     setBookingCutoff({
       day: configuration.booking_cutoff?.day || '',
@@ -418,8 +422,11 @@ function HomeworkConfiguration({ loggedInUser }) {
     try {
       await updateHomeworkConfiguration(loggedInUser, {
         term_id: Number(selectedTermId),
-        selected_weeks: sessions.map((session) => ({ week_number: session.week_number })),
+        selected_weeks: sessions.map((session) => ({
+          week_number: session.week_number,
+        })),
         time_slots: slots.map((slot) => ({
+          id: slot.id ?? null,
           week_number: slot.week_number,
           start_time: slot.start_time,
           end_time: slot.end_time,
@@ -431,7 +438,8 @@ function HomeworkConfiguration({ loggedInUser }) {
         class_day: classDay,
       })
 
-      const refreshedConfiguration = await getHomeworkConfiguration(loggedInUser)
+      const refreshedConfiguration =
+        await getHomeworkConfiguration(loggedInUser)
 
       if (refreshedConfiguration) {
         applyConfiguration(refreshedConfiguration)
